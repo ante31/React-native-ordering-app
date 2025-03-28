@@ -9,13 +9,27 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ante3101.Gricko",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "credentials": {
+        "apnsKeyId": "99FLAZ56VY", 
+        "apnsKeyPath": "./AuthKey_99FLAZ56VY.p8",
+        "teamId": "UL4P48AG7K" 
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ante3101.Gricko",
+      "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +50,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "64efc754-b2fd-4e1a-8a5c-f58834b86343"
+      },
+      "mode": "production",
+      "localhost": "192.168.255.210",
+      "productionUrl": "https://server-three-pink-44.vercel.app/",
+      "devPort": "3000"
     }
   }
 }

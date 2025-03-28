@@ -5,9 +5,14 @@ node_modules/
 
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
+
+# Build files (if not customizing native code)
+android/
+ios/
 
 # Native
 *.orig.*
@@ -25,6 +30,12 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
+# Optional (if using Yarn)
+package-lock.json
+
+# EAS (if sensitive)
+eas.json
+
 # macOS
 .DS_Store
 *.pem
@@ -35,4 +46,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-app-example
+# Environment/config files
+expo-env.d.ts
+localhostConf.ts
+AuthKey_*.p8  # Ignore all Apple auth keys
