@@ -16,6 +16,8 @@ const ClosedAppModal = ({ isCroatianLanguage }: any) => {
 
   const dayOfWeek = getDayOfTheWeek(getLocalTime());
 
+  console.log("Time details log", getLocalTime(), dayOfWeek);
+
   return (
     <Portal>
       <Modal 

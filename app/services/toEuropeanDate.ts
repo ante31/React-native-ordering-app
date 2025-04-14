@@ -1,8 +1,5 @@
-export const formatEuropeanDateTime = (isoString: string) => {
-  const date = new Date(isoString);
+export const formatEuropeanDateTime = (date: Date)  => {
   console.log(date);
-
-  date.setHours(date.getHours() - 1);
 
   console.log(date);
 
@@ -13,5 +10,13 @@ export const formatEuropeanDateTime = (isoString: string) => {
     hour: '2-digit',
     minute: '2-digit',
     hourCycle: 'h23',
+  }).format(date);
+};
+
+export const formatEuropeanTime = (date: Date) => {
+  return new Intl.DateTimeFormat('de-DE', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23', 
   }).format(date);
 };

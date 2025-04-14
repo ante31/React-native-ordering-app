@@ -122,6 +122,7 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
   const handleSubmit = async () => {
     // Calculate current time
     const currentDate = getLocalTime();
+    console.log("loggg", currentDate);
     const manipulativeCurrentDate = getLocalTime();
     
     let deadline = "";
@@ -172,12 +173,12 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
           const orderDataWithToken = {
             ...orderData,
             token: expoPushToken.data,
-            totalPrice: orderPrice + (isSlidRight? general?.deliveryPrice: 0),
+            totalPrice: orderPrice + (isSlidRight ? general?.deliveryPrice : 0),
             time: currentDate,
             deadline: deadline,
             language: isCroatianLang ? "hr" : "en",
           };
-  
+      
           const response = await fetch(`${backendUrl}/orders`, {
             method: 'POST',
             headers: {
@@ -185,20 +186,26 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
             },
             body: JSON.stringify(orderDataWithToken),
           });
-  
-          ({id} = await response.json());
+      
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} ${errorText}`);
+          }
+      
+          const { id } = await response.json();
           if (id) {
-            console.log("ODATA ",orderDataWithToken)
-            await storeData(id, orderDataWithToken);
+            await storeData(id, orderDataWithToken); 
             updateMealPopularity(orderData.cartItems);
             dispatch({ type: 'CLEAR_CART' });
             navigation.navigate('ThankYouScreen', { isCroatianLang });
+          } else {
+            throw new Error('Missing order ID in response.');
           }
         }
       } catch (err: any) {
-        alert(`Fetch error: ${err.message}`);
+        alert(`Order failed: ${err.message}`);
         console.error(err);
-      }
+      }      
     } else {
       console.log("Form validation failed");
     }

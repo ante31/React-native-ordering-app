@@ -52,6 +52,7 @@ export default function HomePage({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     // Poziv na backend za kategorije
+    console.log("Backend URL: ", backendUrl);
     fetch(`${backendUrl}/kategorije`)
       .then(response => response.json())
       .then(data => {
@@ -95,7 +96,6 @@ export default function HomePage({ navigation }: { navigation: any }) {
           <View style={{ width: '100%', backgroundColor: 'white', marginTop: 5, padding: 10}}>
             <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 10 }}>
               <View style={{ flex: 1 }}>
-                {/* Radno vrijeme */}
                 <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' }}>
                   Radno vrijeme:
                 </Text>
@@ -121,7 +121,6 @@ export default function HomePage({ navigation }: { navigation: any }) {
               <View style={{ flex: 1, paddingHorizontal: 10
 
                }}>  
-                {/* Vrijeme dostave */}
                 <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' }}>
                   Vrijeme dostave:
                 </Text>
@@ -148,7 +147,7 @@ export default function HomePage({ navigation }: { navigation: any }) {
               style={{ fontSize: 12, color: 'blue', textDecorationLine: 'underline', textAlign: 'center' }}
               onPress={() => {
                 // Ovdje dodajte navigaciju ili otvaranje linka za Privacy Policy
-                Linking.openURL('https://www.example.com/privacy-policy');
+                Linking.openURL('https://ff-gricko.web.app/privacy/');
               }}
             >
               Privacy Policy

@@ -91,12 +91,12 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
     </View>
     ))}
     <View style={styles.buttonContainer}>
-        {/* <TouchableOpacity 
+        <TouchableOpacity 
             onPress={() => handleDelete(item.id)}
             style={styles.leftButton}
         >
             <MaterialIcons name="delete" size={30} color="red" />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <TouchableOpacity
             onPress={() => handleRenew(item.id)}
             style={[styles.rightButton, appButtonsDisabled(general?.workTime[dayOfWeek]) && styles.disabledButton]}

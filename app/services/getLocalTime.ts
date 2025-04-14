@@ -1,10 +1,35 @@
-export const getLocalTime = () => {
-  const falseTime = new Date(new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Zagreb' }));
-  let now = new Date(falseTime);
-  now.setHours(now.getHours() + 1);
-  // now = setTime("3", "50");
-  return now;
+export const getLocalTime = (): Date => {
+  // Get current time in Zagreb timezone
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Zagreb',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(now);
+  const partValues: Record<string, string> = {};
+
+  parts.forEach(part => {
+    if (part.type !== 'literal') {
+      partValues[part.type] = part.value;
+    }
+  });
+
+  // Construct ISO 8601 string (YYYY-MM-DDTHH:mm:ss)
+  const isoString = `${partValues.year}-${partValues.month}-${partValues.day}T${partValues.hour}:${partValues.minute}:${partValues.second}`;
+  
+  // Convert to Date object while preserving local time
+  const localDate = new Date(isoString + 'Z'); // Treat it as UTC
+
+  return new Date(localDate.getTime()); // Adjust to local time
 };
+
 
 export const getLocalTimeHours = () => {
   const now = getLocalTime();
