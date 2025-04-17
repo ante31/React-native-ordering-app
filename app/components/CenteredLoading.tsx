@@ -1,6 +1,7 @@
 import { ActivityIndicator, StyleSheet, View } from "react-native"
 
 export const CenteredLoading = () => {
+  console.log("⏳ Showing CenteredLoading");
   return (
     <View style={styles.loaderContainer}>
       <ActivityIndicator size="large" color="#DA291C" />

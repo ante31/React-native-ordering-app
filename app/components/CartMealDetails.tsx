@@ -12,18 +12,57 @@ import { isCroatian } from "../services/languageChecker";
 import { CenteredLoading } from "./CenteredLoading";
 
 
-const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
+const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setReloadTrigger, navigation }: any) => {
+  console.log("CartMealDetailsmeal", meal);
+  const initialMeal = meal;
   const isCroatianLang = isCroatian();
   const [extras, setExtras] = useState<{ [key: string]: string }>({});
-  const [selectedPortionIndex, setSelectedPortionIndex] = useState<number>(0);
-  const [selectedSize, setSelectedSize] = useState(meal ? meal.portions[0].size : "");
-  const [quantity, setQuantity] = useState(1);
-  const [cartPrice, setPrice] = useState(meal ? meal.portions[0].price : 0); 
-  const [selectedExtras, setSelectedExtras] = useState<{ [key: string]: string }>({});
+  const initialPortionIndex = meal.portionsOptions.findIndex(
+    (portion: any) => portion.size === meal.size
+  );
+  const [selectedPortionIndex, setSelectedPortionIndex] = useState<number>(
+    initialPortionIndex !== -1 ? initialPortionIndex : 0
+  );  const [selectedSize, setSelectedSize] = useState(meal ? meal.size : "");
+  const [quantity, setQuantity] = useState(meal ? meal.quantity : 1);
+  const [cartPrice, setPrice] = useState(meal ? meal.price : 0); 
+  const [selectedExtras, setSelectedExtras] = useState<{ [key: string]: string }>(meal.selectedExtras);
   const [cartPriceSum, setPriceSum] = useState(cartPrice);
   const [isUpdating, setIsUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitButtonStatus, setSubmitButtonStatus] = useState("");
 
+  useEffect(() => {
+    const submitButtonStatusCheck = () => {
+      const extrasChanged = () => {
+        const initialExtras = initialMeal.selectedExtras || {};
+        const currentExtras = selectedExtras || {};
+  
+        const initialKeys = Object.keys(initialExtras);
+        const currentKeys = Object.keys(currentExtras);
+  
+        if (initialKeys.length !== currentKeys.length) return true;
+  
+        for (let key of initialKeys) {
+          if (initialExtras[key] !== currentExtras[key]) return true;
+        }
+  
+        return false;
+      };
+  
+      if (
+        initialMeal.size !== selectedSize ||
+        initialMeal.quantity !== quantity ||
+        extrasChanged()
+      ) {
+        setSubmitButtonStatus("Ažuriraj");
+      } else {
+        setSubmitButtonStatus("Ukloni");
+      }
+    };
+  
+    submitButtonStatusCheck();
+  }, [selectedSize, selectedPortionIndex, selectedExtras, quantity, meal]);
+  
   const toast = useToast();
 
   useEffect(() => {    console.log("isUpdating", isUpdating);
@@ -32,27 +71,27 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
 
   const { state, dispatch } = useCart();
 
+  console.log('MEALYMeal:', meal);
+
   const handleAddToCart = () => {
-    console.log('MEALY:', meal);
     const uniqueId = `${meal.id}${Object.entries(selectedExtras)
       .map(([key]) => `_${key.split('|')[0].replace(/\s+/g, '')}`) // Remove spaces from extras
       .sort() // Sort the extras alphabetically
       .join('')}`;
 
     console.log("UniqueId", uniqueId)
-    console.log("Selected size123", selectedSize)
 
     dispatch({
       type: 'ADD_TO_CART',
       payload: {
         id: uniqueId, // Pretpostavka: meal ima ID
-        name: `${meal.ime}|${meal.ime_en}`, 
-        description: `${meal.opis}|${meal.opis_en}`,
+        name: meal.name, 
+        description: meal.description,
         size: selectedSize,
         price: cartPriceSum/quantity,
         quantity: quantity,
         selectedExtras: selectedExtras,
-        portionsOptions: meal.portions,
+        portionsOptions: meal.portionsOptions,
       },
     });
     console.log('After state:', state);
@@ -68,10 +107,10 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
   };
   useEffect(() => {
     const fetchExtras = async () => {
-      if (meal.portions[selectedPortionIndex]?.extras != "null") {
+      if (meal.portionsOptions[selectedPortionIndex]?.extras != "null") {
         try {
           console.log("A fetch happened");
-          const response = await fetch(`${backendUrl}/cjenik/Prilozi/${meal.portions[selectedPortionIndex]?.extras}`);
+          const response = await fetch(`${backendUrl}/cjenik/Prilozi/${meal.portionsOptions[selectedPortionIndex]?.extras}`);
           const data = await response.json();
           setExtras(data);
           setLoading(false); 
@@ -79,16 +118,16 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
           console.error('Error fetching extras:', error);
           setLoading(false); 
         }
-      }
+        }
       else {
         setLoading(false); // Set loading to false if no extras
       }
     };
   
-    //console.log("selectedPortionIndex", selectedPortionIndex); // Check if extras update correctly here
+    console.log("selectedPortionIndex", selectedPortionIndex); // Check if extras update correctly here
   
     fetchExtras();
-  }, [meal.portions[selectedPortionIndex]?.extras, selectedPortionIndex]); // Ensure `selectedPortionIndex` and `meal.portions[selectedPortionIndex]` trigger effect
+  }, [meal.portionsOptions[selectedPortionIndex]?.extras, selectedPortionIndex]); 
   
 
 
@@ -98,8 +137,8 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
       <View style={[styles.modalContent]}>
         <View style={{ marginBottom: 10 }}>
           <View style={{ width: "75%", paddingLeft: 10, paddingTop: 10 }}>
-            <Text style={styles.extrasTitle}>{isCroatianLang ? meal.ime : meal.ime_en}</Text>
-            <Text style={{ flexWrap: 'wrap' }}>{isCroatianLang ? meal.opis : meal.opis_en}</Text>
+            <Text style={styles.extrasTitle}>{isCroatianLang ? meal.name.split("|")[0] : meal.name.split("|")[1]}</Text>
+            <Text style={{ flexWrap: 'wrap' }}>{isCroatianLang ? meal.description.split("|")[0] : meal.description.split("|")[1]}</Text>
           </View>
           <TouchableOpacity
             onPress={onClose}
@@ -119,7 +158,7 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
         : (
           <>
           <ScrollView>
-            {meal.portions.length > 1 && (
+            {meal.portionsOptions.length > 1 && (
               <SizesList
                 meal={meal}
                 selectedSize={selectedSize}
@@ -136,7 +175,7 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
                 isCroatianLang={isCroatianLang}
               />
             )}
-            {meal.portions[0].extras !== "null" && (
+            {Object.keys(extras).length > 0 && meal.portionsOptions[0].extras !== "null" && (
               <ExtrasList
                 meal={meal}
                 extras={extras}
@@ -151,14 +190,18 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
           </ScrollView>
           <Counter
             quantity={quantity}
-            onIncrease={() => setQuantity((prev) => prev + 1)}
-            onDecrease={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+            onIncrease={() => setQuantity((prev: number) => prev + 1)}
+            onDecrease={() => setQuantity((prev: number) => Math.max(prev - 1, 1))}
             handleAddToCart={handleAddToCart}
+            handleRemoveFromCart={handleRemoveFromCart}
+            mealId={meal.id}
             cartPrice={cartPrice}
             cartPriceSum={cartPriceSum}
             setPriceSum={setPriceSum}
             isUpdating={isUpdating}
             navigation={navigation}
+            submitButtonStatus={submitButtonStatus}
+            setReloadTrigger={setReloadTrigger}
           />
         </>
         )}
@@ -181,4 +224,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MealDetails;
+export default CartMealDetails;

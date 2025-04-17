@@ -5,20 +5,44 @@ export const isClosedMessageDisplayed = (workingHours: any): boolean => {
   const hours = getLocalTimeHours();
   const minutes = getLocalTimeMinutes();
 
+  console.log("hhours", hours);
+  console.log("mminutes", minutes);
+
   const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.closingTime.split(":").map(Number);
 
+  console.log("openingHours", openingHours);
+  console.log("openingMinutes", openingMinutes);
+  console.log("closingHours", closingHours);
+  console.log("closingMinutes", closingMinutes);
+
   // Show closed message if current time is before opening or after closing
-  return closingAfterMidnight(openingHours, closingHours)?
-    hours > closingHours && hours < openingHours || // generalno
+  return closingAfterMidnight(openingHours, closingHours) ?
+  (console.log('Prolazim kroz closingAfterMidnight true'),
+   console.log(`Generalno: hours > closingHours: ${hours > closingHours}, hours < openingHours: ${hours < openingHours}`),
+   console.log(`hours > closingHours && hours < openingHours: ${hours > closingHours && hours < openingHours}`),
+   console.log(`hours === closingHours && minutes >= closingMinutes: ${hours === closingHours && minutes >= closingMinutes}`),
+   console.log(`hours === openingHours && minutes < openingMinutes: ${hours === openingHours && minutes < openingMinutes}`),
+   console.log(`Final result of condition: ${(hours > closingHours && hours < openingHours) || (hours === closingHours && minutes >= closingMinutes) || (hours === openingHours && minutes < openingMinutes)}`),
+   (hours > closingHours && hours < openingHours || 
     hours === closingHours && minutes >= closingMinutes ||
-    hours === openingHours && minutes < openingMinutes
-    :
-    hours > closingHours || 
+    hours === openingHours && minutes < openingMinutes)) :
+  (console.log('Prolazim kroz closingAfterMidnight false'),
+   console.log(`hours > closingHours: ${hours > closingHours}`),
+   console.log(`minutes >= closingMinutes: ${minutes >= closingMinutes}`),
+   console.log(`hours < openingHours: ${hours < openingHours}`),
+   console.log(`minutes < openingMinutes: ${minutes < openingMinutes}`),
+   console.log(`Final result of condition: ${hours > closingHours || 
     (hours === closingHours && minutes >= closingMinutes) || 
     hours < openingHours || 
-    (hours === openingHours && minutes < openingMinutes);
-  };
+    (hours === openingHours && minutes < openingMinutes)}`),
+   hours > closingHours || 
+   (hours === closingHours && minutes >= closingMinutes) || 
+   hours < openingHours || 
+   (hours === openingHours && minutes < openingMinutes));
+};
+
+
 
 export const appButtonsDisabled = (workingHours: any): boolean => {
   const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);

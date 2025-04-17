@@ -43,7 +43,6 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
     }, [item]);
   
   }
-
   return (
 
   <View style={styles.content}>
@@ -60,7 +59,7 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
           (order.status === "completed" ? "Dovršeno" : 
           order.status === "accepted" ? "Prihvaćeno" : 
           order.status === "rejected" ? "Odbijeno" : 
-          order.status === "pending" ? "Na čekanju" : 
+          order.status === "pending" ? "Čeka se odgovor" : 
           order.status) 
           : order.status
       ) : ""}

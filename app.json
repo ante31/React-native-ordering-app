@@ -4,7 +4,7 @@
     "slug": "Gricko",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/gricko-icon.png",
+    "icon": "./assets/images/gricko.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,17 +16,12 @@
       },
       "config": {
         "usesNonExemptEncryption": false
-      },
-      "credentials": {
-        "apnsKeyId": "99FLAZ56VY", 
-        "apnsKeyPath": "./AuthKey_99FLAZ56VY.p8",
-        "teamId": "UL4P48AG7K" 
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/gricko.png",
+        "backgroundColor": "#FFFFFF"
       },
       "package": "com.ante3101.Gricko",
       "googleServicesFile": "./android/app/google-services.json"
@@ -65,3 +60,4 @@
     }
   }
 }
+

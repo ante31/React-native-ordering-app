@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Dimensions, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { isCroatian } from '../services/languageChecker';
 import * as Haptics from "expo-haptics"; 
@@ -7,7 +7,7 @@ import { appButtonsDisabled } from '../services/isAppClosed';
 import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 
-const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation }: any) => {
+const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, submitButtonStatus = "Dodaj", setReloadTrigger=() => {console.log("reloadTrigger")} }: any) => {
   const {general} = useGeneral();
   const isCroatianLang = isCroatian();
   const { height, width } = Dimensions.get('window');
@@ -15,6 +15,8 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, cartPrice,
   const dynamicFontSize = width > 600 ? 18 : 14;
   console.log(width, dynamicFontSize)
   const dayofWeek = getDayOfTheWeek(getLocalTime());
+  console.log("submitButtonStatus", submitButtonStatus)
+
 
 
   return (
@@ -51,15 +53,65 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, cartPrice,
       <TouchableOpacity 
         onPress={() => {
           if (!isUpdating) {
-            handleAddToCart();
+            if(submitButtonStatus === "Dodaj")
+              handleAddToCart()
+            if(submitButtonStatus === "Ukloni") 
+              handleRemoveFromCart(mealId);
+            if (submitButtonStatus === "Ažuriraj") {
+              handleRemoveFromCart(mealId);
+              handleAddToCart();
+              setReloadTrigger((prev: number) => prev + 1);
+            }
           }
         }} 
         disabled={isUpdating || appButtonsDisabled(general?.workTime[dayofWeek])} 
-        style={[{ flex: 2, backgroundColor: '#FFC72C', borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 10 }, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledButton]}
+        style={[
+          {
+            flex: 2,
+            backgroundColor: submitButtonStatus !== "Ukloni" ? '#FFC72C' : '#DA291C',
+            borderRadius: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 10
+          },
+          appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledButton
+        ]}
       >
-            <Text style={[{ fontSize: dynamicFontSize, fontWeight: 'bold', color: '#fff' }, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText]}>{isCroatianLang? "Dodaj u narudžbu!": "Add to order!"}</Text>
-            <Text style={[{ fontSize: dynamicFontSize, color: '#fff' }, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText]}>{cartPriceSum.toFixed(2)} €</Text>
+        <Text
+          style={[
+            {
+              fontSize: dynamicFontSize,
+              fontWeight: 'bold',
+              color: '#fff'
+            },
+            appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText
+          ]}
+        >
+        {submitButtonStatus === "Dodaj" &&
+          (isCroatianLang ? "Dodaj u narudžbu!" : "Add to order!")}
+
+        {submitButtonStatus === "Ukloni" &&
+          (isCroatianLang ? "Ukloni iz košarice" : "Remove from cart")}
+
+        {submitButtonStatus === "Ažuriraj" &&
+          (isCroatianLang ? "Ažuriraj narudžbu" : "Update order")}
+
+        </Text>
+        {(submitButtonStatus !== "Dodaj" || submitButtonStatus !== "Ažuriraj") && (
+          <Text
+            style={[
+              {
+                fontSize: dynamicFontSize,
+                color: '#fff'
+              },
+              appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText
+            ]}
+          >
+            {cartPriceSum.toFixed(2)} €
+          </Text>
+        )}
       </TouchableOpacity>
+
 
     </View>
   );

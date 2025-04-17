@@ -8,7 +8,6 @@ import { isCroatian } from "../services/languageChecker";
 import { CenteredLoading } from "../components/CenteredLoading";
 import { useGeneral } from "../generalContext";
 import { getCroDaysOfTheWeek, getDayOfTheWeek, getDaysOfTheWeek, getLocalTime } from "../services/getLocalTime";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 
 export default function HomePage({ navigation }: { navigation: any }) {
@@ -51,23 +50,42 @@ export default function HomePage({ navigation }: { navigation: any }) {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    // Poziv na backend za kategorije
-    console.log("Backend URL: ", backendUrl);
+    console.log("🔧 Backend URL: ", `${backendUrl}/kategorije`);
+  
     fetch(`${backendUrl}/kategorije`)
-      .then(response => response.json())
+      .then(response => {
+        console.log("✅ Response status:", response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log("📦 Fetched data:", data);
+  
         const categoryList = Object.keys(data).map(key => {
           const fullTitle = key.split('|');
+          console.log("📌 Key split:", key, fullTitle);
           return {
-            title: fullTitle[0],  // Croatian part
-            titleEn: fullTitle[1],  // English part
+            title: fullTitle[0],  // Croatian
+            titleEn: fullTitle[1], // English
             image: data[key], 
           };
         });
+  
+        console.log("📂 Parsed categories:", categoryList);
         setCategories(categoryList);
       })
-      .catch(error => console.error('Error:', error));
+      .catch(error => {
+        console.error('❌ Error fetching categories:', error);
+      });
   }, []);
+
+  console.log("🌐 General context:", general);
+console.log("📅 Work time:", general?.workTime);
+console.log("📆 Day of week:", dayofWeek);
+console.log("🧾 Days of week:", daysOfWeek);
+console.log("🇭🇷 Croatian days:", croDaysOfWeek);
+console.log("🗂 Categories:", categories);
+
+  
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -99,22 +117,25 @@ export default function HomePage({ navigation }: { navigation: any }) {
                 <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' }}>
                   Radno vrijeme:
                 </Text>
-                {
-                isEveryTimeSame(general?.workTime, true) ?
-                <Text style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
-                  Radni dan: {general?.workTime[daysOfWeek[0]].openingTime} - {general?.workTime[daysOfWeek[0]].closingTime}
-                </Text>
-                :
-                daysOfWeek.map((day, index) => {
-                  if (day === "Sunday") return null;
-                  return (
-                    <Text key={index} style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
-                      {isCroatianLanguage ? croDaysOfWeek[index] : day}: {general?.workTime[day].openingTime} - {general?.workTime[day].closingTime}
-                    </Text>
-                  );
-                })}
+                {general?.workTime && isEveryTimeSame(general.workTime, true) ? (
+                  <Text style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
+                    Radni dan: {general.workTime[daysOfWeek[0]]?.openingTime ?? '-'} - {general.workTime[daysOfWeek[0]]?.closingTime ?? '-'}
+                  </Text>
+                ) : (
+                  general?.workTime ? daysOfWeek.map((day, index) => {
+                    if (day === "Sunday") return null;
+                    const time = general.workTime[day];
+                    return (
+                      <Text key={index} style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
+                        {isCroatianLanguage ? croDaysOfWeek[index] : day}: {time?.openingTime ?? '-'} - {time?.closingTime ?? '-'}
+                      </Text>
+                    );
+                  }) : <Text style={{ textAlign: 'center' }}>Nema radnog vremena.</Text>
+                )}
+
+                
                 <Text style={{ fontSize: 12, marginBottom: 10, textAlign: 'center' }}>
-                {isCroatianLanguage ? "Nedjelja" : "Sunday"}: {general?.workTime["Sunday"].openingTime} - {general?.workTime["Sunday"].closingTime}
+                  {isCroatianLanguage ? "Nedjelja" : "Sunday"}: {general?.workTime?.Sunday?.openingTime ?? '-'} - {general?.workTime?.Sunday?.closingTime ?? '-'}
                 </Text>
               </View>
 
@@ -124,21 +145,24 @@ export default function HomePage({ navigation }: { navigation: any }) {
                 <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' }}>
                   Vrijeme dostave:
                 </Text>
-                {isEveryTimeSame(general?.workTime, false) ?
-                <Text style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
-                  Radni dan: {general?.workTime[daysOfWeek[0]].deliveryOpeningTime} - {general?.workTime[daysOfWeek[0]].deliveryClosingTime}
-                </Text>
-                :
-                daysOfWeek.map((day, index) => {
-                  if (day === "Sunday") return null;
-                  return (
-                    <Text key={index} style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
-                      {isCroatianLanguage ? croDaysOfWeek[index] : day}: {general?.workTime[day].deliveryOpeningTime} - {general?.workTime[day].deliveryClosingTime}
-                    </Text>
-                  );
-                })}
+                {general?.workTime && isEveryTimeSame(general.workTime, false) ? (
+                  <Text style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
+                    Radni dan: {general.workTime[daysOfWeek[0]]?.deliveryOpeningTime ?? '-'} - {general.workTime[daysOfWeek[0]]?.deliveryClosingTime ?? '-'}
+                  </Text>
+                ) : (
+                  general?.workTime ? daysOfWeek.map((day, index) => {
+                    if (day === "Sunday") return null;
+                    const time = general.workTime[day];
+                    return (
+                      <Text key={index} style={{ fontSize: 12, marginBottom: 3, textAlign: 'center' }}>
+                        {isCroatianLanguage ? croDaysOfWeek[index] : day}: {time?.deliveryOpeningTime ?? '-'} - {time?.deliveryClosingTime ?? '-'}
+                      </Text>
+                    );
+                  }) : <Text style={{ textAlign: 'center' }}>Nema vremena dostave.</Text>
+                )}
+
                 <Text style={{ fontSize: 12, marginBottom: 10, textAlign: 'center' }}>
-                {isCroatianLanguage ? "Nedjelja" : "Sunday"}: {general?.workTime["Sunday"].deliveryOpeningTime} - {general?.workTime["Sunday"].deliveryClosingTime}
+                  {isCroatianLanguage ? "Nedjelja" : "Sunday"}: {general?.workTime?.Sunday?.deliveryOpeningTime ?? '-'} - {general?.workTime?.Sunday?.deliveryClosingTime ?? '-'}
                 </Text>
               </View>
             </View>

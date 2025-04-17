@@ -24,6 +24,8 @@ export const PreviousOrdersScreen = ({ navigation }: { navigation: any }) => {
           payload: {
           id: cartItem.id, 
           name: cartItem.name,
+          description: cartItem.description,
+          portionsOptions: cartItem.portionsOptions,
           size: cartItem.size,
           price: cartItem.price,
           quantity: cartItem.quantity,
@@ -83,7 +85,7 @@ export const PreviousOrdersScreen = ({ navigation }: { navigation: any }) => {
           .map((order) => (
           <List.Accordion
             key={order.id}
-            title={order.time ? order.time : "Invalid Date"}
+            title={order.time ? formatEuropeanDateTime(order.time) : "Invalid Date"}
             left={(props) => <List.Icon {...props} icon="folder" />}
             expanded={expandedId === order.id}
             onPress={() => handleExpanding(order.id)}

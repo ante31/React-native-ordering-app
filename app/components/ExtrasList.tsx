@@ -65,10 +65,10 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
     const extrasPrice = Object.values(selectedExtras).reduce((acc, value) => acc as any + value, 0);
   
     // Update the price with the new size and extras
-    setPrice(meal.portions[selectedPortionIndex].price + extrasPrice);
+    setPrice(meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice);
   
     // Update the total price sum based on quantity
-    setPriceSum(quantity * (meal.portions[selectedPortionIndex].price + extrasPrice));
+    setPriceSum(quantity * (meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice));
   }, [selectedExtras, quantity, setPrice, setPriceSum]);
   
   console.log("Extras", selectedExtras);

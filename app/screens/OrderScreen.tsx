@@ -128,8 +128,6 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
     let deadline = "";
     
     // Fake currentDate to be 23:00 in Europe/Zagreb time
-
-    console.log("Isappclosed ", isClosedMessageDisplayed(general?.workTime[dayOfWeek]));
     
     if (selectedDeliveryOption === "standard") {
       console.log("Standard:");

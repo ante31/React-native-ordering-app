@@ -38,10 +38,10 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
     //console.log("Extras price", extrasPrice);
 
     // Update the price with the new size and extras
-    setPrice(meal.portions[selectedPortionIndex].price + extrasPrice);
+    setPrice(meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice);
 
     // Update the total price sum based on quantity
-    setPriceSum(quantity * (meal.portions[selectedPortionIndex].price + extrasPrice));
+    setPriceSum(quantity * (meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice));
     setIsUpdating(false)
   }, [selectedExtras, quantity, setPrice, setPriceSum]);
 
@@ -57,7 +57,7 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
     <View style={styles.sizeContainer}>
       <Text style={styles.sizeTitle}>{isCroatianLang? 'Odaberi veličinu': 'Select size'}</Text>
       <Divider style={styles.divider} />
-      {meal.portions.map((portion: any, index: number) => {
+      {(meal.portions ? meal.portions : meal.portionsOptions).map((portion: any, index: number) => {
         return (
           <TouchableOpacity key={index} style={styles.radioButtonContainer}
             onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
@@ -76,7 +76,10 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
                 {isCroatianLang? portion.size : portion.size_en}
               </Text>
             </View>
-            { portion.price - meal.portions[0].price ? <Text style={styles.sizePrice}>+{(portion.price - meal.portions[0].price).toFixed(2)} €</Text>: <></>}
+            {meal.portions? 
+              portion.price - meal.portions[0].price ? <Text style={styles.sizePrice}>+{(portion.price - meal.portions[0].price).toFixed(2)} €</Text>: <></>:
+              portion.price - meal.portionsOptions[0].price ? <Text style={styles.sizePrice}>+{(portion.price - meal.portionsOptions[0].price).toFixed(2)} €</Text>: <></>
+            }
           </TouchableOpacity>
         );
       })}

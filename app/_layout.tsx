@@ -19,12 +19,24 @@ import { useState, useEffect } from "react";
 import * as Notifications from 'expo-notifications';
 import { GeneralProvider } from './generalContext';
 import ClosedAppModal from './components/closedAppModal';
+import * as SplashScreen from 'expo-splash-screen';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   
   const isCroatianLanguage = isCroatian();
+
+  useEffect(() => {
+    async function prepareApp() {
+      await SplashScreen.preventAutoHideAsync();
+
+      // Možeš loadati podatke, čekati nešto ako treba
+      await SplashScreen.hideAsync();
+    }
+  
+    prepareApp();
+  }, []);
 
   useEffect(() => {
     const foregroundSubscription = Notifications.addNotificationReceivedListener(notification => {
@@ -134,8 +146,10 @@ export default function App() {
               />
               <Stack.Screen
                 name="CartScreen"
-                component={CartScreen}
-                options={{ title: isCroatianLanguage? 'Košarica': 'Cart' }}
+                component={(props: any) => <CartScreen {...props} meals={[]} />}
+                options={({ navigation }) => ({
+                  title: isCroatianLanguage? 'Košarica': 'Cart' }
+                )}
               />
               <Stack.Screen
                 name="OrderScreen"

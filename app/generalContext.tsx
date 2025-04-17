@@ -37,6 +37,10 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     fetchGeneral();
   }, []);
 
+  if (general)
+    console.log("boga", isClosedMessageDisplayed(general.workTime[dayofWeek]))
+
+
   // Check app status and show modal if needed
   useEffect(() => {
     const checkAppStatus = () => {

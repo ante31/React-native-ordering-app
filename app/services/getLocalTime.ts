@@ -27,27 +27,25 @@ export const getLocalTime = (): Date => {
   // Convert to Date object while preserving local time
   const localDate = new Date(isoString + 'Z'); // Treat it as UTC
 
+  console.log("Local date NEWWWWWW", new Date(localDate.getTime())); // Adjust to local time
+
   return new Date(localDate.getTime()); // Adjust to local time
 };
 
 
-export const getLocalTimeHours = () => {
-  const now = getLocalTime();
-  now.setHours(now.getHours() - 1);
-  return now.getHours();
+export const getLocalTimeHours = (): number => {
+  const now = getLocalTime(); // Get the formatted ISO string from getLocalTime
+  const timeParts = now.toISOString().split('T')[1].split(':'); // Extract time part (HH:mm:ss)
+  const hours = parseInt(timeParts[0], 10); // Get the hours as a number
+  console.log("Local time hounfkdnfienfkrs", hours); // Log the hours
+  return hours;
 };
+
 
 export const getLocalTimeMinutes = () => {
   const now = getLocalTime();
+  console.log("Local time minutes", now.getMinutes()); // Log the minutes
   return now.getMinutes();
-};
-
-export const setTime = (hours: string, minutes: string) => {
-  const now = new Date();
-  now.setHours(parseInt(hours, 10)+1);
-  now.setMinutes(parseInt(minutes, 10));
-  now.setSeconds(0);
-  return now;
 };
 
 export const getYearMonthDay = (input: Date) => {

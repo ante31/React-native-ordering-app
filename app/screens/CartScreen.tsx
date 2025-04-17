@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Animated,
+  Dimensions,
 } from "react-native";
 import { useCart } from "../cartContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -16,17 +17,67 @@ import * as Haptics from "expo-haptics"
 import { appButtonsDisabled } from "../services/isAppClosed";
 import { useGeneral } from "../generalContext";
 import { CenteredLoading } from "../components/CenteredLoading";
+import { getDayOfTheWeek, getLocalTime } from "../services/getLocalTime";
+import { Meal } from "../models/mealModel";
+import CartMealDetails from "../components/CartMealDetails";
+import { HeaderBackButton } from '@react-navigation/elements';
+import { CommonActions, StackActions } from "@react-navigation/native";
 
-const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => {
+
+const { width, height } = Dimensions.get('screen');
+
+const getModalHeight = (meal: any | null) => {
+  if (!meal) return height * 0.7;
+  return meal.portionsOptions[0].extras === "null" ? "20%" : "80%";
+};
+
+
+
+const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any, meals: Meal[] }) => {
+  useLayoutEffect(() => {
+    const handleHeaderBack = () => {
+      console.log("Header back button pressed, navigating to Home");
+      navigation.popToTop();
+
+      return true; // Prevent default back behavior
+  };
+
+    navigation.setOptions({
+      gestureEnabled: false, // Disable swipe back (iOS)
+      
+      headerLeft: () => (
+        <View style={styles.backButtonContainer}>
+          <HeaderBackButton onPress={() => {}} style={{ marginRight: 31, }} />
+          <TouchableOpacity
+            style={[StyleSheet.absoluteFillObject, {padding: 100}]} // this makes it cover the entire container
+            onPressOut={handleHeaderBack}
+          />
+        </View>
+      ),
+    });
+  }, [navigation]);
   const isCroatianLanguage = isCroatian();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
   const { storageOrder } = route.params || {}; // Default empty object if params are not available
   const {general} = useGeneral();
+  const [showMealDetailsModal, setShowMealDetailsModal] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState<any | null>(null);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
+
+  useEffect(() => {
+    
+  }, [reloadTrigger]);
 
   const { getCartLength, state: cartState, dispatch } = useCart();
   const cartLength = getCartLength();
-  
+  const dayofWeek = getDayOfTheWeek(getLocalTime());
+
+    const handleMealClick = (meal: any) => {
+      setSelectedMeal(meal);
+      setShowMealDetailsModal(true);
+    };
+
 
   // Store animated widths for each item by id
   const animatedWidths = useRef(
@@ -40,6 +91,15 @@ const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => 
     const newTotalPrice = cartState.items.reduce((sum, item) => sum + item.quantity * item.price, 0);
     setTotalPrice(newTotalPrice);
   }, [cartState.items]);
+
+  useEffect(() => {
+    cartState.items.forEach(item => {
+      if (!animatedWidths.has(item.id)) {
+        animatedWidths.set(item.id, new Animated.Value(50)); // initial closed width
+      }
+    });
+  }, [cartState.items]);
+  
 
   const handlePress = () => {
     navigation.navigate('OrderScreen', { cartState, storageOrder });
@@ -124,8 +184,7 @@ const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => 
       }
     }, 3500);
   };
-  
-  
+
 
   if (cartLength === 0) {
     return (
@@ -150,15 +209,21 @@ const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => 
     );
   }
 
+  console.log("Cart items:", cartState.items);
+
   return (
     <View style={styles.container}>
       <ScrollView
         style={{ width: "100%" }}
         contentContainerStyle={styles.scrollViewContent}
       >
+        {/* <View style={styles.addMoreView}>
+        <MaterialIcons name="add" size={26} color="black" /> 
+        <Text style={styles.addMoreText}>{isCroatianLanguage? "Dodajte još artikala": "+ Add more items"}</Text>
+        </View> */}
         {cartState.items.map((item: any, index: number) => (
           <View key={index} style={{ width: '100%' }}>
-            <View style={styles.itemWrapper}>
+            <TouchableOpacity onPress={() => handleMealClick(item)} style={styles.itemWrapper}>
               <TouchableOpacity onPress={() => handleQuantityPress(item.id)}>
                 <Animated.View
                   style={[
@@ -203,7 +268,7 @@ const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => 
               >
                 <MaterialIcons name="delete" size={30} color="red" />
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
             <View style={styles.dividerWrapper}>
               <Divider style={[styles.divider, { width: '100%' }]} />
               <Text style={styles.overlayText}>{(item.price * item.quantity).toFixed(2)} €</Text>
@@ -213,16 +278,16 @@ const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => 
       </ScrollView>
       <TouchableOpacity
         onPress={handlePress}
-        disabled={appButtonsDisabled(general?.workingHours)}
-        style={[styles.button, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workingHours) && styles.disabledButton]}
+        disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+        style={[styles.button, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledButton]}
       >
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{marginRight: 15, width: 30, height: 30, borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workingHours) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
+            <Text style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
-          <Text style={[styles.buttonText, appButtonsDisabled(general?.workingHours) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
+          <Text style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
         </View>
-        <Text style={[{color: '#fff', fontSize: 20}, appButtonsDisabled(general?.workingHours) && styles.disabledText ]}>{totalPrice.toFixed(2)} €</Text>
+        <Text style={[{color: '#fff', fontSize: 20}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{totalPrice.toFixed(2)} €</Text>
 
       </TouchableOpacity>
       <Portal>
@@ -254,6 +319,28 @@ const CartScreen = ({ navigation, route  }: { navigation: any, route: any }) => 
               </Button>
             </View>
           </View>
+        </Modal>
+      </Portal>
+      <Portal>
+        <Modal
+          visible={showMealDetailsModal}
+          onDismiss={() => setShowMealDetailsModal(false)}
+          contentContainerStyle={[styles.modalContainer, { height: getModalHeight(selectedMeal) }]}
+        >
+          {selectedMeal ? (
+            <CartMealDetails
+              visible={showMealDetailsModal}
+              meal={selectedMeal}
+              onClose={() => setShowMealDetailsModal(false)}
+              handleRemoveFromCart={handleDelete}
+              setReloadTrigger={setReloadTrigger}
+              navigation={navigation}
+            />
+          ) : (
+            <View style={styles.loaderContainer}>
+              <CenteredLoading />
+            </View>
+          )}
         </Modal>
       </Portal>
     </View>
@@ -376,7 +463,38 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: '#fff', // Light grey text when disabled
-  }
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 0,
+    borderRadius: 10,
+    marginHorizontal: 20,
+    height: height * 0.7,
+  },
+  backButtonContainer: {
+    position: 'relative',
+    width: 50, // or whatever size your HeaderBackButton takes
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addMoreText: {
+    fontSize: 20,
+    color: 'black',
+    marginBottom: 10,
+    textAlign: 'right',
+    alignSelf: 'flex-end',
+  },
+  addMoreView: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',}
 });
 
 export default CartScreen;
