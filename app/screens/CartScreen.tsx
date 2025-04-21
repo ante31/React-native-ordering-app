@@ -8,6 +8,7 @@ import {
   ScrollView,
   Animated,
   Dimensions,
+  Platform,
 } from "react-native";
 import { useCart } from "../cartContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -47,9 +48,9 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
       
       headerLeft: () => (
         <View style={styles.backButtonContainer}>
-          <HeaderBackButton onPress={() => {}} style={{ marginRight: 31, }} />
+          <HeaderBackButton onPress={() => {}} style={{ marginRight: 10, }} />
           <TouchableOpacity
-            style={[StyleSheet.absoluteFillObject, {padding: 100}]} // this makes it cover the entire container
+            style={[StyleSheet.absoluteFillObject, {padding: 0}]} // this makes it cover the entire container
             onPressOut={handleHeaderBack}
           />
         </View>
@@ -106,12 +107,16 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
   };
 
   const handleDelete = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     dispatch({ type: "REMOVE_FROM_CART", payload: id });
   };
 
   const handleIncrement = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     // Find the item in the cart
     const item = cartState.items.find((item: any) => item.id === id);
     if (item) {
@@ -124,7 +129,9 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
     }
   };
   const handleDecrement = (id: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     const item = cartState.items.find((item: any) => item.id === id);
     if (item && item.quantity > 1) {
       // Dispatch the action to decrement the quantity
@@ -283,9 +290,9 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
       >
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{marginRight: 15, width: 30, height: 30, borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
-            <Text style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
+            <Text allowFontScaling={false} style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
-          <Text style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
+          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
         </View>
         <Text style={[{color: '#fff', fontSize: 20}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{totalPrice.toFixed(2)} €</Text>
 

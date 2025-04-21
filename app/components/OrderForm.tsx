@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TextInput, HelperText, Checkbox, ActivityIndicator } from "react-native-paper";
-import { Keyboard, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { geodecode, getLocation } from '../services/locationService';
 import DropdownComponent from './DropdownPicker';
@@ -21,8 +21,9 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
 
     setLoading(true);
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }    
     const location = await getLocation();
     
     if (location) {

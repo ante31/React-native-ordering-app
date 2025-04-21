@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { RadioButton, Divider } from 'react-native-paper';
 import * as Haptics from "expo-haptics"
 import { appButtonsDisabled } from '../services/isAppClosed';
@@ -49,7 +49,9 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
   const toggleSize = (size: string, value: number, index: number) => {
     // Update the selected size and the selected portion index
     setIsUpdating(true)
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     setSelectedSize(size);
     setSelectedPortionIndex(index);
   };

@@ -18,28 +18,13 @@ export const isClosedMessageDisplayed = (workingHours: any): boolean => {
 
   // Show closed message if current time is before opening or after closing
   return closingAfterMidnight(openingHours, closingHours) ?
-  (console.log('Prolazim kroz closingAfterMidnight true'),
-   console.log(`Generalno: hours > closingHours: ${hours > closingHours}, hours < openingHours: ${hours < openingHours}`),
-   console.log(`hours > closingHours && hours < openingHours: ${hours > closingHours && hours < openingHours}`),
-   console.log(`hours === closingHours && minutes >= closingMinutes: ${hours === closingHours && minutes >= closingMinutes}`),
-   console.log(`hours === openingHours && minutes < openingMinutes: ${hours === openingHours && minutes < openingMinutes}`),
-   console.log(`Final result of condition: ${(hours > closingHours && hours < openingHours) || (hours === closingHours && minutes >= closingMinutes) || (hours === openingHours && minutes < openingMinutes)}`),
-   (hours > closingHours && hours < openingHours || 
+    (hours > closingHours && hours < openingHours || 
     hours === closingHours && minutes >= closingMinutes ||
-    hours === openingHours && minutes < openingMinutes)) :
-  (console.log('Prolazim kroz closingAfterMidnight false'),
-   console.log(`hours > closingHours: ${hours > closingHours}`),
-   console.log(`minutes >= closingMinutes: ${minutes >= closingMinutes}`),
-   console.log(`hours < openingHours: ${hours < openingHours}`),
-   console.log(`minutes < openingMinutes: ${minutes < openingMinutes}`),
-   console.log(`Final result of condition: ${hours > closingHours || 
+    hours === openingHours && minutes < openingMinutes) :
+    hours > closingHours || 
     (hours === closingHours && minutes >= closingMinutes) || 
     hours < openingHours || 
-    (hours === openingHours && minutes < openingMinutes)}`),
-   hours > closingHours || 
-   (hours === closingHours && minutes >= closingMinutes) || 
-   hours < openingHours || 
-   (hours === openingHours && minutes < openingMinutes));
+    (hours === openingHours && minutes < openingMinutes);
 };
 
 

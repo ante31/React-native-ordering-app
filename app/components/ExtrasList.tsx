@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Touchable, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Touchable, TouchableOpacity, Platform } from 'react-native';
 import { Button, Checkbox, Divider, Modal, Portal } from 'react-native-paper';
 import { isCroatian } from '../services/languageChecker';
 import * as Haptics from "expo-haptics"; // for haptic feedback
@@ -31,7 +31,9 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
   }, [selectedExtras]);
   
   const toggleExtra = (extra: string, value: number) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     const fullExtraKey = Object.entries(extras).find(([key]) => key.includes(extra))?.[0] || extra;
   
     setSelectedExtras((prevSelected: { [key: string]: number }) => {

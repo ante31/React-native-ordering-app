@@ -34,10 +34,16 @@ const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData,
       <View style={styles.grayBox} onLayout={(event) => setBoxWidth(event.nativeEvent.layout.width * 0.5)}>
         <Animated.View style={[styles.whiteBox, { transform: [{ translateX: slideAnim }] }]} />
         <TouchableOpacity style={[styles.touchableLeft, isSlidRight && { opacity: 0.4 }]} onPress={() => toggleSlide('left')} activeOpacity={1}>
-          <Text style={styles.centerText}>{isCroatianLang ? 'Preuzimanje' : 'Pickup'}</Text>
+          <Text 
+            allowFontScaling={false}
+            style={styles.centerText}>{isCroatianLang ? 'Preuzimanje' : 'Pickup'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.touchableRight, !isSlidRight && { opacity: 0.4 }]} onPress={() => toggleSlide('right')} activeOpacity={1}>
-          <Text style={styles.centerText}>{isCroatianLang ? 'Dostava' : 'Delivery'}</Text>
+          <Text 
+            allowFontScaling={false}
+            style={styles.centerText}>{isCroatianLang ? 'Dostava' : 'Delivery'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

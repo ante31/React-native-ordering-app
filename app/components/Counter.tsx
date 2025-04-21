@@ -6,6 +6,7 @@ import * as Haptics from "expo-haptics";
 import { appButtonsDisabled } from '../services/isAppClosed';
 import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
+import { Platform } from 'react-native';
 
 const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, submitButtonStatus = "Dodaj", setReloadTrigger=() => {console.log("reloadTrigger")} }: any) => {
   const {general} = useGeneral();
@@ -26,7 +27,9 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
           onPress={() => {
             onDecrease(); 
             setPriceSum((prev: number) => prev -= cartPrice);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            if (Platform.OS !== 'web') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
             }} 
           disabled={quantity <= 1} 
           style={[{ opacity: quantity <= 1 ? 0.5 : 1}]}
@@ -40,7 +43,9 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
           onPress={() => { 
             onIncrease(); 
             setPriceSum((prev: number) => prev += cartPrice);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            if (Platform.OS !== 'web') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }          
           }} 
           disabled={quantity >= 20 || appButtonsDisabled(general?.workTime[dayofWeek])} 
           style={[{ opacity: quantity >= 20 ? 0.5 : 1}]}
@@ -78,6 +83,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
         ]}
       >
         <Text
+          allowFontScaling={false}
           style={[
             {
               fontSize: dynamicFontSize,

@@ -3,6 +3,7 @@ import { TouchableOpacity, Image } from 'react-native';
 import { Badge } from 'react-native-elements';
 import { useCart } from  '../cartContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Text } from 'react-native-paper';
 
 const CartIcon = ({ navigation }: { navigation: any }) => {
   const { getCartLength } = useCart();
@@ -15,7 +16,11 @@ const CartIcon = ({ navigation }: { navigation: any }) => {
           <Badge
             status="error"
             containerStyle={{ position: 'absolute', top: 8, right: 4 }}
-            value={cartLength}
+            value={
+              <Text allowFontScaling={false} style={{ color: 'white', fontSize: 12 }}>
+                {cartLength}
+              </Text>
+            }
           />
         )}
       </>

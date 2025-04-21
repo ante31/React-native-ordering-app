@@ -97,7 +97,7 @@ console.log("🗂 Categories:", categories);
             flexDirection: 'row',
             flexWrap: 'wrap',
             justifyContent: 'flex-start',
-            maxWidth: 850,
+            // maxWidth: 850,
             marginHorizontal: 'auto',
           }}
         >
