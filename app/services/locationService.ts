@@ -31,10 +31,13 @@ export const geodecode = async (location: number[]) => {
     if (address && address.length > 0) {
       console.log("Address:", address);
       const aboveOrBelow = checkPosition(latitude, longitude);
-      const formattedAddress = address[0].formattedAddress;
-      const parts = formattedAddress ? formattedAddress.split(',') : []; 
+      const addressObject = address[0];
+      const formattedAddress = `${addressObject.street} ${addressObject.streetNumber}, ${addressObject.city}`;
+      const parts = formattedAddress.split(',');      
+      console.log("Parts:", parts, "Formatted address:", formattedAddress);
       // Extract the first and third parts, and concatenate them with a comma
-      const result = `${parts[0]},${parts[2]}, ${aboveOrBelow}`;
+      const result = `${parts[0]},${parts[1]}, ${aboveOrBelow}`;
+      console.log("Result:", result);
       return result;
     }
   } catch (error) {

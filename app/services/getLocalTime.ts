@@ -1,3 +1,6 @@
+import { Holidays } from "../models/generalModel";
+import { isHoliday } from "./isAppClosed";
+
 export const getLocalTime = (): Date => {
   // Get current time in Zagreb timezone
   const now = new Date();
@@ -27,7 +30,7 @@ export const getLocalTime = (): Date => {
   // Convert to Date object while preserving local time
   const localDate = new Date(isoString + 'Z'); // Treat it as UTC
 
-  console.log("Local date NEWWWWWW", new Date(localDate.getTime())); // Adjust to local time
+  console.log("localDate", localDate);
 
   return new Date(localDate.getTime()); // Adjust to local time
 };
@@ -37,14 +40,12 @@ export const getLocalTimeHours = (): number => {
   const now = getLocalTime(); // Get the formatted ISO string from getLocalTime
   const timeParts = now.toISOString().split('T')[1].split(':'); // Extract time part (HH:mm:ss)
   const hours = parseInt(timeParts[0], 10); // Get the hours as a number
-  console.log("Local time hounfkdnfienfkrs", hours); // Log the hours
   return hours;
 };
 
 
 export const getLocalTimeMinutes = () => {
   const now = getLocalTime();
-  console.log("Local time minutes", now.getMinutes()); // Log the minutes
   return now.getMinutes();
 };
 
@@ -57,10 +58,13 @@ export const getYearMonthDay = (input: Date) => {
   return `${year}-${month}-${day}`;
 }
 
-export const getDayOfTheWeek = (input: Date): string => {
+export const getDayOfTheWeek = (input: Date, holidays?: Holidays): string => {
   const daysOfWeek = getDaysOfTheWeek();
   const dayIndex = input.getDay(); // getDay() returns a number (0-6) where 0 is Sunday
-  console.log("Day of the week", daysOfWeek[dayIndex]);
+
+  const holiday = isHoliday(holidays);
+  console.log("isholiday", isHoliday(holidays));
+  if (holiday === "shortened") return "Sunday";
   return daysOfWeek[dayIndex];
 };
 

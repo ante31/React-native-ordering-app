@@ -13,7 +13,7 @@ import { getUpdatedTime } from "../services/getUpdatedTime";
 const Picker = ({ showPicker, setShowPicker, timeString, setTimeString, isSlidRight, setDisplayWorkTimeMessage, setDisplayMessage }: any) => {
     const isCroatianLanguage = isCroatian();
     const {general} = useGeneral();
-    const dayofWeek = getDayOfTheWeek(getLocalTime());
+    const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
     const closingTime = isSlidRight ? general?.workTime[dayofWeek].deliveryClosingTime : general?.workTime[dayofWeek].closingTime;
     const openingTime = isSlidRight ? general?.workTime[dayofWeek].deliveryOpeningTime : general?.workTime[dayofWeek].openingTime;

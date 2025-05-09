@@ -15,8 +15,6 @@ type GeneralContextType = {
 
 const GeneralContext = createContext<GeneralContextType | null>(null);
 
-const dayofWeek = getDayOfTheWeek(getLocalTime());
-
 export const GeneralProvider = ({ children }: { children: React.ReactNode }) => {
   const [general, setGeneral] = useState<General | null>(null);
   const [showClosedAppModal, setShowClosedAppModal] = useState(false);
@@ -37,6 +35,8 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     fetchGeneral();
   }, []);
 
+  let dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
+
   if (general)
     console.log("boga", isClosedMessageDisplayed(general.workTime[dayofWeek]))
 
@@ -50,11 +50,9 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     };
 
     if (general) {
-      console.log("First check", general);
       checkAppStatus();
 
       const interval = setInterval(() => {
-        console.log("nth check", general);
         checkAppStatus();
       }, 60000); // Check every minute
 

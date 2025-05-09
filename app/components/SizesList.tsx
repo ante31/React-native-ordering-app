@@ -8,7 +8,7 @@ import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 
 const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortionIndex, setSelectedPortionIndex, selectedExtras, setSelectedExtras, setPrice, setPriceSum, quantity, setIsUpdating, isCroatianLang }: any) => {
     const {general} = useGeneral();
-    const dayofWeek = getDayOfTheWeek(getLocalTime());
+    const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   
   useEffect(() => {
     if (Object.keys(extras).length > 0) {
@@ -63,7 +63,7 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
         return (
           <TouchableOpacity key={index} style={styles.radioButtonContainer}
             onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
-            disabled={appButtonsDisabled(general?.workTime[dayofWeek])}            
+            disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}            
           >
             <View style={styles.radioButtonTextContainer}>
               <RadioButton
@@ -71,7 +71,8 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
                 status={selectedSize === portion.size || selectedSize === portion.size_en ? 'checked' : 'unchecked'}
                 onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
                 color="#ffe521"
-                disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+                disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+              
               />
               <Text style={styles.sizeText} 
               >

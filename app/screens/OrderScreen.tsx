@@ -33,7 +33,7 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
   const isCroatianLang = isCroatian();
   const [lastOrder, setLastOrder] = useState<StorageModel | null>(null);
   const {general} = useGeneral();
-  const dayOfWeek = getDayOfTheWeek(getLocalTime());
+  const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   //    setOrderData(prev => ({ ...prev, totalPrice: orderPrice + (isSlidRight? general?.deliveryPrice: 0) }))
 
   useEffect(() => {
@@ -176,6 +176,8 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
             deadline: deadline,
             language: isCroatianLang ? "hr" : "en",
           };
+
+          console.log("GOSPAAAA")
       
           const response = await fetch(`${backendUrl}/orders`, {
             method: 'POST',
@@ -184,9 +186,12 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
             },
             body: JSON.stringify(orderDataWithToken),
           });
+
+          console.log("Radi", response)
       
           if (!response.ok) {
             const errorText = await response.text();
+            console.log("Ne radi", errorText)
             throw new Error(`Server error: ${response.status} ${errorText}`);
           }
       
@@ -279,16 +284,16 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
         mode="contained" 
           style={[
             styles.orderButton, 
-            general?.workTime && appButtonsDisabled(general.workTime[dayOfWeek]) && styles.disabledButton
+            general?.workTime && appButtonsDisabled(general.workTime[dayOfWeek], general.holidays) && styles.disabledButton
           ]}
           onPress={() => { handleSubmit(); }} 
-          disabled={!general?.workTime || appButtonsDisabled(general.workTime[dayOfWeek])} 
+          disabled={!general?.workTime || appButtonsDisabled(general.workTime[dayOfWeek], general.holidays)} 
         > 
 
         <Text style={[
           { fontSize: 26 }, 
           styles.textPosition, 
-          general?.workTime && appButtonsDisabled(general.workTime[dayOfWeek]) && styles.disabledText // Change text color when disabled
+          general?.workTime && appButtonsDisabled(general.workTime[dayOfWeek], general.holidays) && styles.disabledText // Change text color when disabled
         ]}>
           {isCroatianLang ? 'Završi narudžbu' : 'Confirm order'}
         </Text>

@@ -13,7 +13,7 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   const {general} = useGeneral();
   const isCroatianLang = isCroatian();
   const [order, setOrder] = useState<any>(null);
-  const dayOfWeek = getDayOfTheWeek(getLocalTime());
+  const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   
   console.log("fetched ",order);
 
@@ -98,10 +98,10 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
         </TouchableOpacity>
         <TouchableOpacity
             onPress={() => handleRenew(item.id)}
-            style={[styles.rightButton, appButtonsDisabled(general?.workTime[dayOfWeek]) && styles.disabledButton]}
-            disabled={appButtonsDisabled(general?.workTime[dayOfWeek])} 
+            style={[styles.rightButton, appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) && styles.disabledButton]}
+            disabled={appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays)} 
         >
-            <Text style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayOfWeek]) && styles.disabledText]}>{isCroatianLang ? "Ponovi narudžbu!" : "Renew order!"}</Text>
+            <Text style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) && styles.disabledText]}>{isCroatianLang ? "Ponovi narudžbu!" : "Renew order!"}</Text>
         </TouchableOpacity>
     </View>
   </View>

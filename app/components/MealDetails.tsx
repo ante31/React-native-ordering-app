@@ -169,7 +169,7 @@ const MealDetails = ({ visible, meal, onClose, navigation }: any) => {
 
 const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  modalContent: { backgroundColor: "white", padding: 10, borderRadius: 10, width: "100%", height: "100%", maxWidth: 600 },
+  modalContent: { backgroundColor: "white", padding: 10, borderRadius: 10, width: "100%", height: "100%" },
   extrasTitle: { fontSize: 18, fontWeight: "bold" },
   footer: {
     position: "absolute",

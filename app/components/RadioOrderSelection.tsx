@@ -7,8 +7,9 @@ import { getDayOfTheWeek, getLocalTime, getLocalTimeHours, getLocalTimeMinutes }
 import { useGeneral } from "../generalContext";
 
 export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDeliveryOption, setShowPicker, displayMessage, setDisplayMessage, displayWorkTimeMessage, setDisplayWorkTimeMessage, displaySecondMessage, setDisplaySecondMessage, timeString, isSlidRight, isCroatianLang}: any) => {
-    const dayofWeek = getDayOfTheWeek(getLocalTime());
     const {general} = useGeneral();
+    const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
+
     useEffect(() => {
         if (onlyCustomOrders(general?.workTime[dayofWeek]) && selectedDeliveryOption === 'standard') {
             setSelectedDeliveryOption('custom'); 
@@ -76,10 +77,10 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
                     console.log("LT", getLocalTimeHours(), getLocalTimeMinutes());
                 }
             }}
-            disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+            disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
         >
             <RadioButton
-                disabled={onlyCustomOrders(general?.workTime[dayofWeek]) || appButtonsDisabled(general?.workTime[dayofWeek])}
+                disabled={onlyCustomOrders(general?.workTime[dayofWeek]) || appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
                 color="#ffe521"
                 value="standard"
                 status={selectedDeliveryOption === 'standard' && !onlyCustomOrders(general?.workTime[dayofWeek]) ? 'checked' : 'unchecked'}
@@ -95,7 +96,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             >
                 {isCroatianLang? "Standarno": "Standard"}
             </Text>
-            {selectedDeliveryOption==='standard' && !appButtonsDisabled(general?.workTime[dayofWeek]) && <View >
+            {selectedDeliveryOption==='standard' && !appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && <View >
                 <View style={styles.box}>
                     <MaterialIcons name="access-time" size={20} color="#DA291C" />
                     <Text style={styles.radioButtonText}> {isSlidRight? general?.deliveryTime: general?.pickUpTime} min</Text>
@@ -125,7 +126,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             </HelperText>  
         )}
         <TouchableOpacity 
-            disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+            disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
             style={{ flexDirection: 'row', alignItems: 'center' }}
             onPress={() => {setSelectedDeliveryOption('custom')
                 setShowPicker(true);}}
@@ -133,7 +134,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             <RadioButton
                 color="#ffe521"
                 value="custom"
-                disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+                disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
                 status={selectedDeliveryOption === 'custom' ? 'checked' : 'unchecked'}
                 onPress={() => {setSelectedDeliveryOption('custom')
                                 setShowPicker(true);}}

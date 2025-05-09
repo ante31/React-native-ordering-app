@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Gricko",
-    "slug": "Gricko",
+    "slug": "client",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/gricko-icon.png",
@@ -51,7 +51,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "64efc754-b2fd-4e1a-8a5c-f58834b86343"
+        "projectId": "44d3859c-df1f-4b2a-8458-83b3c5dc78be"
       },
       "mode": "production",
       "localhost": "192.168.42.210",

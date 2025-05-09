@@ -11,7 +11,7 @@ import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 
 const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice, setPriceSum, quantity, selectedPortionIndex }: any) => {
   const {general} = useGeneral();
-  const dayofWeek = getDayOfTheWeek(getLocalTime());
+  const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   
   const isCroatianLang = isCroatian();
   const [freeExtrasCount, setFreeExtrasCount] = useState(0);
@@ -86,14 +86,15 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
               key={index}
               style={styles.checkboxContainer}
               onPress={() => toggleExtra(name, value as number)}
-              disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+              disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
             >
               <View style={styles.checkboxTextContainer}>
                 <Checkbox
                   status={label in selectedExtras ? 'checked' : 'unchecked'} // Check if the full key is in selectedExtras
                   onPress={() => toggleExtra(name, value as number)} // Toggle extra based on Croatian name
                   color="#ffe521"
-                  disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
+                  disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+                  
                 />
                 <Text style={styles.checkboxText}>{isCroatianLang ? name : nameEn}</Text>
               </View>

@@ -22,7 +22,6 @@ import { getDayOfTheWeek, getLocalTime } from "../services/getLocalTime";
 import { Meal } from "../models/mealModel";
 import CartMealDetails from "../components/CartMealDetails";
 import { HeaderBackButton } from '@react-navigation/elements';
-import { CommonActions, StackActions } from "@react-navigation/native";
 
 
 const { width, height } = Dimensions.get('screen');
@@ -33,29 +32,16 @@ const getModalHeight = (meal: any | null) => {
 };
 
 
-
 const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any, meals: Meal[] }) => {
   useLayoutEffect(() => {
     const handleHeaderBack = () => {
       console.log("Header back button pressed, navigating to Home");
       navigation.popToTop();
-
-      return true; // Prevent default back behavior
-  };
-
-    navigation.setOptions({
-      gestureEnabled: false, // Disable swipe back (iOS)
+      return true;
+    };
+  
+    
       
-      headerLeft: () => (
-        <View style={styles.backButtonContainer}>
-          <HeaderBackButton onPress={() => {}} style={{ marginRight: 10, }} />
-          <TouchableOpacity
-            style={[StyleSheet.absoluteFillObject, {padding: 0}]} // this makes it cover the entire container
-            onPressOut={handleHeaderBack}
-          />
-        </View>
-      ),
-    });
   }, [navigation]);
   const isCroatianLanguage = isCroatian();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -72,7 +58,7 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
 
   const { getCartLength, state: cartState, dispatch } = useCart();
   const cartLength = getCartLength();
-  const dayofWeek = getDayOfTheWeek(getLocalTime());
+  const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
     const handleMealClick = (meal: any) => {
       setSelectedMeal(meal);
@@ -285,16 +271,16 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
       </ScrollView>
       <TouchableOpacity
         onPress={handlePress}
-        disabled={appButtonsDisabled(general?.workTime[dayofWeek])}
-        style={[styles.button, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledButton]}
+        disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+        style={[styles.button, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
       >
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{marginRight: 15, width: 30, height: 30, borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
-            <Text allowFontScaling={false} style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
+            <Text allowFontScaling={false} style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
-          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
+          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
         </View>
-        <Text style={[{color: '#fff', fontSize: 20}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText ]}>{totalPrice.toFixed(2)} €</Text>
+        <Text style={[{color: '#fff', fontSize: 20}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{totalPrice.toFixed(2)} €</Text>
 
       </TouchableOpacity>
       <Portal>
@@ -393,7 +379,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
-  },
+    marginTop: 4, 
+  },  
   itemWrapper: {
     width: "100%",
     marginBottom: 20,

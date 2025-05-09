@@ -15,14 +15,14 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
   const dynamicHeight = width > 600 ? 70 : 70; // Adjust for small screens
   const dynamicFontSize = width > 600 ? 18 : 14;
   console.log(width, dynamicFontSize)
-  const dayofWeek = getDayOfTheWeek(getLocalTime());
+  const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   console.log("submitButtonStatus", submitButtonStatus)
 
 
 
   return (
     <View style={{ flexDirection: "row", height: dynamicHeight, width: "100%" }}>
-      <View style={[{ flex: 1.4, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", backgroundColor: '#fff', borderColor: '#FFC72C', borderWidth: 1, marginRight: 8, borderRadius: 5}, appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledCounterButton]}>
+      <View style={[{ flex: 1.4, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", backgroundColor: '#fff', borderColor: '#FFC72C', borderWidth: 1, marginRight: 8, borderRadius: 5}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterButton]}>
         <TouchableOpacity 
           onPress={() => {
             onDecrease(); 
@@ -35,10 +35,10 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
           style={[{ opacity: quantity <= 1 ? 0.5 : 1}]}
         >
           <View style={{ backgroundColor: '#fff', borderRadius: 25 }}>
-            <MaterialIcons name="remove" size={dynamicFontSize*2} color="#FFC72C" style={appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledCounterText}/>
+            <MaterialIcons name="remove" size={dynamicFontSize*2} color="#FFC72C" style={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText}/>
           </View>
         </TouchableOpacity>
-        <Text style={[{ fontSize: dynamicFontSize + 2, color: "#FFC72C", fontWeight: "bold" }, , appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledCounterText]}>{quantity}</Text>
+        <Text style={[{ fontSize: dynamicFontSize + 2, color: "#FFC72C", fontWeight: "bold" }, , appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText]}>{quantity}</Text>
         <TouchableOpacity 
           onPress={() => { 
             onIncrease(); 
@@ -47,11 +47,11 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }          
           }} 
-          disabled={quantity >= 20 || appButtonsDisabled(general?.workTime[dayofWeek])} 
+          disabled={quantity >= 20 || appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)} 
           style={[{ opacity: quantity >= 20 ? 0.5 : 1}]}
         >
           <View style={{ backgroundColor: '#fff', borderRadius: 25 }}>
-            <MaterialIcons name="add" size={dynamicFontSize*2} color="#FFC72C" style={appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledCounterText}/>
+            <MaterialIcons name="add" size={dynamicFontSize*2} color="#FFC72C" style={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText}/>
           </View>
         </TouchableOpacity>
       </View>
@@ -69,7 +69,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
             }
           }
         }} 
-        disabled={isUpdating || appButtonsDisabled(general?.workTime[dayofWeek])} 
+        disabled={isUpdating || appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)} 
         style={[
           {
             flex: 2,
@@ -79,7 +79,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
             alignItems: 'center',
             padding: 10
           },
-          appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledButton
+          appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton
         ]}
       >
         <Text
@@ -90,7 +90,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
               fontWeight: 'bold',
               color: '#fff'
             },
-            appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText
+            appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText
           ]}
         >
         {submitButtonStatus === "Dodaj" &&
@@ -110,7 +110,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
                 fontSize: dynamicFontSize,
                 color: '#fff'
               },
-              appButtonsDisabled(general?.workTime[dayofWeek]) && styles.disabledText
+              appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText
             ]}
           >
             {cartPriceSum.toFixed(2)} €

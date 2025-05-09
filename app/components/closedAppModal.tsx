@@ -14,7 +14,7 @@ const ClosedAppModal = ({ isCroatianLanguage }: any) => {
     setInfoAcknowledged,
   } = useGeneral();
 
-  const dayOfWeek = getDayOfTheWeek(getLocalTime());
+  const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
   console.log("Time details log", getLocalTime(), dayOfWeek);
 
@@ -27,7 +27,7 @@ const ClosedAppModal = ({ isCroatianLanguage }: any) => {
       >
         {general && <View style={styles.modalContent}>
           <Text style={styles.modalText}>
-            {appButtonsDisabled(general?.workTime[dayOfWeek]) ?
+            {appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) ?
               isCroatianLanguage
               ? `Aplikacija je zatvorena. Radno vrijme je od ${general?.workTime[dayOfWeek].openingTime} do ${general?.workTime[dayOfWeek].closingTime}.`
               : `Application is closed. Working hours are from ${general?.workTime[dayOfWeek].openingTime} to ${general?.workTime[dayOfWeek].closingTime}.`

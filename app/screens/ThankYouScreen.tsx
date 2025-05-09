@@ -1,60 +1,79 @@
-import { Text, View, BackHandler, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { Button } from "react-native-paper";
-import { useEffect } from "react";
+import { Text, View, BackHandler, StyleSheet, Image, TouchableOpacity, Platform } from "react-native";
+import { useEffect, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
+import { HeaderBackButton } from '@react-navigation/elements';
 
 export default function ThankYouScreen({ route, navigation }: any) {
     const { isCroatianLang } = route.params;
     const nav = useNavigation();
 
-    useEffect(() => {
-        // Override the header back button to reset the stack and navigate to Home
-        const handleHeaderBack = () => {
-            console.log("Header back button pressed, navigating to Home");
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Home' }],
-            });
-            return true; // Prevent default back behavior
-        };
-
-        // Override the default header back button
-        navigation.setOptions({
-            headerLeft: () => null, // Remove the default back button
-            gestureEnabled: false, // Disable swipe back (iOS)
+    const handleHeaderBack = () => {
+        console.log("Header back button pressed, navigating to Home");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
         });
-
+        return true;
+      };
+    
+      useLayoutEffect(() => {
         navigation.setOptions({
-            headerLeft: () => (
-                <TouchableOpacity onPressOut={handleHeaderBack}>
-                    <AntDesign
-                        style={styles.icon}
-                        color="black"
-                        name="arrowleft"
-                        size={20}
-                    />
-                </TouchableOpacity>
-            ),
-            gestureEnabled: false, // Disable swipe back (iOS)
+          gestureEnabled: true,
+          headerLeft: () => (
+            <View style={styles.backButtonContainer}>
+              {Platform.OS === 'ios' ? (
+                <>
+                  <TouchableOpacity
+                    style={{
+                      position: 'absolute',
+                      left: -50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      padding: 0,
+                      backgroundColor: 'transparent',
+                    }}
+                    onPressOut={handleHeaderBack}
+                  />
+                  <HeaderBackButton
+                    onPress={() => {}}
+                    style={{
+                      marginRight: 10,
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <HeaderBackButton
+                    onPress={() => {}}
+                    style={{ marginRight: 10, marginLeft: -10 }}
+                  />
+                  <TouchableOpacity
+                    style={[StyleSheet.absoluteFillObject, { padding: 0 }]}
+                    onPressOut={handleHeaderBack}
+                  />
+                </>
+              )}
+            </View>
+          ),
         });
-
-        // Custom hardware back button behavior
+      }, [navigation]);
+    
+      useEffect(() => {
         const backAction = () => {
-            console.log("Back button pressed, navigating to root");
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Home' }],
-            });
-            return true; // Prevent default back behavior
+          console.log("Back button pressed, navigating to root");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          });
+          return true;
         };
-
-        BackHandler.addEventListener("hardwareBackPress", backAction);
-
-        return () => {
-            BackHandler.removeEventListener("hardwareBackPress", backAction);
-        };
-    }, [navigation]);
+    
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+      }, [navigation]);
 
     return (
         <View style={styles.container}>
@@ -123,5 +142,10 @@ const styles = StyleSheet.create({
       },
       icon: {
         marginRight: 30,
+      },
+      backButtonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: 10,
       },
 });

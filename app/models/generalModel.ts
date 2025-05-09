@@ -15,6 +15,7 @@ export type General = {
   deliveryPrice: number;
   deliveryTime: number;
   displayCurrency: string;
+  holidays: Holidays;
   enabled: boolean;
   minOrder: MinOrder;
   minVersionAndroid: number;
@@ -25,3 +26,7 @@ export type General = {
   workTime: WorkTime;
 };
 
+export type Holidays = {
+  non_working_days: string[];
+  shortened_days: string[];
+};

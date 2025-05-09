@@ -12,7 +12,7 @@ const { width, height } = Dimensions.get('screen');
 
 const getModalHeight = (meal: Meal | null) => {
   if (!meal) return height * 0.7;
-  return meal.portions[0].extras === "null" ? "20%" : "80%";
+  return meal.portions[0].extras === "null" ? "25%" : "80%";
 };
 
 export default function CategoryPage({ route, navigation }: { route: any, navigation: any }) {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 0,
     borderRadius: 10,
-    marginHorizontal: 20,
+    marginHorizontal: width > 1000 ? width * 0.1 : 20,
     height: height * 0.7,
   },
   container: {

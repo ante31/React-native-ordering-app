@@ -15,7 +15,7 @@ const CartIcon = ({ navigation }: { navigation: any }) => {
         {cartLength > 0 && (
           <Badge
             status="error"
-            containerStyle={{ position: 'absolute', top: 8, right: 4 }}
+            containerStyle={{ position: 'absolute', top: 0, left: 24 }}
             value={
               <Text allowFontScaling={false} style={{ color: 'white', fontSize: 12 }}>
                 {cartLength}
