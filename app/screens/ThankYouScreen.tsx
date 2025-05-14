@@ -6,60 +6,6 @@ import { HeaderBackButton } from '@react-navigation/elements';
 export default function ThankYouScreen({ route, navigation }: any) {
     const { isCroatianLang } = route.params;
     const nav = useNavigation();
-
-    const handleHeaderBack = () => {
-        console.log("Header back button pressed, navigating to Home");
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Home' }],
-        });
-        return true;
-      };
-    
-      useLayoutEffect(() => {
-        navigation.setOptions({
-          gestureEnabled: true,
-          headerLeft: () => (
-            <View style={styles.backButtonContainer}>
-              {Platform.OS === 'ios' ? (
-                <>
-                  <TouchableOpacity
-                    style={{
-                      position: 'absolute',
-                      left: -50,
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      padding: 0,
-                      backgroundColor: 'transparent',
-                    }}
-                    onPressOut={handleHeaderBack}
-                  />
-                  <HeaderBackButton
-                    onPress={() => {}}
-                    style={{
-                      marginRight: 10,
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <HeaderBackButton
-                    onPress={() => {}}
-                    style={{ marginRight: 10, marginLeft: -10 }}
-                  />
-                  <TouchableOpacity
-                    style={[StyleSheet.absoluteFillObject, { padding: 0 }]}
-                    onPressOut={handleHeaderBack}
-                  />
-                </>
-              )}
-            </View>
-          ),
-        });
-      }, [navigation]);
     
       useEffect(() => {
         const backAction = () => {

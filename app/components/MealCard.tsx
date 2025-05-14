@@ -15,7 +15,7 @@ const MealCard = ({ item }: { item: Meal }) => {
       </View>
       <View style={styles.rightContainer}>
         <Image
-          source={{ uri: 'https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty-300x240.jpg' }} 
+          source={{ uri: item.image }} 
           style={styles.image}
         />
       </View>

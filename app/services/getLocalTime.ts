@@ -30,8 +30,6 @@ export const getLocalTime = (): Date => {
   // Convert to Date object while preserving local time
   const localDate = new Date(isoString + 'Z'); // Treat it as UTC
 
-  console.log("localDate", localDate);
-
   return new Date(localDate.getTime()); // Adjust to local time
 };
 

@@ -95,7 +95,7 @@ export default function HomePage({ navigation }: { navigation: any }) {
             //maxWidth: 850,
             marginHorizontal: 'auto',
           }}
-        >{}
+        >
         {categories.map((item, index) => (
           <View key={index} style={{ width: '50%', padding: 5 }}>
             <Card onPress={() => handlePress(item.title, item.titleEn, item.image)}>

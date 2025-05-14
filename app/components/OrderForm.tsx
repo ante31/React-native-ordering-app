@@ -75,7 +75,7 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
   return (
     <View>
       <TextInput 
-        label={isCroatianLang ? 'Ime' : 'Name'}
+        placeholder={isCroatianLang ? 'Ime' : 'Name'}
         mode="outlined" 
         value={orderData.name} 
         onChangeText={(text) => setOrderData({ ...orderData, name: text })} 
@@ -85,7 +85,7 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
       {errors.name && <HelperText type="error" visible={!!errors.name}>{errors.name}</HelperText>}
 
       <TextInput 
-        label={isCroatianLang ? 'Telefon' : 'Phone number'}
+        placeholder={isCroatianLang ? 'Telefon' : 'Phone number'}
         mode="outlined"
         keyboardType="phone-pad"
         value={orderData.phone}
@@ -95,7 +95,7 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
       {errors.phone && <HelperText type="error" visible={!!errors.phone}>{errors.phone}</HelperText>}
    
       {orderData.isDelivery && <TextInput 
-        label={isCroatianLang ? 'Adresa' : 'Address'}
+        placeholder={isCroatianLang ? 'Adresa' : 'Address'}
         mode="outlined"
         value={orderData.address}
         onChangeText={(text) => setOrderData({ ...orderData, address: text })}
@@ -123,7 +123,7 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
       {errors.zone && orderData.isDelivery && <HelperText type="error" visible={!!errors.zone}>{errors.zone}</HelperText>}
 
       <TextInput 
-        label={isCroatianLang ? 'Napomena' : 'Note'}
+        placeholder={isCroatianLang ? 'Napomena' : 'Note'}
         mode="outlined"
         value={orderData.note}
         onChangeText={(text) => setOrderData({ ...orderData, note: text })}

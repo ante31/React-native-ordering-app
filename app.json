@@ -2,9 +2,9 @@
   "expo": {
     "name": "Gricko",
     "slug": "client",
-    "version": "1.0.1",
+    "version": "59.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/gricko-icon.png",
+    "icon": "./assets/images/gricko-icon2.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/gricko-icon.png",
+        "foregroundImage": "./assets/images/gricko-icon2.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ante3101.Gricko",
@@ -36,9 +36,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/gricko-icon.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
+          "resizeMode": "cover",
           "backgroundColor": "#ffffff"
         }
       ]

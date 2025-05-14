@@ -10,7 +10,6 @@ export const isHoliday = (holidays?: Holidays): 'closed' | 'shortened' | 'normal
 
   const easterSunday = getEasterDate(year)// MM-DD
   const easterMonday = getEasterMonday(year) // MM-DD
-  console.log(date, "year", year, "easterSunday", easterSunday, "easterMonday", easterMonday, "mmdd", mmdd);
 
   const isNonWorking =
     holidays?.non_working_days.includes(mmdd) ||

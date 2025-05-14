@@ -59,9 +59,12 @@ export default function App() {
       <GeneralProvider>
         <CartProvider>
           <SafeAreaProvider>
-            {!isAndroid ? (
+            {true ? (
               <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
                 <Provider theme={MD3LightTheme}>
+                  {isAndroid && <StatusBar
+                    backgroundColor="black"
+                  />}
                   <ClosedAppModal isCroatianLanguage={isCroatianLanguage} />
                   <Stack.Navigator initialRouteName="Home">
                     {/* Home Screen */}
@@ -153,7 +156,8 @@ export default function App() {
                                 activeOpacity={0.7}
                                 style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
                               >
-                                <Text style={{ fontSize: 16, color: '#007AFF'}}>Gricko</Text>
+                                {!isAndroid ? <Text style={{ fontSize: 16, color: '#007AFF'}}>Gricko</Text>
+                                : <Text style={{ fontSize: 18, color: 'black'}}>Gricko</Text> }
                               </TouchableOpacity>
                             </View>
                   
@@ -216,8 +220,67 @@ export default function App() {
                                 })}
                                 style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
                               >
-                                <Text style={{ fontSize: 16, color: '#007AFF'}}>Gricko</Text>
-                              </TouchableOpacity>
+                                {!isAndroid 
+                                  ? <Text style={{ fontSize: 16, color: '#007AFF'}}>Gricko</Text>
+                                  : <Text style={{ fontSize: 18, color: 'black'}}>Gricko</Text>
+                                }
+                         </TouchableOpacity>
+                            </View>
+                  
+                            {/* Title */}
+                            <View>
+                            </View>
+                  
+                            {/* Right Icons */}
+                            <View style={{ flexDirection: 'row' }}>
+                              
+                            </View>
+                          </View>
+                        </SafeAreaView>
+                      ),
+                    })}
+                  />
+                  <Stack.Screen
+                    name="PreviousOrdersScreen"
+                    component={({ navigation }: any) => (
+                        <PreviousOrdersScreen navigation={navigation} isCroatianLang={isCroatianLanguage} />
+                      )}     
+                      options={({ navigation }) => ({
+                      title: isCroatianLanguage ? "Prethodne narudžbe" : "PreviousOrdersScreen",
+                      headerTitleAlign: 'center',
+                      headerBackTitleVisible: false,
+                      header: () => (
+                        <SafeAreaView style={{ backgroundColor: '#fff' }}>
+                          <View
+                            style={{
+                              height: 50,
+                              paddingHorizontal: 16,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              borderBottomWidth: 1,
+                              borderBottomColor: '#eee',
+                            }}
+                          >
+                            {/* Back Button */}
+                            <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
+                              <HeaderBackButton onPress={() => navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Home' }],
+                              })} />
+                              <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })}
+                                style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
+                              >
+                                {!isAndroid 
+                                  ? <Text style={{ fontSize: 16, color: '#007AFF'}}>Gricko</Text>
+                                  : <Text style={{ fontSize: 18, color: 'black'}}>Gricko</Text>
+                                }
+                         </TouchableOpacity>
                             </View>
                   
                             {/* Title */}
@@ -227,18 +290,7 @@ export default function App() {
                   
                             {/* Right Icons */}
                             <View style={{ flexDirection: 'row' }}>
-                              <TouchableOpacity
-                                onPressOut={() => navigation.navigate('PreviousOrdersScreen')}
-                                style={{ marginHorizontal: 8, marginTop: 4 }}
-                              >
-                                <Ionicons name="document-text-outline" size={28} color="black" />
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                onPressOut={() => navigation.navigate('CartScreen')}
-                                style={{ marginHorizontal: 8 }}
-                              >
-                                <CartIcon navigation={navigation} />
-                              </TouchableOpacity>
+                              
                             </View>
                           </View>
                         </SafeAreaView>
@@ -246,12 +298,53 @@ export default function App() {
                     })}
                   />
                   <Stack.Screen
-                    name="PreviousOrdersScreen"
-                    component={PreviousOrdersScreen}
-                    options={({ navigation }) => ({
-                      title: isCroatianLanguage ? "Prethodne narudžbe" : "Previous Orders",
-                    })}
-                  />
+  name="OrderScreen"
+  component={OrderScreen}
+  options={({ navigation }) => ({
+    title: '',
+    headerTitleAlign: 'left',
+    headerBackTitleVisible: false,
+    header: () => (
+      <SafeAreaView style={{ backgroundColor: '#fff' }}>
+        <View
+          style={{
+            height: 50,
+            paddingHorizontal: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottomWidth: 1,
+            borderBottomColor: '#eee',
+          }}
+        >
+          {/* Back Button */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
+            <HeaderBackButton onPress={() => navigation.goBack()} />
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+              style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
+            >
+              <Text style={{ fontSize: 18, color: 'black' }}>Gricko</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Right Icons */}
+          <View style={{ flexDirection: 'row' }}>
+          </View>
+        </View>
+      </SafeAreaView>
+    ),
+  })}
+/>
+
+<Stack.Screen
+  name="ThankYouScreen"
+  component={ThankYouScreen}
+  options={{
+    headerShown: false, // Optional - no header for thank you page
+  }}
+/>
                 </Stack.Navigator>
                 </Provider>
               </SafeAreaView>
@@ -375,13 +468,7 @@ export default function App() {
                     component={ThankYouScreen}
                     options={{ title: 'Gricko' }}
                   />
-                  <Stack.Screen
-                    name="PreviousOrdersScreen"
-                    component={PreviousOrdersScreen}
-                    options={{
-                      title: isCroatianLanguage ? 'Prethodne narudžbe' : 'Previous orders'
-                    }}
-                  />
+                  
                   <Stack.Screen
                     name="NewScreen"
                     component={NewScreen}

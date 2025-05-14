@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { List } from 'react-native-paper';
 import { PreviousOrderCard } from '../components/PreviuosOrderCard';
 import { formatEuropeanDateTime } from '../services/toEuropeanDate';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useCart } from '../cartContext';
 import { removeData } from '../services/storageService';
 import * as SecureStore from 'expo-secure-store';
 
-export const PreviousOrdersScreen = ({ navigation }: { navigation: any }) => {
+export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigation: any, isCroatianLang: boolean }) => {
   const [orders, setOrders] = useState<any[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const { state: cartState, dispatch } = useCart();
@@ -73,6 +73,30 @@ export const PreviousOrdersScreen = ({ navigation }: { navigation: any }) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  if (orders.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={{
+            uri: "https://static.lenskart.com/media/owndays/mobile/img/owndays/empty-cart.webp",
+          }}
+          style={styles.image}
+        />
+        <Text style={styles.boldText}>{isCroatianLang? "Nemaš prethodnih narudžbi": "You have no previous orders"}</Text>
+        <Text style={styles.lightText}>{isCroatianLang? "Naruči nešto po želji!": "Add something you like!"}</Text>
+        <View style={{position: 'absolute', bottom: 20, width: '100%', alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>{isCroatianLang? "Natrag": "Back"}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+  
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
       <List.Section style={{ marginVertical: 0, paddingVertical: 0 }}>
@@ -102,3 +126,42 @@ export const PreviousOrdersScreen = ({ navigation }: { navigation: any }) => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  boldText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  lightText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  button: {
+    height: 60,
+    marginBottom: 20,
+    backgroundColor: "#FFC72C",
+    padding: 15,
+    borderRadius: 5,
+    width: "90%",
+    alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginTop: 4, 
+  },  
+});

@@ -205,6 +205,9 @@ export default function OrderScreen({ route, navigation }: { route: any, navigat
             throw new Error('Missing order ID in response.');
           }
         }
+        else {
+          throw new Error('Missing expoPushToken.');
+        }
       } catch (err: any) {
         alert(`Order failed: ${err.message}`);
         console.error(err);
