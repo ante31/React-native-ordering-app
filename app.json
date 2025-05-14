@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Gricko",
+    "slug": "client",
+    "version": "59.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/gricko-icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ante3101.Gricko",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/gricko-icon2.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.ante3101.Gricko",
+      "googleServicesFile": "./android/app/google-services.json"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/gricko-icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/gricko-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "cover",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "44d3859c-df1f-4b2a-8458-83b3c5dc78be"
+      },
+      "mode": "production",
+      "localhost": "192.168.42.210",
+      "productionUrl": "https://server-three-pink-44.vercel.app/",
+      "devPort": "3000"
+    }
+  }
+}
+

@@ -1,0 +1,31 @@
+{
+  "project_info": {
+    "project_number": "695022602615",
+    "firebase_url": "https://gricko-ca93b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "gricko-ca93b",
+    "storage_bucket": "gricko-ca93b.firebasestorage.app"
+  },
+  "client": [
+    {
+    "client_info": {
+      "mobilesdk_app_id": "1:695022602615:android:e5e10cb19226bc685cb972",
+      "android_client_info": {
+        "package_name": "com.ante3101.Gricko"
+      }
+    },
+
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPxcu7OZB9VcheCtRdFudIqRwaytpJ-Jg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
