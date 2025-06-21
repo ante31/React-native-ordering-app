@@ -41,6 +41,33 @@ export const getLocalTimeHours = (): number => {
   return hours;
 };
 
+export function setTimeInISOString(isoString: any, hours: any, minutes: any) {
+  console.log("YOmo", isoString, hours, minutes)
+  // Dodaj višak minuta u sate
+  hours = (hours + Math.floor(minutes / 60)) % 24;
+  minutes = minutes % 60;
+
+    console.log("YOHO")
+
+  // Formatiraj sate i minute s vodećim nulama
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+
+    console.log("YOHOHO")
+
+
+
+  // Zamijeni samo HH:MM dio u ISO stringu
+  // Pronađi indeks početka T i napravi novi string ručno
+  const datePart = isoString.substring(0, 11); // "2025-06-08T"
+  const rest = isoString.substring(19); // ".000Z" ili ostatak
+
+      console.log("YOHOHOWOWO")
+
+
+  return `${datePart}${hh}:${mm}:00${rest}`;}
+
+
 
 export const getLocalTimeMinutes = () => {
   const now = getLocalTime();

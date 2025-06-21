@@ -29,16 +29,23 @@ export const isClosedMessageDisplayed = (workingHours: any, holidays?: Holidays)
   const hours = getLocalTimeHours();
   const minutes = getLocalTimeMinutes();
 
-  // console.log("hhours", hours);
-  // console.log("mminutes", minutes);
+  console.log("hhours", hours);
+  console.log("mminutes", minutes);
 
   const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.closingTime.split(":").map(Number);
 
-  // console.log("openingHours", openingHours);
-  // console.log("openingMinutes", openingMinutes);
-  // console.log("closingHours", closingHours);
-  // console.log("closingMinutes", closingMinutes);
+  console.log("openingHours", openingHours);
+  console.log("openingMinutes", openingMinutes);
+  console.log("closingHours", closingHours);
+  console.log("closingMinutes", closingMinutes);
+
+  console.log("holidaysY", 
+    hours > closingHours || 
+    (hours === closingHours && minutes >= closingMinutes) || 
+    hours < openingHours || 
+    (hours === openingHours && minutes < openingMinutes) ||
+    isHoliday(holidays) === "closed");
 
   // Show closed message if current time is before opening or after closing
   return closingAfterMidnight(openingHours, closingHours) ?
@@ -57,6 +64,8 @@ export const isClosedMessageDisplayed = (workingHours: any, holidays?: Holidays)
 export const appButtonsDisabled = (workingHours: any, holidays?: Holidays): boolean => {
   const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.closingTime.split(":").map(Number);
+
+  // return false;
 
   if (closingAfterMidnight(openingHours, closingHours)) // buttons are never disabled if closing hours are 00:00 and after
     return false;

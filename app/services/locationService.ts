@@ -8,7 +8,7 @@ export const getLocation = async () => {
 
     if (status !== "granted") {
       locationError = "Location permission denied";
-      console.error("Location error", locationError);
+      // console.error("Location error", locationError);
       return null;
     }
 
@@ -16,7 +16,7 @@ export const getLocation = async () => {
     console.log("Location", location)
     return [location.coords.latitude, location.coords.longitude];
   } catch (error) {
-    console.error("Error requesting location permission:", error);
+    // console.error("Error requesting location permission:", error);
     return null;
   }
 };

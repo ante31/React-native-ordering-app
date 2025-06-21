@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { List } from 'react-native-paper';
 import { PreviousOrderCard } from '../components/PreviuosOrderCard';
 import { formatEuropeanDateTime } from '../services/toEuropeanDate';
-import { ScrollView, View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Image, StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { useCart } from '../cartContext';
 import { removeData } from '../services/storageService';
 import * as SecureStore from 'expo-secure-store';
+import { CenteredLoading } from '../components/CenteredLoading';
 
-export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigation: any, isCroatianLang: boolean }) => {
+export const PreviousOrdersScreen = ({ navigation, isCroatianLang, scale }: { navigation: any, isCroatianLang: boolean, scale: any }) => {
   const [orders, setOrders] = useState<any[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const { state: cartState, dispatch } = useCart();
   const [refresh, setRefresh] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleRenew = (id: string) => {
     const storageOrder = orders.find((order) => order.id === id);
@@ -47,6 +49,7 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigatio
   };
   
   useEffect(() => {
+    setLoading(true);
     const loadOrders = async () => {
       try {
         // Since SecureStore doesn't support getting all keys, store an index manually
@@ -64,6 +67,8 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigatio
       } catch (error) {
         console.error('Error loading orders', error);
       }
+  
+      setLoading(false);
     };
   
     loadOrders();
@@ -72,6 +77,14 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigatio
   const handleExpanding = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <CenteredLoading />
+      </View>
+    );
+  }
 
   if (orders.length === 0) {
     return (
@@ -82,14 +95,14 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigatio
           }}
           style={styles.image}
         />
-        <Text style={styles.boldText}>{isCroatianLang? "Nemaš prethodnih narudžbi": "You have no previous orders"}</Text>
-        <Text style={styles.lightText}>{isCroatianLang? "Naruči nešto po želji!": "Add something you like!"}</Text>
+        <Text style={[styles.boldText, { fontSize: scale.light(22)}]}>{isCroatianLang? "Nemate prethodnih narudžbi": "You have no previous orders"}</Text>
+        <Text style={[styles.lightText, { fontSize: scale.light(18)}]}>{isCroatianLang? "Naručite nešto po želji!": "Order something you like!"}</Text>
         <View style={{position: 'absolute', bottom: 20, width: '100%', alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={styles.button}
+            style={[styles.button, { height: scale.light(60) }]}
           >
-            <Text style={styles.buttonText}>{isCroatianLang? "Natrag": "Back"}</Text>
+            <Text allowFontScaling={false} style={[styles.buttonText, { fontSize: scale.light(18)}]}>{isCroatianLang? "Natrag": "Back"}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -114,9 +127,8 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang }: { navigatio
             expanded={expandedId === order.id}
             onPress={() => handleExpanding(order.id)}
             theme={{ colors: { primary: '#ffe521' } }}
-            titleStyle={{ color: 'black', fontWeight: 'bold' }}
+            titleStyle={{ color: 'black', fontFamily: 'Lexend_700Bold' }}
             style={{ backgroundColor: '#f2f2f2' }}  // Grayish background
-
           >
             <PreviousOrderCard item={order} handleRenew={handleRenew} handleDelete={handleDelete}/>
             
@@ -141,27 +153,27 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: 'Lexend_700Bold',
     color: "#333",
     marginBottom: 10,
   },
   lightText: {
+    fontFamily: 'Lexend_400Regular',
     fontSize: 16,
     color: "#666",
   },
   button: {
-    height: 60,
     marginBottom: 20,
-    backgroundColor: "#FFC72C",
+    backgroundColor: "#ffd400",
     padding: 15,
     borderRadius: 5,
     width: "90%",
     alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: 'Lexend_700Bold',
     color: "#fff",
-    marginTop: 4, 
   },  
 });

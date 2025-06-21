@@ -7,15 +7,16 @@ import { backendUrl } from '../../localhostConf';
 import { isCroatian } from '../services/languageChecker';
 import { Divider, Modal, Portal } from 'react-native-paper';
 import { CenteredLoading } from '../components/CenteredLoading';
+import { safeFetch } from '../services/safeFetch';
 
 const { width, height } = Dimensions.get('screen');
 
 const getModalHeight = (meal: Meal | null) => {
   if (!meal) return height * 0.7;
-  return meal.portions[0].extras === "null" ? "25%" : "80%";
+  return meal.portions[0].extras === "null" ? "22%" : "80%";
 };
 
-export default function CategoryPage({ route, navigation }: { route: any, navigation: any }) {
+export default function CategoryPage({ route, navigation, scale }: { route: any, navigation: any, scale: any }) {
   const { title, titleEn } = route.params;
   const [meals, setMeals] = useState<any[]>([]);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
@@ -24,7 +25,7 @@ export default function CategoryPage({ route, navigation }: { route: any, naviga
   const isCroatianLanguage = isCroatian();
 
   useEffect(() => {
-    fetch(`${backendUrl}/cjenik/${title}`)
+    safeFetch(`${backendUrl}/cjenik/${title}`)
       .then((response) => response.json())
       .then((data) => {
         setMeals(Object.entries(data).map(([key, meal]) => ({ id: key, ...(typeof meal === 'object' ? meal : {}) })));
@@ -48,7 +49,7 @@ export default function CategoryPage({ route, navigation }: { route: any, naviga
         <View key={index}>
           <Divider />
           <TouchableOpacity onPress={() => handleMealClick(meal)} activeOpacity={0.7}>
-            <MealCard item={meal} />
+            <MealCard item={meal} scale={scale} />
           </TouchableOpacity>
         </View>
       ));
@@ -57,20 +58,27 @@ export default function CategoryPage({ route, navigation }: { route: any, naviga
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{isCroatianLanguage ? title : titleEn}</Text>
+    <View style={[styles.container, { paddingLeft: scale.light(16) }]}>
+      <Text style={[styles.title, { fontSize: scale.light(24) }]}>{isCroatianLanguage ? title : titleEn}</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>{content}</ScrollView>
 
       <Portal>
         <Modal
           visible={showSecondModal}
           onDismiss={() => setShowSecondModal(false)}
-          contentContainerStyle={[styles.modalContainer, { height: getModalHeight(selectedMeal) }]}
+          contentContainerStyle={[
+            styles.modalContainer, 
+            { 
+              minHeight: getModalHeight(selectedMeal), 
+              margin: scale.heavy(16) 
+            }
+          ]}
         >
           {selectedMeal ? (
             <MealDetails
               visible={showSecondModal}
               meal={selectedMeal}
+              scale={scale}
               onClose={() => setShowSecondModal(false)}
               navigation={navigation}
             />
@@ -87,24 +95,23 @@ export default function CategoryPage({ route, navigation }: { route: any, naviga
 
 const styles = StyleSheet.create({
   modalContainer: {
+    
     backgroundColor: 'white',
-    padding: 0,
     borderRadius: 10,
-    marginHorizontal: width > 1000 ? width * 0.1 : 20,
-    height: height * 0.7,
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+    paddingBottom: 0,
   },
   scrollContainer: {
     flexGrow: 1,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 16,
+    fontFamily: 'Lexend_700Bold',
   },
   loaderContainer: {
     flex: 1,

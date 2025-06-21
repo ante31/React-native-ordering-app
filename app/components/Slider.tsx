@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { StyleSheet, View, Animated, TouchableOpacity, Text } from 'react-native';
 
-const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData, setOrderData, initialSide = 'left', isCroatianLang }: { isSlidRight: boolean; setIsSlidRight: any; boxWidth: number; setBoxWidth: any; orderData: any; setOrderData: any; initialSide?: 'left' | 'right'; isCroatianLang: boolean }) => {
+const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData, setOrderData, initialSide = 'left', isCroatianLang, scale }: { isSlidRight: boolean; setIsSlidRight: any; boxWidth: number; setBoxWidth: any; orderData: any; setOrderData: any; initialSide?: 'left' | 'right'; isCroatianLang: boolean, scale: number }) => {
+  const styles = getStyles(scale);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData,
 
   return (
     <View style={styles.sliderContainer}>
-      <View style={styles.grayBox} onLayout={(event) => setBoxWidth(event.nativeEvent.layout.width * 0.5)}>
+      <View style={[styles.grayBox]} onLayout={(event) => setBoxWidth(event.nativeEvent.layout.width * 0.5)}>
         <Animated.View style={[styles.whiteBox, { transform: [{ translateX: slideAnim }] }]} />
         <TouchableOpacity style={[styles.touchableLeft, isSlidRight && { opacity: 0.4 }]} onPress={() => toggleSlide('left')} activeOpacity={1}>
           <Text 
@@ -50,46 +51,44 @@ const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData,
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (scale: any) =>
+  StyleSheet.create({
   sliderContainer: {
     alignItems: 'center',
     marginTop: 20,
   },
   centerText: {
-    paddingTop: 4,
-    textAlign: 'center',
-    textAlignVertical: 'center',
     color: '#DA291C',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+    fontSize: scale.isTablet() ? 30 : 17,
+    fontFamily: "Lexend_700Bold"  }
+  ,
   grayBox: {
+    flexDirection: 'row',
     width: '90%',
-    height: 46,
+    height: scale.isTablet() ? 80 : 46,
     backgroundColor: '#d4d4d4',
-    borderRadius: 30,
+    borderRadius: scale.isTablet() ? 50 : 30,
     position: 'relative',
     justifyContent: 'center',
   },
   whiteBox: {
     width: '50%',
-    height: 43,
+    height: scale.isTablet() ? 76 : 42,
     backgroundColor: 'white',
-    borderRadius: 28,
+    borderRadius: scale.isTablet() ? 50 : 28,
     position: 'absolute',
     left: 2,
+    top: 2
   },
-  touchableLeft: {
-    position: 'absolute',
-    width: '50%',
-    height: 30,
-    left: 0,
+touchableLeft: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   touchableRight: {
-    position: 'absolute',
-    width: '50%',
-    height: 30,
-    right: 0,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

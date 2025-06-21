@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { appButtonsDisabled } from '../services/isAppClosed';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 
-const ClosedAppModal = ({ isCroatianLanguage }: any) => {
+const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
   const {
     general,
     showClosedAppModal,
@@ -26,7 +26,7 @@ const ClosedAppModal = ({ isCroatianLanguage }: any) => {
         onDismiss={() => { setInfoAcknowledged(true); setShowClosedAppModal(false); }}
       >
         {general && <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
+          <Text style={[styles.modalText, { fontSize: scale.light(16) }]}>
             {appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) ?
               isCroatianLanguage
               ? `Aplikacija je zatvorena. Radno vrijme je od ${general?.workTime[dayOfWeek].openingTime} do ${general?.workTime[dayOfWeek].closingTime}.`
@@ -39,10 +39,23 @@ const ClosedAppModal = ({ isCroatianLanguage }: any) => {
           </Text>
           <Button 
             mode="contained" 
-            style={styles.orderButton} 
-            onPress={() => { setInfoAcknowledged(true); setShowClosedAppModal(false); }}
+            style={[
+              styles.orderButton, 
+              { 
+                paddingVertical: scale.light(8),
+                minHeight: scale.light(40)
+              }
+            ]}
+                      onPress={() => { setInfoAcknowledged(true); setShowClosedAppModal(false); }}
           >
-            <Text style={styles.textPosition}>
+            <Text style={[
+              styles.textPosition, 
+              { 
+                fontFamily: 'Lexend_700Bold',
+                fontSize: scale.light(16),
+                lineHeight: scale.light(16)
+              }
+            ]}>
               {isCroatianLanguage ? 'U redu' : 'OK'}
             </Text>
           </Button>
@@ -63,7 +76,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,  // Padding inside the modal content
-    width: '90%',  // Controls the width of the modal (adjust as needed)
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -75,24 +87,20 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   modalText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Lexend_700Bold',
     textAlign: 'center',
     marginBottom: 10,  // Space between the text and button
   },
-  orderButton: {
-    backgroundColor: '#FFC72C',
-    color: '#fff',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  textPosition: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-  },
+orderButton: {
+  backgroundColor: '#ffd400',
+  justifyContent: 'center',
+  paddingHorizontal: 20,
+  borderRadius: 5,
+},
+textPosition: {
+  color: '#fff',
+  textAlign: 'center',
+},
 })
 
 export default ClosedAppModal;

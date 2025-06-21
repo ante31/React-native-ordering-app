@@ -10,9 +10,9 @@ import { backendUrl } from "../../localhostConf";
 import { useToast } from "react-native-toast-notifications";
 import { isCroatian } from "../services/languageChecker";
 import { CenteredLoading } from "./CenteredLoading";
+import { safeFetch } from "../services/safeFetch";
 
-
-const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setReloadTrigger, navigation }: any) => {
+const CartMealDetails = ({ visible, meal, scale, onClose, handleRemoveFromCart, setReloadTrigger, navigation }: any) => {
   console.log("CartMealDetailsmeal", meal);
   const initialMeal = meal;
   const isCroatianLang = isCroatian();
@@ -25,11 +25,13 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
   );  const [selectedSize, setSelectedSize] = useState(meal ? meal.size : "");
   const [quantity, setQuantity] = useState(meal ? meal.quantity : 1);
   const [cartPrice, setPrice] = useState(meal ? meal.price : 0); 
-  const [selectedExtras, setSelectedExtras] = useState<{ [key: string]: string }>(meal.selectedExtras);
+  const [selectedExtras, setSelectedExtras] = useState<{ [key: string]: number }>(meal.selectedExtras);
   const [cartPriceSum, setPriceSum] = useState(cartPrice);
   const [isUpdating, setIsUpdating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitButtonStatus, setSubmitButtonStatus] = useState("");
+
+  console.log("DEtails", cartPrice, cartPriceSum, quantity);
 
   useEffect(() => {
     const submitButtonStatusCheck = () => {
@@ -74,12 +76,14 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
   console.log('MEALYMeal:', meal);
 
   const handleAddToCart = () => {
-    const uniqueId = `${meal.id}${Object.entries(selectedExtras)
+    console.log('Mealinfo', meal);
+    const uniqueId = `${meal.id}${meal.size}${Object.entries(selectedExtras)
       .map(([key]) => `_${key.split('|')[0].replace(/\s+/g, '')}`) // Remove spaces from extras
       .sort() // Sort the extras alphabetically
       .join('')}`;
 
     console.log("UniqueId", uniqueId)
+    console.log("Koji kurac", meal.name, meal.description, selectedSize, cartPriceSum/quantity, quantity, selectedExtras, meal.portionsOptions);
 
     dispatch({
       type: 'ADD_TO_CART',
@@ -88,7 +92,7 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
         name: meal.name, 
         description: meal.description,
         size: selectedSize,
-        price: cartPriceSum/quantity,
+        price: cartPrice,
         quantity: quantity,
         selectedExtras: selectedExtras,
         portionsOptions: meal.portionsOptions,
@@ -102,6 +106,7 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
         type: "danger",
         placement: "bottom",
         duration: 1200,
+        
       });
     }, 400); // Small delay
   };
@@ -110,9 +115,20 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
       if (meal.portionsOptions[selectedPortionIndex]?.extras != "null") {
         try {
           console.log("A fetch happened");
-          const response = await fetch(`${backendUrl}/cjenik/Prilozi/${meal.portionsOptions[selectedPortionIndex]?.extras}`);
+          const response = await safeFetch(`${backendUrl}/cjenik/Prilozi/${meal.portionsOptions[selectedPortionIndex]?.extras}`);
           const data = await response.json();
+
+          // 🔁 Update selectedExtras with new prices from fetched extras
+          const updatedSelectedExtras = Object.keys(selectedExtras).reduce((acc: { [key: string]: number }, key) => {
+          if (data.hasOwnProperty(key)) {
+            // If this extra was selected before and still exists, update to new price
+            acc[key] = data[key];
+          }
+          return acc;
+        }, {});
+
           setExtras(data);
+          setSelectedExtras(updatedSelectedExtras); // update selected ones with new prices
           setLoading(false); 
         } catch (error) {
           console.error('Error fetching extras:', error);
@@ -133,24 +149,24 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
 
 
   return (
-    <View style={styles.modalContainer}>
+    <View style={[styles.modalContainer, scale.isTablet() ? { margin: 10 } : {}]}>
       <View style={[styles.modalContent]}>
         <View style={{ marginBottom: 10 }}>
           <View style={{ width: "75%", paddingLeft: 10, paddingTop: 10 }}>
-            <Text style={styles.extrasTitle}>{isCroatianLang ? meal.name.split("|")[0] : meal.name.split("|")[1]}</Text>
-            <Text style={{ flexWrap: 'wrap' }}>{isCroatianLang ? meal.description.split("|")[0] : meal.description.split("|")[1]}</Text>
+            <Text style={[styles.extrasTitle, { fontSize: scale.medium(16) }]}>{isCroatianLang ? meal.name.split("|")[0] : meal.name.split("|")[1]}</Text>
+            <Text style={{ fontFamily: 'Lexend_400Regular', flexWrap: 'wrap', fontSize: scale.medium(12), paddingTop: 5 }}>{isCroatianLang ? meal.description.split("|")[0] : meal.description.split("|")[1]}</Text>
           </View>
           <TouchableOpacity
             onPress={onClose}
             style={{
               position: "absolute",
-              top: -10,
-              right: -10,
+              top: -6,
+              right: -6,
               padding: 10, // Optional padding for better click area
               zIndex: 1, // Ensure it appears on top
             }}
           >
-            <MaterialIcons name="close" size={38} color="black" />
+            <MaterialIcons name="close" size={scale.medium(32)} color="black" />
           </TouchableOpacity>
         </View>
         {loading ?
@@ -173,6 +189,7 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
                 quantity={quantity}
                 setIsUpdating={setIsUpdating}
                 isCroatianLang={isCroatianLang}
+                scale={scale}
               />
             )}
             {Object.keys(extras).length > 0 && meal.portionsOptions[0].extras !== "null" && (
@@ -185,6 +202,7 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
                 setPriceSum={setPriceSum}
                 quantity={quantity}
                 selectedPortionIndex={selectedPortionIndex}
+                scale={scale}
               />
             )}
           </ScrollView>
@@ -202,6 +220,8 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
             navigation={navigation}
             submitButtonStatus={submitButtonStatus}
             setReloadTrigger={setReloadTrigger}
+            scale={scale}
+            onClose={onClose}
           />
         </>
         )}
@@ -212,16 +232,9 @@ const CartMealDetails = ({ visible, meal, onClose, handleRemoveFromCart, setRelo
 
 const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  modalContent: { backgroundColor: "white", padding: 10, borderRadius: 10, width: "100%", height: "100%" },
-  extrasTitle: { fontSize: 18, fontWeight: "bold" },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    width: "100%",
-    paddingHorizontal: 0,
-  },
+  modalContent: { backgroundColor: "white", padding: 10, paddingBottom: 0, borderRadius: 10, width: "100%", height: "100%" },
+  extrasTitle: { fontSize: 18, fontFamily: "Lexend_700Bold",
+ },
 });
 
 export default CartMealDetails;

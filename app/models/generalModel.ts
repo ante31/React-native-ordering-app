@@ -11,6 +11,11 @@ export type MinOrder = {
   [location: string]: number;
 };
 
+export type Extras = {
+  penalty: number;
+  freeMax: number;
+}
+
 export type General = {
   deliveryPrice: number;
   deliveryTime: number;
@@ -24,6 +29,9 @@ export type General = {
   pickUpTime: number;
   sourceCurrency: string;
   workTime: WorkTime;
+  updateUrlAndroid: string;
+  updateUrlIOS: string;
+  extras: Extras
 };
 
 export type Holidays = {

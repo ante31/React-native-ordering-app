@@ -1,12 +1,13 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View, StyleSheet} from "react-native";
 import { HelperText, RadioButton } from "react-native-paper";
 import { appButtonsDisabled, onlyCustomOrders } from "../services/isAppClosed";
 import { getDayOfTheWeek, getLocalTime, getLocalTimeHours, getLocalTimeMinutes } from "../services/getLocalTime";
 import { useGeneral } from "../generalContext";
 
-export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDeliveryOption, setShowPicker, displayMessage, setDisplayMessage, displayWorkTimeMessage, setDisplayWorkTimeMessage, displaySecondMessage, setDisplaySecondMessage, timeString, isSlidRight, isCroatianLang}: any) => {
+export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDeliveryOption, setShowPicker, displayMessage, setDisplayMessage, displayWorkTimeMessage, setDisplayWorkTimeMessage, displaySecondMessage, setDisplaySecondMessage, timeString, isSlidRight, isCroatianLang, scale}: any) => {
+    const styles = getStyles(scale);
     const {general} = useGeneral();
     const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
@@ -64,7 +65,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             </HelperText>  
         )}
         <TouchableOpacity 
-            style={{ flexDirection: 'row', alignItems: 'center' }}
+            style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scale.isTablet() ? 20 : 6 }}
            onPress={() => {
                 if (onlyCustomOrders(general?.workTime[dayofWeek])) {
                     setDisplayWorkTimeMessage(true);
@@ -125,46 +126,90 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             }
             </HelperText>  
         )}
-        <TouchableOpacity 
-            disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
-            style={{ flexDirection: 'row', alignItems: 'center' }}
-            onPress={() => {setSelectedDeliveryOption('custom')
-                setShowPicker(true);}}
-        >
-            <RadioButton
-                color="#ffe521"
-                value="custom"
-                disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
-                status={selectedDeliveryOption === 'custom' ? 'checked' : 'unchecked'}
-                onPress={() => {setSelectedDeliveryOption('custom')
-                                setShowPicker(true);}}
-            />
-            <Text style={styles.radioButtonText}>
-                  {isCroatianLang
-                    ? `Odaberi vrijeme ${isSlidRight ? 'dostave' : 'preuzimanja'}`
-                    : `Select ${isSlidRight ? 'delivery' : 'pickup'} time`}
-            </Text>          
-            {timeString != "null" && selectedDeliveryOption === 'custom' && 
-            <View style={styles.box}>
-                <MaterialIcons name="access-time" size={20} color="#DA291C" />
-                <Text style={{color: '#000', fontSize: 18}}> {timeString}</Text>
-            </View>
-            }
-        </TouchableOpacity>
+        <TouchableOpacity
+  disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+  style={{
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+  }}
+  onPress={() => {
+    setSelectedDeliveryOption('custom');
+    setShowPicker(true);
+  }}
+>
+  <RadioButton
+    color="#ffe521"
+    value="custom"
+    disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+    status={selectedDeliveryOption === 'custom' ? 'checked' : 'unchecked'}
+    onPress={() => {
+      setSelectedDeliveryOption('custom');
+      setShowPicker(true);
+    }}
+  />
+
+  <Text
+    style={[
+      styles.radioButtonText,
+      {
+        flexShrink: 1,
+        flexWrap: 'nowrap',
+        marginRight: 5,
+      },
+    ]}
+    numberOfLines={2}
+    ellipsizeMode="tail"
+  >
+    {isCroatianLang
+      ? `Odaberi vrijeme ${isSlidRight ? 'dostave' : 'preuzimanja'}`
+      : `Select ${isSlidRight ? 'delivery' : 'pickup'} time`}
+  </Text>
+
+  {timeString != "null" && selectedDeliveryOption === 'custom' && (
+    <View
+      style={[
+        styles.box,
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+        },
+      ]}
+    >
+      <MaterialIcons name="access-time" size={20} color="#DA291C" />
+      <Text
+        style={{
+          marginLeft: 4,
+          color: '#000',
+          fontSize: 18,
+          fontFamily: 'Lexend_400Regular',
+        }}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {timeString}
+      </Text>
+    </View>
+  )}
+</TouchableOpacity>
+
+
     </View>
   );
 }
 
-const styles = {
+const getStyles = (scale: any) =>
+  StyleSheet.create({
     radioButtonContainer: {
-        marginTop: 10,
+        marginTop: scale.isTablet() ? 24 : 12,
       },
       radioButtonRow: {
         flexDirection: 'row',
         alignItems: 'center',
       },
       radioButtonText: {
-        fontSize: 16,
+        fontFamily: 'Lexend_400Regular',
+        fontSize: scale.light(14),
         color: '#000',
       },
       paddingContainer: {
@@ -181,4 +226,4 @@ const styles = {
         borderRadius: 8, // Za zaobljene rubove
         backgroundColor: '#f5f5f5', // Svijetla pozadina
       },
-};
+});

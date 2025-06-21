@@ -23,25 +23,18 @@ import { Meal } from "../models/mealModel";
 import CartMealDetails from "../components/CartMealDetails";
 import { HeaderBackButton } from '@react-navigation/elements';
 
-
-const { width, height } = Dimensions.get('screen');
+  const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const getModalHeight = (meal: any | null) => {
-  if (!meal) return height * 0.7;
+  if (!meal) return SCREEN_HEIGHT * 0.7;
   return meal.portionsOptions[0].extras === "null" ? "20%" : "80%";
 };
 
 
-const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any, meals: Meal[] }) => {
+const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, route: any, meals: Meal[], scale: any }) => {
+  const styles = getStyles(scale);
   useLayoutEffect(() => {
-    const handleHeaderBack = () => {
-      console.log("Header back button pressed, navigating to Home");
-      navigation.popToTop();
-      return true;
-    };
   
-    
-      
   }, [navigation]);
   const isCroatianLanguage = isCroatian();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -68,7 +61,7 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
 
   // Store animated widths for each item by id
   const animatedWidths = useRef(
-    new Map(cartState.items.map((item: any) => [item.id, new Animated.Value(50)]))
+    new Map(cartState.items.map((item: any) => [item.id, new Animated.Value(scale.light(46))]))
   ).current;
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
@@ -82,10 +75,12 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
   useEffect(() => {
     cartState.items.forEach(item => {
       if (!animatedWidths.has(item.id)) {
-        animatedWidths.set(item.id, new Animated.Value(50)); // initial closed width
+        animatedWidths.set(item.id, new Animated.Value(scale.light(46))); // initial closed width
       }
     });
   }, [cartState.items]);
+
+  console.log("Cart items in CartScreen:", cartState.items);
   
 
   const handlePress = () => {
@@ -138,7 +133,7 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
       const animatedWidth = animatedWidths.get(item.id);
       if (animatedWidth && item.id !== id) {
         Animated.timing(animatedWidth, {
-          toValue: 50,
+          toValue: scale.light(46),
           duration: 300,
           useNativeDriver: false,
         }).start();
@@ -149,7 +144,7 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
     const animatedWidth = animatedWidths.get(id);
     if (animatedWidth) {
       Animated.timing(animatedWidth, {
-        toValue: isSameItem ? 50 : 100,
+        toValue: isSameItem ? scale.light(46) : scale.light(100),
         duration: 300,
         useNativeDriver: false,
       }).start();
@@ -169,7 +164,7 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
       const animatedWidth = animatedWidths.get(id);
       if (animatedWidth) {
         Animated.timing(animatedWidth, {
-          toValue: 50,
+          toValue: scale.light(46),
           duration: 300,
           useNativeDriver: false,
         }).start();
@@ -188,14 +183,14 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
           }}
           style={styles.image}
         />
-        <Text style={styles.boldText}>{isCroatianLanguage? "Tvoja narudžba je prazna": "Your cart is empty"}</Text>
-        <Text style={styles.lightText}>{isCroatianLanguage? "Dodaj nešto po želji!": "Add something you like!"}</Text>
+        <Text style={[styles.boldText, { fontSize: scale.light(22)}]}>{isCroatianLanguage? "Vaša narudžba je prazna": "Your cart is empty"}</Text>
+        <Text style={[styles.lightText, { fontSize: scale.light(18)}]}>{isCroatianLanguage? "Dodajte nešto po želji!": "Add something you like!"}</Text>
         <View style={{position: 'absolute', bottom: 20, width: '100%', alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={styles.button}
+            style={[styles.button]}
           >
-            <Text style={styles.buttonText}>{isCroatianLanguage? "Natrag": "Back"}</Text>
+            <Text allowFontScaling={false} style={[styles.buttonText, { fontSize: scale.light(18), height: 26}]}>{isCroatianLanguage? "Natrag": "Back"}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -221,7 +216,7 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
                 <Animated.View
                   style={[
                     styles.quantityContainer,
-                    { width: animatedWidths.get(item.id) || 50 },
+                    { width: animatedWidths.get(item.id) || scale.light(46) },
                   ]}
                 >
                   {selectedItem === item.id ? (
@@ -230,14 +225,14 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
                         onPress={() => handleDecrement(item.id)}
                         style={styles.quantityButtonremove}
                       >
-                        <MaterialIcons name="remove" size={26} color="#FFC72C" />
+                        <MaterialIcons name="remove" size={scale.light(26)} color="#ffd400" />
                       </TouchableOpacity>
                       <Text style={styles.quantityText}>{item.quantity}</Text>
                       <TouchableOpacity
                         onPress={() => handleIncrement(item.id)}
                         style={styles.quantityButtonadd}
                       >
-                        <MaterialIcons name="add" size={26} color="#FFC72C" />
+                        <MaterialIcons name="add" size={scale.light(26)} color="#ffd400" />
                       </TouchableOpacity>
                     </View>
                   ) : (
@@ -246,20 +241,36 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
                 </Animated.View>
               </TouchableOpacity>
               <View style={styles.infoContainer}>
-                <Text style={styles.boldText}>{isCroatianLanguage ? item.name.split("|")[0] : item.name.split("|")[1]}{item.size !== "null" ? ` (${item.size})` : ''}</Text>
-                {Object.keys(item.selectedExtras).length > 0 && <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={[styles.boldText, { fontSize: scale.light(20)}]}>{isCroatianLanguage ? item.name.split("|")[0] : item.name.split("|")[1]}{item.size !== "null" ? ` (${item.size})` : ''}</Text>
+                {Object.keys(item.selectedExtras).length > 0 && 
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                   <Text style={styles.lightText}>
                     {Object.keys(item.selectedExtras).map(key => key.split('|')[isCroatianLanguage? 0: 1]).join(', ')}
                   </Text>
                 </View>}
+                {item.selectedDrinks?.length > 0 && 
+                  <View style={{flexDirection: 'row', marginTop: 5}}>
+                    <Text style={styles.lightText}>
+                      {item.selectedDrinks
+                        .map((drink: any) =>
+                          isCroatianLanguage
+                            ? drink.ime
+                            : drink.ime_en
+                        )
+                        .join(', ')
+                      }
+                    </Text>
+                  </View>
+                }
               </View>
               <TouchableOpacity
                 onPress={() => {
                   setItemToDelete(item.id);
                   setShowDeleteModal(true);
                 }}
+                style={{ marginRight: scale.isTablet() ? 20 : 0 }}
               >
-                <MaterialIcons name="delete" size={30} color="red" />
+                <MaterialIcons name="delete" size={scale.light(28)} color="red" />
               </TouchableOpacity>
             </TouchableOpacity>
             <View style={styles.dividerWrapper}>
@@ -272,15 +283,19 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
       <TouchableOpacity
         onPress={handlePress}
         disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
-        style={[styles.button, {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
+        style={[styles.button, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
       >
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <View style={{marginRight: 15, width: 30, height: 30, borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
-            <Text allowFontScaling={false} style={[{color: '#FFC72C', fontSize: 18,}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
+          <View style={{ marginLeft: scale.isTablet()? 10 : 0, marginRight: scale.isTablet()? 20 : 15, width: scale.light(30), height: scale.light(30), borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
+            <Text allowFontScaling={false} style={[{color: '#ffd400', fontFamily: "Lexend_400Regular", fontSize: scale.light(16)}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
-          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>{isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}</Text>
+          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>
+            {isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}
+          </Text>
         </View>
-        <Text style={[{color: '#fff', fontSize: 20}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{totalPrice.toFixed(2)} €</Text>
+        <Text style={[{fontFamily: "Lexend_400Regular", color: '#fff', fontSize: scale.light(18), marginRight: scale.isTablet()? 10 : 0}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>
+          {totalPrice.toFixed(2)} €
+        </Text>
 
       </TouchableOpacity>
       <Portal>
@@ -318,12 +333,13 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
         <Modal
           visible={showMealDetailsModal}
           onDismiss={() => setShowMealDetailsModal(false)}
-          contentContainerStyle={[styles.modalContainer, { height: getModalHeight(selectedMeal) }]}
+          contentContainerStyle={[styles.modalContainer, { height: getModalHeight(selectedMeal), margin: scale.heavy(16) }]}
         >
           {selectedMeal ? (
             <CartMealDetails
               visible={showMealDetailsModal}
               meal={selectedMeal}
+              scale={scale}
               onClose={() => setShowMealDetailsModal(false)}
               handleRemoveFromCart={handleDelete}
               setReloadTrigger={setReloadTrigger}
@@ -340,7 +356,8 @@ const CartScreen = ({ navigation, route, meals  }: { navigation: any, route: any
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (scale: any) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -348,7 +365,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   scrollViewContent: {
-    padding: 20,
+    padding: scale.isTablet()? 50 : 20,
     alignItems: "center",
   },
   image: {
@@ -357,29 +374,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   boldText: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Lexend_700Bold",
     color: "#333",
     marginBottom: 10,
   },
   lightText: {
-    fontSize: 16,
+    fontFamily: "Lexend_400Regular",
+    fontSize: scale.light(14),
     color: "#666",
   },
-  button: {
-    height: 60,
-    marginBottom: 20,
-    backgroundColor: "#FFC72C",
-    padding: 15,
-    borderRadius: 5,
-    width: "90%",
-    alignItems: "center",
-  },
+button: {
+  // height: scale.light(50),  // makni ovo
+  paddingVertical: 15,
+  paddingHorizontal: 20,
+  marginBottom: 20,
+  backgroundColor: "#ffd400",
+  borderRadius: 5,
+  width: "90%",
+  alignItems: "center",
+  justifyContent: "center",
+},
   buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: scale.light(17),
+    fontFamily: "Lexend_700Bold",
     color: "#fff",
-    marginTop: 4, 
   },  
   itemWrapper: {
     width: "100%",
@@ -388,61 +406,56 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   quantityContainer: {
-    height: 50,
+    height: scale.light(46),
     backgroundColor: "#fff",
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#ffcc00",
+    borderWidth: scale.light(2),
+    borderColor: "#ffd400",
     marginRight: 10,
   },
   quantityContent: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   quantityButtonadd: {
-    width: 30,
-    height: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft:10
+    marginLeft: scale.light(10)
   },
   quantityButtonremove: {
-    width: 30,
-    height: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10
-  },
-  quantityButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    marginRight: scale.light(10)
   },
   quantityText: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: scale.light(14),
+    fontFamily: "Lexend_700Bold"
   },
   infoContainer: {
     flex: 1,
     marginHorizontal: 10,
+    marginLeft: scale.isTablet()? 10 : 0
   },
   divider: {
-    marginBottom: 20,
+    marginBottom: 8,
     height: 1,
     backgroundColor: "grey",
-    opacity: 1, /* was 0 */
+    opacity: 1, 
   },
   dividerWrapper: {
     width: '100%',
-    position: 'relative', // Allow absolute positioning of the text
-    marginBottom: 20, // Adjust as needed
+    position: 'relative',
+    marginBottom: 20, 
   },
   overlayText: {
+    fontFamily: "Lexend_400Regular",
     position: 'absolute',
-    right: 10, 
-    top: -15, 
-    fontSize: 16,
+    right: scale.isTablet() ? 30 : 10, 
+    top: scale.isTablet() ? -22 : -15, 
+    fontSize: scale.isTablet() ? 28 : 16,
     color: 'red', 
     backgroundColor: 'white',
     paddingHorizontal: 15,
@@ -468,12 +481,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 0,
     borderRadius: 10,
-    marginHorizontal: 20,
-    height: height * 0.7,
+    height: SCREEN_HEIGHT * 0.7,
   },
   backButtonContainer: {
     position: 'relative',
-    width: 50, // or whatever size your HeaderBackButton takes
+    width: 50, 
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
@@ -489,6 +501,8 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-end',}
-});
+  });
+
+
 
 export default CartScreen;

@@ -1,3 +1,4 @@
+
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect } from "expo-router";
 import { useEffect, useState } from "react";
@@ -8,6 +9,8 @@ import { appButtonsDisabled, isClosedMessageDisplayed } from "../services/isAppC
 import { getDayOfTheWeek, getLocalTime, getYearMonthDay } from "../services/getLocalTime";
 import { backendUrl } from "@/localhostConf";
 import { useGeneral } from "../generalContext";
+import { formatEuropeanDateTime } from '../services/toEuropeanDate';
+import { safeFetch } from "../services/safeFetch";
 
 export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   const {general} = useGeneral();
@@ -24,7 +27,7 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
           try {
             const fullDateString = getYearMonthDay(item.time);
             const [year, month, day] = fullDateString.split("-");
-            const response = await fetch(`${backendUrl}/orders/${year}/${month}/${day}/${item.id}`);
+            const response = await safeFetch(`${backendUrl}/orders/${year}/${month}/${day}/${item.id}`);
     
             if (!response.ok) throw new Error(`Error fetching orders: ${response.statusText}`);
     
@@ -48,11 +51,16 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   <View style={styles.content}>
     <Text style={styles.text}>{isCroatianLang ? 'Ime: ': 'Name: '}{item.name}</Text>
     <Text style={styles.text}>{isCroatianLang ? 'Telefon: ': 'Phone: '}{item.phone}</Text>
-    <Text style={styles.text}>{!item.isDelivery ? isCroatianLang ? 'Preuzimanje': 'Pickup' : isCroatianLang ? 'Dostava': 'Delivery'}</Text>
+    {/* <Text style={styles.text}>{!item.isDelivery ? isCroatianLang ? 'Preuzimanje': 'Pickup' : isCroatianLang ? 'Dostava': 'Delivery'}</Text> */}
     {item.isDelivery && (               
         <Text style={styles.text}>{isCroatianLang ? 'Adresa: ': 'Address:'} {item.address}, {item.zone}</Text>
     )}
-    {item.note.length !== 0 && (<Text style={styles.text}>Napomena: {String(item.note)}</Text>)}
+    <Text style={styles.text}>{isCroatianLang
+      ? item.isDelivery ? 'Okvrino vrijeme dostave: ' : 'Okvirno vrijeme pripreme: '
+      : item.isDelivery ? 'Estimated delivery time: ' : 'Estimated preparation time: '}
+      {formatEuropeanDateTime(item.deadline).split(" ")[1]}
+    </Text>
+    {item.note.length !== 0 && (<Text style={styles.text}>{isCroatianLang ? 'Napomena: ': 'Note:'} {String(item.note)}</Text>)}
     <Text style={[styles.text, styles.statusText]}>
       Status: {order ? (
         isCroatianLang ? 
@@ -80,7 +88,7 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
       {Object.keys(cartItem.selectedExtras).length !== 0 && (
       <Text style={styles.selectedExtrasText}>
         {Object.entries(cartItem.selectedExtras).map(([extra, quantity], extraIndex) => (
-        <Text key={extraIndex}>
+        <Text key={extraIndex} style={{fontFamily: 'Lexend_400Regular'}}>
           {extra.split('|')[isCroatianLang ? 0 : 1]}
           {extraIndex < Object.entries(cartItem.selectedExtras).length - 1 && ', '}
         </Text>
@@ -90,12 +98,12 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
     </View>
     ))}
     <View style={styles.buttonContainer}>
-        <TouchableOpacity 
+        {/* <TouchableOpacity 
             onPress={() => handleDelete(item.id)}
             style={styles.leftButton}
         >
             <MaterialIcons name="delete" size={30} color="red" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
             onPress={() => handleRenew(item.id)}
             style={[styles.rightButton, appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) && styles.disabledButton]}
@@ -128,7 +136,7 @@ const styles = StyleSheet.create({
       },
       rightButton: {
         marginHorizontal: 5,
-        borderColor: '#FFC72C',
+        borderColor: '#ffd400',
         borderWidth: 2,
         flex: 5,
         borderRadius: 5,
@@ -136,13 +144,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',      // Center text horizontally
       },      
       buttonText: {
-        color: '#FFC72C',
+        color: '#ffd400',
         fontSize: 20,
         paddingVertical: 15,
+        fontFamily: 'Lexend_400Regular',
       },
       text: {
         fontSize: 16,
         marginBottom: 5,
+        fontFamily: 'Lexend_400Regular',
       },
       statusText: {
         color: 'gray',
@@ -153,10 +163,10 @@ const styles = StyleSheet.create({
       cartItemText: {
         fontSize: 14,
         marginBottom: 5,
-        fontWeight: 'bold',
+        fontFamily: 'Lexend_700Bold',
       },
       sizeText: {
-        fontWeight: 'normal',
+        fontFamily: 'Lexend_400Regular',
       },
       selectedExtrasText: {
         paddingLeft: 1,

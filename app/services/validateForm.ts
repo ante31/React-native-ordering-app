@@ -2,8 +2,16 @@ const validateForm = (orderData: any, isSlidRight: boolean, setErrors: any, minO
     let valid = true;
     let newErrors = { name: '', phone: '', address: '', zone: '' };
 
-    if (!orderData.name || orderData.name.length < 2 || orderData.name.length > 50 || /[^a-zA-Z\s]/.test(orderData.name)) {
-      newErrors.name = iscroatianLang ? "Unesite ispravno ime (2-50 slova, bez brojeva i spec. znakova)" : "Enter a valid name (2-50 letters, no numbers or special characters)";
+    if (
+        !orderData.name ||
+        orderData.name.length < 2 ||
+        orderData.name.length > 50 ||
+        /[^\p{L}\s]/u.test(orderData.name)
+      ) 
+    {
+      newErrors.name = iscroatianLang
+        ? "Unesite ispravno ime (2-50 slova, bez brojeva i spec. znakova)"
+        : "Enter a valid name (2-50 letters, no numbers or special characters)";
       valid = false;
     }
     
@@ -30,6 +38,8 @@ const validateForm = (orderData: any, isSlidRight: boolean, setErrors: any, minO
     }
 
     setErrors(newErrors);
+
+    console.log("VALIDITYy", valid);
     return valid;
   };
 

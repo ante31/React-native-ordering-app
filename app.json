@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gricko",
     "slug": "client",
-    "version": "59.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/gricko-icon.png",
     "scheme": "myapp",
@@ -18,6 +18,10 @@
         "usesNonExemptEncryption": false
       }
     },
+     "notification": {
+        "icon": "./assets/images/notification.png",
+        "color": "#ffd400"
+      },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/gricko-icon2.png",

@@ -1,19 +1,65 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextInput, HelperText, Checkbox, ActivityIndicator } from "react-native-paper";
 import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { geodecode, getLocation } from '../services/locationService';
 import DropdownComponent from './DropdownPicker';
 
-const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isCroatianLang }: any) => {
+const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSaveData, isCroatianLang, scale }: any) => {
+  const styles = getStyles(scale);
   const [loading, setLoading] = useState(false);
   const theme = {
+    fonts: {
+    regular: {
+      fontFamily: 'Lexend_400Regular',
+      fontWeight: 'normal',
+    },
+  },
     colors: {
       primary: 'black',
       underlineColor: 'transparent',
       text: 'red', // Label color is controlled by the 'text' color in React Native Paper theme
     },
   };
+
+
+  useEffect(() => {
+    setErrors((prevErrors: any) => {
+      const updatedErrors = { ...prevErrors };
+      let changed = false;
+
+      if (orderData.name && orderData.name.length >= 2 && orderData.name.length <= 50 && !/[^a-zA-Z\s]/.test(orderData.name)) {
+        if (updatedErrors.name) {
+          delete updatedErrors.name;
+          changed = true;
+        }
+      }
+
+      if (orderData.phone && /^\+?[0-9]{7,15}$/.test(orderData.phone)) {
+        if (updatedErrors.phone) {
+          delete updatedErrors.phone;
+          changed = true;
+        }
+      }
+
+      if (orderData.isDelivery && orderData.address && orderData.address.length >= 5 && orderData.address.length <= 100) {
+        if (updatedErrors.address) {
+          delete updatedErrors.address;
+          changed = true;
+        }
+      }
+
+      if (orderData.isDelivery && orderData.zone) {
+        if (updatedErrors.zone) {
+          delete updatedErrors.zone;
+          changed = true;
+        }
+      }
+
+      return changed ? updatedErrors : prevErrors;
+    });
+  }, [orderData]);
+
 
   const handleLocationPress = async (event: any) => {
     event.stopPropagation(); // Prevents input field from being focused
@@ -81,8 +127,22 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
         onChangeText={(text) => setOrderData({ ...orderData, name: text })} 
         left={<TextInput.Icon icon="account" color="#ffcc00" />}
         style={styles.input}
-        theme={theme} />
-      {errors.name && <HelperText type="error" visible={!!errors.name}>{errors.name}</HelperText>}
+        theme={{
+          ...theme,
+          colors: {
+            ...theme.colors,
+            outline: errors.name ? 'red' : theme.colors.primary, // 👈 conditional outline color
+          },
+          fonts: {
+            ...theme.fonts,
+            regular: {
+              fontFamily: 'Lexend_400Regular',
+              fontWeight: 'normal',
+            },
+          },
+        }}
+      />
+      {errors.name && <HelperText style={styles.helperText} type="error" visible={!!errors.name}>{errors.name}</HelperText>}
 
       <TextInput 
         placeholder={isCroatianLang ? 'Telefon' : 'Phone number'}
@@ -91,9 +151,22 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
         value={orderData.phone}
         left={<TextInput.Icon icon="phone" color="#ffcc00" />}
         onChangeText={(text) => setOrderData({ ...orderData, phone: text })} style={styles.input} 
-        theme={theme} />
-      {errors.phone && <HelperText type="error" visible={!!errors.phone}>{errors.phone}</HelperText>}
-   
+        theme={{
+          ...theme,
+          colors: {
+            ...theme.colors,
+            outline: errors.phone ? 'red' : theme.colors.primary, // 👈 conditional outline color
+          },
+          fonts: {
+            ...theme.fonts,
+            regular: {
+              fontFamily: 'Lexend_400Regular',
+              fontWeight: 'normal',
+            },
+          },
+        }}
+      />
+      {errors.phone && <HelperText style={styles.helperText} type="error" visible={!!errors.phone}>{errors.phone}</HelperText>}   
       {orderData.isDelivery && <TextInput 
         placeholder={isCroatianLang ? 'Adresa' : 'Address'}
         mode="outlined"
@@ -104,63 +177,86 @@ const Orderform = ({ orderData, setOrderData, errors, saveData, setSaveData, isC
           !loading ? (
             <TextInput.Icon 
               icon="crosshairs-gps" 
+              style={{ marginRight: scale.isTablet() ? 30 : 4 }}
+              size={scale.light(24)}
               color="#ffcc00" 
               onPress={(event) => handleLocationPress(event)} 
               />
           ): (
             <TextInput.Icon
-              icon={() => <ActivityIndicator size="small" color="#ffcc00" />}
+              icon={() => <ActivityIndicator 
+              style={{ marginRight: scale.isTablet() ? 30 : 4 }}
+              size={scale.light(24)} 
+              color="#ffcc00" />}
             />
           )
         }        
         style={styles.input}
-        theme={theme} />}
-      {errors.address && orderData.isDelivery && <HelperText type="error" visible={!!errors.address}>{errors.address}</HelperText>}
+        theme={{
+          ...theme,
+          colors: {
+            ...theme.colors,
+            outline: errors.address && orderData.isDelivery ? 'red' : theme.colors.primary, // 👈 conditional outline color
+          },
+          fonts: {
+            ...theme.fonts,
+            regular: {
+              fontFamily: 'Lexend_400Regular',
+              fontWeight: 'normal',
+            },
+          },
+        }}
+      />}
 
+      {errors.address && orderData.isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.address}>{errors.address}</HelperText>}
       {orderData.isDelivery && (
-        <DropdownComponent orderData={orderData} setOrderData={setOrderData} isCroatianLang={isCroatianLang}/>
+        <DropdownComponent errors={errors} orderData={orderData} setOrderData={setOrderData} isCroatianLang={isCroatianLang} scale={scale}/>
       )}
-      {errors.zone && orderData.isDelivery && <HelperText type="error" visible={!!errors.zone}>{errors.zone}</HelperText>}
+      {errors.zone && orderData.isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.zone}>{errors.zone}</HelperText>}
 
-      <TextInput 
+      <TextInput
         placeholder={isCroatianLang ? 'Napomena' : 'Note'}
         mode="outlined"
         value={orderData.note}
         onChangeText={(text) => setOrderData({ ...orderData, note: text })}
         left={<TextInput.Icon icon="comment-text-outline" color="#ffcc00" />}
         style={styles.input}
-        theme={theme} />
+        theme={{
+          ...theme,
+          colors: {
+            ...theme.colors,
+          },
+          fonts: {
+            ...theme.fonts,
+            regular: {
+              fontFamily: 'Lexend_400Regular',
+              fontWeight: 'normal',
+            },
+          },
+        }}
+      />
 
-      {/* <View style={styles.checkboxTextContainer}>
-        <Checkbox
-          status={saveData ? 'checked' : 'unchecked'} // Check if the full key is in selectedExtras
-          onPress={() => {
-            setSaveData(!saveData);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }} 
-          color="#ffe521"
-        />
-        <Text onPress={() => {
-            setSaveData(!saveData);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }} 
-        >
-          {isCroatianLang ? 'Spremi podatke' : 'Save order'}
-        </Text>
-      </View> */}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (scale: any) =>
+  StyleSheet.create({
   checkboxTextContainer: { 
     flexDirection: 'row', alignItems: 'center' 
   },
   input: {
-    marginBottom: 10,
+    fontFamily: 'Lexend_400Regular',
+    marginBottom: scale.isTablet() ? 20 : 10,
+    height: scale.isTablet() ? 70 : 50,
+    fontSize: scale.light(16),
   },
   container: {
     position: "relative",
+  },
+  helperText: {
+    fontSize: scale.light(12),
+    marginBottom: scale.isTablet() ? 20 : 10,
   },
 });
 

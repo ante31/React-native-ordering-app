@@ -1,9 +1,10 @@
 import { backendUrl } from "../../localhostConf";
+import { safeFetch } from "./safeFetch";
 
 export const updateMealPopularity = async (meals: any) => {
     try {
         // Fetch data from the backend
-        const response = await fetch(`${backendUrl}/cjenik/updatePopularity`, {
+        const response = await safeFetch(`${backendUrl}/cjenik/updatePopularity`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

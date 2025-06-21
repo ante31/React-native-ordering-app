@@ -10,13 +10,14 @@ export interface PushNotificationState {
 }
 
 export const usePushNotifications = (): PushNotificationState => {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldPlaySound: false,
-      shouldShowAlert: true,
-      shouldSetBadge: false,
-    }),
-  });
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
   const [expoPushToken, setExpoPushToken] = useState<
     Notifications.ExpoPushToken | undefined
@@ -26,8 +27,9 @@ export const usePushNotifications = (): PushNotificationState => {
     Notifications.Notification | undefined
   >();
 
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.Subscription | null>(null);
+  const responseListener = useRef<Notifications.Subscription | null>(null);
+
 
   async function registerForPushNotificationsAsync() {
     let token;
@@ -41,7 +43,7 @@ export const usePushNotifications = (): PushNotificationState => {
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification");
+        console.log("Failed to get push token for push notification");
         return;
       }
 

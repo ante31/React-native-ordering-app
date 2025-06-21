@@ -1,6 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
+apply plugin: 'com.google.gms.google-services'
+
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
@@ -93,7 +95,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "59.0.1"
+        versionName "1.0.3"
     }
     signingConfigs {
         debug {
@@ -101,12 +103,6 @@ android {
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
-        }
-        release {
-            storeFile file('ante_gricko.jks')
-            storePassword '91e9a922dd6e675457feeb5855034f50'
-            keyAlias '8c354dd392c0f3926e4d671c2a796743'
-            keyPassword '3a7b8e1ac710de4a4098c14b02f81901'
         }
     }
     buildTypes {
@@ -156,6 +152,8 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation 'com.google.firebase:firebase-messaging:23.4.0' 
+
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
@@ -181,5 +179,3 @@ dependencies {
         implementation jscFlavor
     }
 }
-
-apply plugin: 'com.google.gms.google-services'

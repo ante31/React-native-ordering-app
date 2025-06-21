@@ -6,12 +6,40 @@ import { appButtonsDisabled } from '../services/isAppClosed';
 import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 
-const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortionIndex, setSelectedPortionIndex, selectedExtras, setSelectedExtras, setPrice, setPriceSum, quantity, setIsUpdating, isCroatianLang }: any) => {
+const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortionIndex, setSelectedPortionIndex, selectedExtras, setSelectedExtras, setPrice, setPriceSum, quantity, setIsUpdating, isCroatianLang, scale }: any) => {
     const {general} = useGeneral();
     const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   
+  // This useEffect will calculate the total price whenever selectedExtras or quantity changes
   useEffect(() => {
+    // Calculate the total extras price based on the selectedExtras format
+    const extrasPrice = Object.values(selectedExtras).reduce((acc, value) => acc as any + value, 0);
+
+    //console.log("Extras price", extrasPrice);
+
+    // Update the price with the new size and extras
+    setPrice(meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice);
+
+    // Update the total price sum based on quantity
+    setPriceSum(quantity * (meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice));
+    setIsUpdating(false)
+  }, [selectedExtras, quantity]);
+
+  // This function is called when a size is selected
+  const toggleSize = (size: string, value: number, index: number) => {
+    // Update the selected size and the selected portion index
+    setIsUpdating(true)
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setSelectedSize(size);
+    setSelectedPortionIndex(index);
+
+    console.log("Toggling size", size, value, index);
+    console.log("Extras", extras);
+    console.log("Selected extras", selectedExtras);
     if (Object.keys(extras).length > 0) {
+      setIsUpdating(true);
       // Recalculate the selectedExtras from the extras object
       const updatedSelectedExtras = Object.keys(selectedExtras).reduce((acc: { [key: string]: number }, key) => {
         const newValue = parseFloat(extras[key] as string || '0');
@@ -23,65 +51,38 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
         return acc;
       }, {});
   
+      console.log("Updated selected extras", updatedSelectedExtras);
       // Set the updated selectedExtras
-      setSelectedExtras(updatedSelectedExtras);
     }
-  }, [extras, setSelectedExtras]); // Add selectedExtras as a dependency
-  
-
-  // This useEffect will calculate the total price whenever selectedExtras or quantity changes
-  useEffect(() => {
-     
-      // Calculate the total extras price based on the selectedExtras format
-      const extrasPrice = Object.values(selectedExtras).reduce((acc, value) => acc as any + value, 0);
-
-    //console.log("Extras price", extrasPrice);
-
-    // Update the price with the new size and extras
-    setPrice(meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice);
-
-    // Update the total price sum based on quantity
-    setPriceSum(quantity * (meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice));
-    setIsUpdating(false)
-  }, [selectedExtras, quantity, setPrice, setPriceSum]);
-
-  // This function is called when a size is selected
-  const toggleSize = (size: string, value: number, index: number) => {
-    // Update the selected size and the selected portion index
-    setIsUpdating(true)
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    setSelectedSize(size);
-    setSelectedPortionIndex(index);
   };
   return (
     <View style={styles.sizeContainer}>
-      <Text style={styles.sizeTitle}>{isCroatianLang? 'Odaberi veličinu': 'Select size'}</Text>
-      <Divider style={styles.divider} />
+      <Text style={[styles.sizeTitle, { fontSize: scale.light(14) }]}>{isCroatianLang? 'Odaberi veličinu': 'Select size'}</Text>
+      <Divider style={[styles.divider, { marginBottom: scale.light(5) }]} />
       {(meal.portions ? meal.portions : meal.portionsOptions).map((portion: any, index: number) => {
         return (
-          <TouchableOpacity key={index} style={styles.radioButtonContainer}
-            onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
+          <TouchableOpacity key={index} style={[styles.radioButtonContainer, { paddingHorizontal: scale.light(10) }]}
+            onPress={() => toggleSize(isCroatianLang ? portion.size : portion.size_en, portion.price, index)}
             disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}            
           >
-            <View style={styles.radioButtonTextContainer}>
-              <RadioButton
-                value={isCroatianLang? portion.size : portion.size_en}
-                status={selectedSize === portion.size || selectedSize === portion.size_en ? 'checked' : 'unchecked'}
-                onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
-                color="#ffe521"
-                disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
-              
-              />
-              <Text style={styles.sizeText} 
-              >
+            <View style={[styles.radioButtonTextContainer, scale.isTablet() && { marginVertical: 6 }]}>
+              <View style={scale.isTablet() ? { transform: [{ scale: 2.2 }], marginHorizontal: 20 } : {}}>
+                <RadioButton
+                  value={isCroatianLang? portion.size : portion.size_en}
+                  status={selectedSize === portion.size || selectedSize === portion.size_en ? 'checked' : 'unchecked'}
+                  onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
+                  color="#ffe521"
+                  disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+                
+                />
+              </View>
+              <Text style={[styles.sizeText, { fontSize: scale.light(14) }]} >
                 {isCroatianLang? portion.size : portion.size_en}
               </Text>
             </View>
             {meal.portions? 
-              portion.price - meal.portions[0].price ? <Text style={styles.sizePrice}>+{(portion.price - meal.portions[0].price).toFixed(2)} €</Text>: <></>:
-              portion.price - meal.portionsOptions[0].price ? <Text style={styles.sizePrice}>+{(portion.price - meal.portionsOptions[0].price).toFixed(2)} €</Text>: <></>
+              portion.price - meal.portions[0].price ? <Text style={[styles.sizePrice, { fontSize: scale.light(12) }]}>+{(portion.price - meal.portions[0].price).toFixed(2)} €</Text>: <></>:
+              portion.price - meal.portionsOptions[0].price ? <Text style={[styles.sizePrice, { fontSize: scale.light(12) }]}>+{(portion.price - meal.portionsOptions[0].price).toFixed(2)} €</Text>: <></>
             }
           </TouchableOpacity>
         );
@@ -93,12 +94,11 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
 const styles = StyleSheet.create({
   sizeContainer: { width: "100%", paddingBottom: 0 },
   radioButtonTextContainer: { flexDirection: "row", alignItems: "center" },
-  radioButtonContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10, justifyContent: "space-between", paddingRight: 10 },
-  sizeText: { fontSize: 16, marginLeft: 10 },
-  sizePrice: { fontSize: 14, color: "#DA291C", marginLeft: 1 },
+  radioButtonContainer: { flexDirection: "row", alignItems: "center", marginBottom: 10, justifyContent: "space-between" },
+  sizeText: { marginLeft: 10, fontFamily: "Lexend_700Bold" },
+  sizePrice: { color: "#DA291C", marginLeft: 1, fontFamily: "Lexend_700Bold" },
   sizeTitle: {
-    fontSize: 16, // Adjust the size of the title
-    fontWeight: "bold",
+    fontFamily: "Lexend_700Bold",    
     color: "#DA291C",
     marginBottom: 10,
     marginLeft: 10,

@@ -93,7 +93,7 @@ const Picker = ({ showPicker, setShowPicker, timeString, setTimeString, isSlidRi
                 closeOnOverlayPress
                 LinearGradient={LinearGradient}
                 Haptics={Haptics}
-                styles={{ theme: "light" }}
+                styles={{ theme: "light", text: { fontFamily: "Lexend_400Regular" }}}
                 confirmButtonText={isCroatianLanguage ? "Potvrdi" : "Confirm"}
                 cancelButtonText={isCroatianLanguage ? "Odustani" : "Cancel"}
             />

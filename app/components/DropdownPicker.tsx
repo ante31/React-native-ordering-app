@@ -18,7 +18,8 @@ const data = [
   { label: 'Kaštel Sućurac', value: 'Kaštel Sućurac' },
 ];
 
-const DropdownComponent = ({ orderData, setOrderData, isCroatianLang }: any) => {
+const DropdownComponent = ({ errors, orderData, setOrderData, isCroatianLang, scale }: any) => {
+  const styles = getStyles(scale, errors, orderData);
   const [isFocus, setIsFocus] = useState(false);
 
   useEffect(() => {
@@ -40,7 +41,7 @@ const DropdownComponent = ({ orderData, setOrderData, isCroatianLang }: any) => 
 
   return (
     <View style={styles.container}>
-      {renderLabel()}
+      {/* {renderLabel()} */}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: 'black', borderWidth: 2  }]}
         placeholderStyle={styles.placeholderStyle}
@@ -74,17 +75,18 @@ const DropdownComponent = ({ orderData, setOrderData, isCroatianLang }: any) => 
 
 export default DropdownComponent;
 
-const styles = StyleSheet.create({
+const getStyles = (scale: any, errors: any, orderData: any) =>
+  StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    paddingTop: 6,
-    paddingBottom: 8
+    paddingTop: 0,
+    marginBottom: scale.isTablet() ? 20 : 10,
   },
   dropdown: {
-    height: 50,
-    borderColor: 'gray',
+    height: scale.isTablet() ? 70 : 50,
+    borderColor: errors.zone && orderData.isDelivery ? 'red' : 'black',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 4,
     paddingHorizontal: 8,
 
   },
@@ -102,10 +104,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: scale.light(16),
   },
   selectedTextStyle: {
-    fontSize: 16,
+    fontSize: scale.light(16),
   },
   iconStyle: {
     width: 20,
