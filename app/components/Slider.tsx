@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { StyleSheet, View, Animated, TouchableOpacity, Text } from 'react-native';
+import { isDeliveryClosed } from '../services/isAppClosed';
 
-const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData, setOrderData, initialSide = 'left', isCroatianLang, scale }: { isSlidRight: boolean; setIsSlidRight: any; boxWidth: number; setBoxWidth: any; orderData: any; setOrderData: any; initialSide?: 'left' | 'right'; isCroatianLang: boolean, scale: number }) => {
+const Slider = ({ workingHours, isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData, setOrderData, initialSide = 'left', isCroatianLang, scale, setDisplayDeliveryClosedMessage }: { workingHours: any; isSlidRight: boolean; setIsSlidRight: any; boxWidth: number; setBoxWidth: any; orderData: any; setOrderData: any; initialSide?: 'left' | 'right'; isCroatianLang: boolean, scale: number, setDisplayDeliveryClosedMessage: any }) => {
   const styles = getStyles(scale);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -40,7 +41,7 @@ const Slider = ({ isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData,
             style={styles.centerText}>{isCroatianLang ? 'Preuzimanje' : 'Pickup'}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.touchableRight, !isSlidRight && { opacity: 0.4 }]} onPress={() => toggleSlide('right')} activeOpacity={1}>
+        <TouchableOpacity style={[styles.touchableRight, !isSlidRight && { opacity: 0.4 }]} onPress={() => isDeliveryClosed(workingHours)? setDisplayDeliveryClosedMessage(true) : toggleSlide('right')} activeOpacity={1}>
           <Text 
             allowFontScaling={false}
             style={styles.centerText}>{isCroatianLang ? 'Dostava' : 'Delivery'}

@@ -25,13 +25,21 @@ export type General = {
   minOrder: MinOrder;
   minVersionAndroid: number;
   minVersionIOS: number;
-  msg: string;
   pickUpTime: number;
   sourceCurrency: string;
   workTime: WorkTime;
   updateUrlAndroid: string;
   updateUrlIOS: string;
   extras: Extras
+  message: {
+    text: string;
+    textEn: string;
+    active: boolean;
+  };
+  appStatus: {
+    appClosed: boolean;
+    forceAppOpen: boolean;
+  }
 };
 
 export type Holidays = {

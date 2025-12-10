@@ -10,24 +10,17 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
     const {general} = useGeneral();
     const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   
-  // This useEffect will calculate the total price whenever selectedExtras or quantity changes
   useEffect(() => {
-    // Calculate the total extras price based on the selectedExtras format
     const extrasPrice = Object.values(selectedExtras).reduce((acc, value) => acc as any + value, 0);
 
-    //console.log("Extras price", extrasPrice);
 
-    // Update the price with the new size and extras
     setPrice(meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice);
 
-    // Update the total price sum based on quantity
     setPriceSum(quantity * (meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice));
     setIsUpdating(false)
   }, [selectedExtras, quantity]);
 
-  // This function is called when a size is selected
   const toggleSize = (size: string, value: number, index: number) => {
-    // Update the selected size and the selected portion index
     setIsUpdating(true)
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -40,30 +33,28 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
     console.log("Selected extras", selectedExtras);
     if (Object.keys(extras).length > 0) {
       setIsUpdating(true);
-      // Recalculate the selectedExtras from the extras object
       const updatedSelectedExtras = Object.keys(selectedExtras).reduce((acc: { [key: string]: number }, key) => {
         const newValue = parseFloat(extras[key] as string || '0');
         
         if (newValue > 0 || selectedExtras[key] === 0 || selectedExtras[key] === 0.2) {
-          acc[key] = selectedExtras[key]; // Use the original value from selectedExtras
+          acc[key] = selectedExtras[key]; 
         }
         
         return acc;
       }, {});
   
       console.log("Updated selected extras", updatedSelectedExtras);
-      // Set the updated selectedExtras
     }
   };
   return (
     <View style={styles.sizeContainer}>
-      <Text style={[styles.sizeTitle, { fontSize: scale.light(14) }]}>{isCroatianLang? 'Odaberi veličinu': 'Select size'}</Text>
+      <Text style={[styles.sizeTitle, { fontSize: scale.light(14) }]}>{isCroatianLang? 'Odaberite veličinu': 'Select size'}</Text>
       <Divider style={[styles.divider, { marginBottom: scale.light(5) }]} />
       {(meal.portions ? meal.portions : meal.portionsOptions).map((portion: any, index: number) => {
         return (
           <TouchableOpacity key={index} style={[styles.radioButtonContainer, { paddingHorizontal: scale.light(10) }]}
             onPress={() => toggleSize(isCroatianLang ? portion.size : portion.size_en, portion.price, index)}
-            disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}            
+            disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}            
           >
             <View style={[styles.radioButtonTextContainer, scale.isTablet() && { marginVertical: 6 }]}>
               <View style={scale.isTablet() ? { transform: [{ scale: 2.2 }], marginHorizontal: 20 } : {}}>
@@ -72,7 +63,7 @@ const SizeList = ({ meal, selectedSize, extras, setSelectedSize, selectedPortion
                   status={selectedSize === portion.size || selectedSize === portion.size_en ? 'checked' : 'unchecked'}
                   onPress={() => toggleSize(isCroatianLang? portion.size : portion.size_en, portion.price, index)}
                   color="#ffe521"
-                  disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+                  disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
                 
                 />
               </View>

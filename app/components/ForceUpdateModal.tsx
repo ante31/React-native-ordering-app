@@ -1,24 +1,21 @@
 import React, { useEffect } from 'react';
 import { Modal, Portal, Button } from 'react-native-paper';
-import { useGeneral } from '../generalContext'; // Import the context hook
+import { useGeneral } from '../generalContext'; 
 import { StyleSheet, Text, View } from 'react-native';
 import { Linking } from 'react-native';
 
 const ForceUpdateModal = ({ isCroatianLanguage, scale }: any) => {
   const {
     general,
-    showClosedAppModal,
-    setShowClosedAppModal,
     showForceUpdate,
     setShowForceUpdate,
-    infoAcknowledged,
-    setInfoAcknowledged,
+    forceUpdateAcknowledged,
+    setForceUpdateAcknowledged,
   } = useGeneral();
 
   console.log("ForceUpdateModal");
-  console.log("showClosedAppModal", showClosedAppModal);
   console.log("showForceUpdate", showForceUpdate);
-  console.log("infoAcknowledged", infoAcknowledged);
+  console.log("infoAcknowledged", forceUpdateAcknowledged);
 
   return (
     <Portal>
@@ -59,15 +56,15 @@ const ForceUpdateModal = ({ isCroatianLanguage, scale }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,  // Ensures the container takes up full screen height
-    justifyContent: 'center',  // Vertically center the modal
-    alignItems: 'center',  // Horizontally center the modal
-    padding: 20,  // Optional: Add padding around the screen edges
+    flex: 1,  
+    justifyContent: 'center',  
+    alignItems: 'center',  
+    padding: 20,  
   },
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 20,  // Padding inside the modal content
+    padding: 20,  
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -81,7 +78,7 @@ const styles = StyleSheet.create({
   modalText: {
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,  // Space between the text and button
+    marginBottom: 10,  
   },
 orderButton: {
   backgroundColor: '#ffd400',

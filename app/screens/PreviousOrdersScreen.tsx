@@ -31,7 +31,10 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang, scale }: { na
           size: cartItem.size,
           price: cartItem.price,
           quantity: cartItem.quantity,
-          selectedExtras: cartItem.selectedExtras
+          extras: cartItem.extras,
+          selectedExtras: cartItem.selectedExtras,
+          selectedDrinks: cartItem.selectedDrinks,
+          type: cartItem.type,
           },
       });
     });
@@ -141,6 +144,7 @@ export const PreviousOrdersScreen = ({ navigation, isCroatianLang, scale }: { na
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: 20,
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
@@ -156,11 +160,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Lexend_700Bold',
     color: "#333",
     marginBottom: 10,
+    textAlign: 'center',
   },
   lightText: {
     fontFamily: 'Lexend_400Regular',
     fontSize: 16,
     color: "#666",
+    textAlign: 'center',
   },
   button: {
     marginBottom: 20,

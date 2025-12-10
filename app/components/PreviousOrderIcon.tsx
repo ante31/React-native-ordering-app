@@ -7,7 +7,7 @@ const PreviousOrderIcon = ({ navigation, scale }: { navigation: any, scale: any 
   return (
       <>
         <Image
-          source={require('../../assets/images/previousOrdersIcon.png')} // adjust the path based on your file structure
+          source={require('../../assets/images/previousOrdersIcon.png')} 
           style={{
             top: 5,
             width: isTablet() ? 72 : 42,

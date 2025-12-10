@@ -10,33 +10,55 @@ const DrinksList = ({ drinks, drinksType, drinksMax, selectedDrinks, setSelected
   const { general } = useGeneral();
   const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
-  const handleSelectDrink = (drinkId: string) => {
-    Haptics.selectionAsync();
+  console.log("type", drinksType)
+  Object.values(drinks).forEach((drink: any) => {
+    console.log("Drink:", drink.ime);
+    console.log("DrinksList props", drink.tip);
+  });
 
-    const selected = selectedDrinks.find((drink: any) => drink.id === drinkId);
+const handleSelectDrink = (drinkId: string) => {
+  Haptics.selectionAsync();
 
-    if (selected) {
-      // Deselect
-      setSelectedDrinks(selectedDrinks.filter((drink: any) => drink.id !== drinkId));
-    } else {
-      const drinkToAdd = drinks[drinkId];
-      if (!drinkToAdd) return; // safety check
+  const drinkToAdd = drinks[drinkId];
+  if (!drinkToAdd) return;
 
-      const newDrink = { id: drinkId, ...drinkToAdd };
+  const countOfThisDrink = selectedDrinks.filter((d: any) => d.id === drinkId).length;
+  const totalSelected = selectedDrinks.length;
 
-      if (selectedDrinks.length < drinksMax) {
-        setSelectedDrinks([...selectedDrinks, newDrink]);
+  if (totalSelected < drinksMax) {
+    // Just add new drink (or increment stack)
+    setSelectedDrinks([...selectedDrinks, { id: drinkId, ...drinkToAdd }]);
+  } else {
+    if (countOfThisDrink > 0) {
+      // Already selected this drink, want to add one more but at max capacity
+      // Remove oldest *different* drink to make room
+      const indexToRemove = selectedDrinks.findIndex((d: any) => d.id !== drinkId);
+      if (indexToRemove !== -1) {
+        const updated = [...selectedDrinks];
+        updated.splice(indexToRemove, 1); // remove oldest different drink
+        updated.push({ id: drinkId, ...drinkToAdd }); // add one more of the selected drink
+        setSelectedDrinks(updated);
       } else {
-        setSelectedDrinks([...selectedDrinks.slice(1), newDrink]);
+        // Only one drink type selected maxed out, can't add more
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
+    } else {
+      // Different drink selected, max reached - remove oldest drink and add new
+      const updated = [...selectedDrinks.slice(1), { id: drinkId, ...drinkToAdd }];
+      setSelectedDrinks(updated);
     }
-  };
+  }
+};
+
+
 
 
   React.useEffect(() => {
     // Reset selected drinks when drinks change
     console.log("Selected drinks changed", selectedDrinks);
   }, [selectedDrinks]);
+
+  console.log("language", isCroatianLang);
 
 
   return (
@@ -53,14 +75,16 @@ const DrinksList = ({ drinks, drinksType, drinksMax, selectedDrinks, setSelected
             return true;
           })
           .map(([id, drink]: any) => {
-            const isSelected = selectedDrinks.some((drink: any) => drink.id === id);
-            const disabled = appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays);
+          const drinkCount = selectedDrinks.filter((drink: any) => drink.id === id).length;
+          const isSelected = drinkCount > 0;
+          const disabled = appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays);
 
             return (
               <TouchableOpacity
                 key={id}
                 style={[styles.radioButtonContainer, { paddingHorizontal: scale.light(10) }]}
                 onPress={() => handleSelectDrink(id)}
+                
                 disabled={disabled}
               >
                 <View style={[styles.radioButtonTextContainer, scale.isTablet() && { marginVertical: 6 }]}>
@@ -73,10 +97,31 @@ const DrinksList = ({ drinks, drinksType, drinksMax, selectedDrinks, setSelected
                       disabled={disabled}
                     />
                   </View>
-                  <Text style={[styles.drinkText, { fontSize: scale.light(14) }]}>
-                    {isCroatianLang ? drink.ime : drink.ime_en}
-                  </Text>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+                    <Text
+                      style={[
+                        styles.drinkText,
+                        {
+                          fontSize: scale.light(14),
+                          flexShrink: 1,
+                          flex: 1,
+                        },
+                      ]}
+                      numberOfLines={0}
+                      ellipsizeMode="tail"
+                    >
+                      {isCroatianLang ? drink.ime : drink.ime_en}
+                      {drinkCount > 1 && (
+                        <Text style={{ color: 'red', fontSize: scale.light(13), fontWeight: '600' }}>
+                          {'  '}x{drinkCount}
+                        </Text>
+                      )}
+                    </Text>
+
+                  </View>
                 </View>
+
               </TouchableOpacity>
             );
           })}
@@ -110,6 +155,7 @@ const styles = StyleSheet.create({
   drinkText: {
     marginLeft: 10,
     fontFamily: "Lexend_400Regular",
+    flexWrap: "wrap",
   },
 });
 

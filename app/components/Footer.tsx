@@ -45,7 +45,7 @@ const Footer = ({ scale, general, isCroatianLanguage }: any) => {
       <View style={{ display: 'flex', flexDirection: 'row', paddingHorizontal: 10 }}>
         <View style={{ flex: 1 }}>
           <Text style={{ fontFamily: 'Lexend_700Bold', fontSize: scale.light(14), marginBottom: 5, textAlign: 'center' }}>
-            {isCroatianLanguage ? 'Radno vrijeme' : 'Working hours'}
+            {isCroatianLanguage ? 'Radno vrijeme:' : 'Working hours:'}
           </Text>
           {general?.workTime && isEveryTimeSame(general.workTime, true) ? (
             <Text
@@ -97,7 +97,7 @@ const Footer = ({ scale, general, isCroatianLanguage }: any) => {
         </View>
 
         <View style={{
-          flex: 1, paddingHorizontal: 10
+          flex: 1
 
         }}>
           <Text style={{ fontSize: scale.light(14), fontFamily: 'Lexend_700Bold', marginBottom: 5, textAlign: 'center' }}>
@@ -160,7 +160,6 @@ const Footer = ({ scale, general, isCroatianLanguage }: any) => {
       <Text
         style={{ fontFamily: 'Lexend_400Regular', fontSize: scale.light(12), color: 'blue', textDecorationLine: 'underline', textAlign: 'center' }}
         onPress={() => {
-          // Ovdje dodajte navigaciju ili otvaranje linka za Privacy Policy
           Linking.openURL('https://ff-gricko.web.app/privacy/');
         }}
       >

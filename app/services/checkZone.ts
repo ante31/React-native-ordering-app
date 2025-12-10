@@ -42,6 +42,6 @@ export function checkPosition(latitude: number, longitude: number) {
 
   if (pointInPolygon(point, Ispod.map(p => new Point(p[0], p[1])))) return "below";
   if (pointInPolygon(point, Iznad.map(p => new Point(p[0], p[1])))) return "above";
-  if (pointInPolygon(point, Iznad.map(p => new Point(p[0], p[1])))) return "aerodrom";
+  if (pointInPolygon(point, Aerodrom.map(p => new Point(p[0], p[1])))) return "aerodrom";
   return "outside";
 }

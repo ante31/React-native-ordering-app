@@ -13,11 +13,15 @@ import MealDetails from '../components/MealDetails';
 import { isTablet } from "../services/isTablet";
 import NetworkError from "../components/NetworkError";
 import { safeFetch } from "../services/safeFetch";
+import { io } from 'socket.io-client';
 
 const { width, height } = Dimensions.get('screen');
+const socket = io(backendUrl, { transports: ['websocket'] });
 
-
-export default function HomePage({ navigation, scale, showNetworkError, setShowNetworkError }: { navigation: any, scale: any, showNetworkError: boolean, setShowNetworkError: any }) {
+export default function HomePage({ navigation, scale, drinks={}, specials, showNetworkError, setShowNetworkError }: { navigation: any, scale: any, drinks: any, specials: any, showNetworkError: boolean, setShowNetworkError: any }) {
+  const [data, setData] = useState<any>(null);
+  
+  
   const CARD_MARGIN = 16;
   const SPECIAL_OFFER_POSITION = -5;
   const SPECIAL_OFFER_TABLET_POSITION = -8;
@@ -26,8 +30,6 @@ export default function HomePage({ navigation, scale, showNetworkError, setShowN
   const { general } = useGeneral();
   const isCroatianLanguage = isCroatian();
   const [extras, setExtras] = useState<any>({});
-  const [specials, setSpecials] = useState<any[]>([]);
-  const [drinks, setDrinks] = useState<any[]>([]);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showMealModal, setShowMealModal] = useState(false);
@@ -50,7 +52,7 @@ export default function HomePage({ navigation, scale, showNetworkError, setShowN
       return;
     }
     else {
-      const selectedMeal = specials.find(meal => meal.id === id);
+      const selectedMeal = specials.find((meal: any) => meal.id === id);
       if (selectedMeal) {
         handleMealClick(selectedMeal); // 👈 Pass full meal object
       } else {
@@ -99,22 +101,6 @@ export default function HomePage({ navigation, scale, showNetworkError, setShowN
       console.log('Greška pri dohvaćanju priloga:', error);
     });
 }, []);
-
-  useEffect(() => {
-    safeFetch(`${backendUrl}/cjenik/Posebno`)
-      .then((response) => response.json())
-      .then((data) => {
-        setSpecials(Object.entries(data).map(([key, meal]) => ({ id: key, ...(typeof meal === 'object' ? meal : {}) })));
-      })
-      .catch((error) => console.error('Error fetching meals:', error))
-
-    safeFetch(`${backendUrl}/cjenik/Piće`)
-      .then((response) => response.json())
-      .then((data) => {
-        setDrinks(data); // Don't convert to array
-      })
-      .catch((error) => console.error('Error fetching meals:', error));
-  }, []);
 
 
   console.log("Zašto ", isTablet())
@@ -182,7 +168,7 @@ export default function HomePage({ navigation, scale, showNetworkError, setShowN
                         }}
                       >
                         <Image
-                          source={require('../../assets/images/posebna ponuda-cro.png')}
+                          source={isCroatianLanguage ? require('../../assets/images/posebna ponuda-cro.png') : require('../../assets/images/posebna ponuda-eng.png')}
                           style={{
                             width: isTablet()
                               ? SPECIAL_OFFER_TABLET_SIZE
@@ -208,28 +194,23 @@ export default function HomePage({ navigation, scale, showNetworkError, setShowN
                         )
                       }
                       style={{
-                        flex: 1, // Raste da popuni prostor
+                        flex: 1, 
+                        ...(Platform.OS === 'ios' && {
+                          overflow: 'hidden',
+                        }),
                       }}
                     >
-                      {Platform.OS === 'ios' ? (
-                        <Image
-                          source={{ uri: item.image }}
-                          style={{
-                            width: '100%',
-                            height: scale.isTablet() ? 400 : 200,
-                            resizeMode: 'cover',
-                            borderRadius: 10,
-                          }}
-                        />
-                      ) : (
-                        <Card.Cover
-                          source={{ uri: item.image }}
-                          style={{
-                            backgroundColor: 'white',
-                            width: '100%',
-                          }}
-                        />
-                      )}
+                      <Card.Cover
+                        source={{ uri: item.image }}
+                        style={{
+                          backgroundColor: 'white',
+                          width: '100%',
+                          // Postavite visinu koju ste imali u iOS kodu
+                          height: scale.isTablet() ? 400 : 200, 
+                          borderRadius: 10,
+                        }}
+                        // Card.Cover automatski koristi resizeMode: 'cover', ali možemo ga eksplicitno definirati
+                      />
 
                       <Card.Content
                         style={{
@@ -268,7 +249,7 @@ export default function HomePage({ navigation, scale, showNetworkError, setShowN
           {selectedMeal ? (
             <MealDetails
               visible={showMealModal}
-              meal={selectedMeal}
+              globalMeal={selectedMeal}
               drinks={drinks}
               scale={scale}
               onClose={() => setShowMealModal(false)}

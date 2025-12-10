@@ -5,6 +5,7 @@ export type CartItem = {
     size: string;
     price: number;
     quantity: number;
+    extras: { [key: string]: number }
     selectedExtras: { [key: string]: number }; 
     selectedDrinks: []; 
     portionsOptions: {
@@ -13,4 +14,5 @@ export type CartItem = {
         price: number;
         extras: string | null;
     }[];
+    type: string;
   };

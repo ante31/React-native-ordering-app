@@ -1,4 +1,6 @@
+import { getDayOfTheWeek } from "./getLocalTime";
 import { getUpdatedTime } from "./getUpdatedTime";
+import { getLocalTime } from "./getLocalTime";
 
 export const checkTimeValidity = (
   pickedDuration: { hours: number; minutes: number; },
@@ -9,11 +11,13 @@ export const checkTimeValidity = (
   isSlidRight: any,
   general: any
 ) =>{
+  const dayOfWeek = getDayOfTheWeek(getLocalTime(), general.holidays);
+  
   const offset = general? isSlidRight ? general.deliveryTime : general.pickUpTime: 45;
   const { hours, minutes } = getUpdatedTime(offset);
 
-  const closingTime = isSlidRight ? general?.workingHours.deliveryClosingTime : general?.workingHours.closingTime;
-  const openingTime = isSlidRight ? general?.workingHours.deliveryOpeningTime : general?.workingHours.openingTime;
+  const closingTime = isSlidRight ? general?.workTime[dayOfWeek].deliveryClosingTime : general?.workTime[dayOfWeek].closingTime;
+  const openingTime = isSlidRight ? general?.workTime[dayOfWeek].deliveryOpeningTime : general?.workTime[dayOfWeek].openingTime;
 
   const [closingHour, closingMinutes] = (closingTime || "23:00").split(":").map(Number);
   const [openingHour, openingMinutes] = (openingTime || "09:00").split(":").map(Number);

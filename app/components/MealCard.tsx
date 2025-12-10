@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
   productDesc: {
     fontSize: 14,
     color: "#777",
-    marginTop: -6,
-    marginBottom: -6,
+    marginTop: 0,
+    marginBottom: 0,
     fontFamily: 'Lexend_400Regular'
   },
   productPrice: {

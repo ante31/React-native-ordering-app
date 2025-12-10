@@ -10,8 +10,8 @@ const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
     general,
     showClosedAppModal,
     setShowClosedAppModal,
-    infoAcknowledged,
-    setInfoAcknowledged,
+    forceUpdateAcknowledged,
+    setForceUpdateAcknowledged,
   } = useGeneral();
 
   const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
@@ -23,11 +23,16 @@ const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
       <Modal 
         style={styles.container} 
         visible={showClosedAppModal} 
-        onDismiss={() => { setInfoAcknowledged(true); setShowClosedAppModal(false); }}
+        onDismiss={() => { setForceUpdateAcknowledged(true); setShowClosedAppModal(false); }}
       >
         {general && <View style={styles.modalContent}>
           <Text style={[styles.modalText, { fontSize: scale.light(16) }]}>
-            {appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) ?
+            {general.appStatus.appClosed && !general.appStatus.forceAppOpen ?
+              isCroatianLanguage
+              ? `Aplikacija je zatvorena.`
+              : `Application is closed.`
+              :
+            appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays) ?
               isCroatianLanguage
               ? `Aplikacija je zatvorena. Radno vrijme je od ${general?.workTime[dayOfWeek].openingTime} do ${general?.workTime[dayOfWeek].closingTime}.`
               : `Application is closed. Working hours are from ${general?.workTime[dayOfWeek].openingTime} to ${general?.workTime[dayOfWeek].closingTime}.`
@@ -46,7 +51,7 @@ const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
                 minHeight: scale.light(40)
               }
             ]}
-                      onPress={() => { setInfoAcknowledged(true); setShowClosedAppModal(false); }}
+                      onPress={() => { setForceUpdateAcknowledged(true); setShowClosedAppModal(false); }}
           >
             <Text style={[
               styles.textPosition, 

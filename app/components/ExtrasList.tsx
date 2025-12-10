@@ -1,19 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Touchable, TouchableOpacity, Platform } from 'react-native';
 import { Button, Checkbox, Divider, Modal, Portal } from 'react-native-paper';
-import { isCroatian } from '../services/languageChecker';
-import * as Haptics from "expo-haptics"; // for haptic feedback
+import * as Haptics from "expo-haptics"; 
 import { appButtonsDisabled } from '../services/isAppClosed';
 import { CenteredLoading } from './CenteredLoading';
 import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 
 
-const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice, setPriceSum, quantity, selectedPortionIndex, isUpdating, scale }: any) => {
+const ExtrasList = ({ isCroatianLang, meal, extras, selectedExtras, setSelectedExtras, setPrice, setPriceSum, quantity, selectedPortionIndex, isUpdating, scale }: any) => {
   const {general} = useGeneral();
   const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   
-  const isCroatianLang = isCroatian();
   const [freeExtrasCount, setFreeExtrasCount] = useState(0);
   const [showWarningModal, setshowWarningModal] = useState(false);
   const prevFreeExtrasCount = useRef(0);
@@ -36,7 +34,7 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
   }, [selectedExtras]);
   
   const toggleExtra = (extra: string, value: number) => {
-    if (!general || !general.extras) return; // prevent null access
+    if (!general || !general.extras) return; 
 
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -50,7 +48,7 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
       if (fullExtraKey in updatedExtras) {
         delete updatedExtras[fullExtraKey];
 
-        // Reset penalty extras if exiting penalty mode
+        // Resetiranje penalty moda
         const newCount = Object.keys(updatedExtras).filter((key) =>
           updatedExtras[key] === 0 || updatedExtras[key] === general.extras.penalty
         ).length;
@@ -58,12 +56,12 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
         if (newCount <= general.extras.freeMax) {
           Object.keys(updatedExtras).forEach((key) => {
             if (updatedExtras[key] === general.extras.penalty) {
-              updatedExtras[key] = 0; // Reset penalty extras
+              updatedExtras[key] = 0; 
             }
           });
         }
       } else {
-        // Check if we're in penalty mode before adding the new extra
+        // Provjera jesmo li u panalty modu prije dodavanja novih priloga
         const isPenaltyMode = Object.keys(updatedExtras).filter((key) =>
           updatedExtras[key] === 0 || updatedExtras[key] === general.extras.penalty
         ).length >= general.extras.freeMax;
@@ -78,26 +76,22 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
   };
 
   
-  // This useEffect will calculate the total price whenever selectedExtras or quantity changes
   useEffect(() => {
-    // Calculate the total extras price based on the selectedExtras format
     const extrasPrice = Object.values(selectedExtras).reduce((acc, value) => acc as any + value, 0);
   
-    // Update the price with the new size and extras
     setPrice(meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice);
   
-    // Update the total price sum based on quantity
     setPriceSum(quantity * (meal.portions? meal.portions[selectedPortionIndex].price + extrasPrice: meal.portionsOptions[selectedPortionIndex].price + extrasPrice));
   }, [selectedExtras, quantity, setPrice, setPriceSum]);
   
   console.log("Extras", selectedExtras);
   return (
     <View style={styles.extrasContainer}>
-      <Text style={[styles.extrasTitle, { fontSize: scale.light(14) }]}>{isCroatianLang? "Odaberi priloge": "Select extras"}</Text>
+      <Text style={[styles.extrasTitle, { fontSize: scale.light(14) }]}>{isCroatianLang? "Odaberite priloge": "Select extras"}</Text>
       <Divider style={[styles.divider, , scale.isTablet() && { marginBottom: 20 }]} />
       {extras ? (
         Object.entries(extras).map(([label, value], index) => {
-          const [name, nameEn] = label.split('|'); // Get Croatian name part
+          const [name, nameEn] = label.split('|'); 
           return (
             <TouchableOpacity
               key={index}
@@ -107,18 +101,18 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
                   toggleExtra(name, value as number);
                 }
               }}
-              disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+              disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
             >
               <View style={styles.checkboxTextContainer}>
                 <View style={scale.isTablet() ? { transform: [{ scale: 2.2 }], marginHorizontal: 20 } : {}}>
                   <Checkbox
-                    status={label in selectedExtras ? 'checked' : 'unchecked'} // Check if the full key is in selectedExtras
+                    status={label in selectedExtras ? 'checked' : 'unchecked'} 
                     onPress={() => {
                       if (!isUpdating) {
                         toggleExtra(name, value as number);
                       }
                     }}                    color="#ffe521"
-                    disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+                    disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
                   />
                 </View>
                 <Text style={[ styles.checkboxText, { fontSize: scale.light(14)}]}>{isCroatianLang ? name : nameEn}</Text>
@@ -131,8 +125,8 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
                   (
                     Object.keys(selectedExtras).filter(
                       (key) =>
-                        selectedExtras[key] === 0 ||
-                        selectedExtras[key] === general.extras.penalty
+                        selectedExtras[key] === 0 
+                        || selectedExtras[key] === general.extras.penalty
                     ).length >= general.extras.freeMax &&
                     selectedExtras[label] !== 0
                   )
@@ -158,7 +152,7 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
       ) : (
         <CenteredLoading />
       )}
-      <Portal>
+      {/* <Portal>
         <Modal
           visible={showWarningModal}
           onDismiss={() => setshowWarningModal(false)}
@@ -176,7 +170,7 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
             </View>
           </View>
         </Modal>
-      </Portal>
+      </Portal> */}
     </View>
   );
 };
@@ -184,6 +178,7 @@ const ExtrasList = ({ meal, extras, selectedExtras, setSelectedExtras, setPrice,
 const styles = StyleSheet.create({
   extrasContainer: { width: '100%', paddingBottom: 0, marginBottom: 3 },
   checkboxContainer: { 
+    paddingVertical: 2,
     marginLeft: 0,
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -200,8 +195,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   priceContainer: {
-    marginTop: 5,
-    paddingVertical: 6,
+    marginTop: 0,
+    marginLeft: -16,
     alignItems: 'flex-start', // Ensure text aligns right
   },
   productPrice: {

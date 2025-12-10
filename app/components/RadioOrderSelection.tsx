@@ -6,10 +6,14 @@ import { appButtonsDisabled, onlyCustomOrders } from "../services/isAppClosed";
 import { getDayOfTheWeek, getLocalTime, getLocalTimeHours, getLocalTimeMinutes } from "../services/getLocalTime";
 import { useGeneral } from "../generalContext";
 
-export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDeliveryOption, setShowPicker, displayMessage, setDisplayMessage, displayWorkTimeMessage, setDisplayWorkTimeMessage, displaySecondMessage, setDisplaySecondMessage, timeString, isSlidRight, isCroatianLang, scale}: any) => {
+export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDeliveryOption, setShowPicker, displayMessage, setDisplayMessage, displayWorkTimeMessage, setDisplayWorkTimeMessage, displaySecondMessage, setDisplaySecondMessage, displayDeliveryClosedMessage, setDisplayDeliveryClosedMessage, timeString, isSlidRight, isCroatianLang, scale}: any) => {
     const styles = getStyles(scale);
     const {general} = useGeneral();
     const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
+
+    useEffect(() => {
+      console.log("selectedDeliveryOption in RadioOrderSelection", selectedDeliveryOption);
+    }, [selectedDeliveryOption]);
 
     useEffect(() => {
         if (onlyCustomOrders(general?.workTime[dayofWeek]) && selectedDeliveryOption === 'standard') {
@@ -22,9 +26,8 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
         if (displayMessage) {
             const timer = setTimeout(() => {
                 setDisplayMessage(false);
-            }, 5000); // Hide message after 5 seconds
-
-            return () => clearTimeout(timer); // Clean up the timeout on component unmount
+            }, 5000); 
+            return () => clearTimeout(timer); 
         }
     }, [displayMessage, setDisplayMessage]);
 
@@ -32,9 +35,9 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
         if (displayWorkTimeMessage) {
             const timer = setTimeout(() => {
                 setDisplayWorkTimeMessage(false);
-            }, 5000); // Hide message after 5 seconds
+            }, 5000);
 
-            return () => clearTimeout(timer); // Clean up the timeout on component unmount
+            return () => clearTimeout(timer); 
         }
     }, [displayWorkTimeMessage, setDisplayWorkTimeMessage]);
 
@@ -42,13 +45,20 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
         if (displaySecondMessage) {
             const timer = setTimeout(() => {
                 setDisplaySecondMessage(false);
-            }, 5000); // Hide message after 5 seconds
+            }, 5000); 
 
-            return () => clearTimeout(timer); // Clean up the timeout on component unmount
+            return () => clearTimeout(timer); 
         }
     }, [displaySecondMessage, setDisplaySecondMessage]);
     
-
+console.log("nirnngotinh6im4poim", isCroatianLang ?  
+                isSlidRight 
+                ? `Minimalno vrijeme za dostavu je ${general?.deliveryTime} min`
+                : `Minimalno vrijeme za preuzimanje je ${general?.pickUpTime} min`  
+            : isSlidRight 
+                ? `Minimum delivery time is ${general?.deliveryTime} min`
+                : `Minimum pickup time is ${general?.pickUpTime} min`
+        )
     return (
     <View style={[styles.radioButtonContainer, styles.paddingContainer]}>
         {displayWorkTimeMessage && (
@@ -64,13 +74,23 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             }
             </HelperText>  
         )}
+        {displayDeliveryClosedMessage && (
+            <HelperText type="error" visible={!!displayDeliveryClosedMessage}>
+            {
+            isCroatianLang 
+            ?  
+            `Radno vrijeme dostave je od ${general?.workTime[dayofWeek].deliveryOpeningTime} do ${general?.workTime[dayofWeek].deliveryClosingTime}`
+            :
+            `The delivery working hours are from ${general?.workTime[dayofWeek].deliveryOpeningTime} to ${general?.workTime[dayofWeek].deliveryClosingTime}` 
+            }
+            </HelperText>  
+        )}
         <TouchableOpacity 
             style={{ flexDirection: 'row', alignItems: 'center', marginBottom: scale.isTablet() ? 20 : 6 }}
            onPress={() => {
                 if (onlyCustomOrders(general?.workTime[dayofWeek])) {
                     setDisplayWorkTimeMessage(true);
                 } else {
-                    // If not disabled, proceed with the original logic
                     setSelectedDeliveryOption('standard');
                     console.log("Set to standard");
                     setShowPicker();
@@ -78,10 +98,10 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
                     console.log("LT", getLocalTimeHours(), getLocalTimeMinutes());
                 }
             }}
-            disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+            disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
         >
             <RadioButton
-                disabled={onlyCustomOrders(general?.workTime[dayofWeek]) || appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+                disabled={onlyCustomOrders(general?.workTime[dayofWeek]) || appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
                 color="#ffe521"
                 value="standard"
                 status={selectedDeliveryOption === 'standard' && !onlyCustomOrders(general?.workTime[dayofWeek]) ? 'checked' : 'unchecked'}
@@ -97,7 +117,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             >
                 {isCroatianLang? "Standarno": "Standard"}
             </Text>
-            {selectedDeliveryOption==='standard' && !appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && <View >
+            {selectedDeliveryOption==='standard' && !appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && <View >
                 <View style={styles.box}>
                     <MaterialIcons name="access-time" size={20} color="#DA291C" />
                     <Text style={styles.radioButtonText}> {isSlidRight? general?.deliveryTime: general?.pickUpTime} min</Text>
@@ -119,7 +139,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
         )}
         {displaySecondMessage && (
             <HelperText type="error" visible={!!displaySecondMessage}>
-            {onlyCustomOrders(general?.workTime[dayofWeek]) &&
+            {
             isCroatianLang ?  
             isSlidRight? "Odaberite vrijeme dostave ispod": "Odaberite vrijeme preuzimanja ispod"
             : isSlidRight? "Select delivery time below": "Select pickup time below"
@@ -127,7 +147,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
             </HelperText>  
         )}
         <TouchableOpacity
-  disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+  disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
   style={{
     flexDirection: 'row',
     alignItems: 'center',
@@ -141,7 +161,7 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
   <RadioButton
     color="#ffe521"
     value="custom"
-    disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
+    disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
     status={selectedDeliveryOption === 'custom' ? 'checked' : 'unchecked'}
     onPress={() => {
       setSelectedDeliveryOption('custom');
@@ -223,7 +243,7 @@ const getStyles = (scale: any) =>
         marginLeft: 10,
         borderWidth: 1,
         borderColor: '#000',
-        borderRadius: 8, // Za zaobljene rubove
-        backgroundColor: '#f5f5f5', // Svijetla pozadina
+        borderRadius: 8, 
+        backgroundColor: '#f5f5f5', 
       },
 });

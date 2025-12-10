@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gricko",
     "slug": "client",
-    "version": "1.0.3",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/gricko-icon.png",
     "scheme": "myapp",
@@ -18,17 +18,17 @@
         "usesNonExemptEncryption": false
       }
     },
-     "notification": {
-        "icon": "./assets/images/notification.png",
-        "color": "#ffd400"
-      },
+    "notification": {
+      "icon": "./assets/images/notification.png",
+      "color": "#ffd400"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/gricko-icon2.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.ante3101.Gricko",
-      "googleServicesFile": "./android/app/google-services.json"
+      "googleServicesFile": "./firebase/google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -45,7 +45,11 @@
           "resizeMode": "cover",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
@@ -59,9 +63,8 @@
       },
       "mode": "production",
       "localhost": "192.168.42.210",
-      "productionUrl": "https://server-three-pink-44.vercel.app/",
+      "productionUrl": "https://server-production-579c.up.railway.app",
       "devPort": "3000"
     }
   }
 }
-

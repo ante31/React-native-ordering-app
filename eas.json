@@ -15,7 +15,9 @@
       "autoIncrement": true,
       "android": {
         "gradleCommand": ":app:bundleRelease",
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "image": "android-29-ndk26"
+
       }
     }
   },

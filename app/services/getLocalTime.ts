@@ -24,20 +24,20 @@ export const getLocalTime = (): Date => {
     }
   });
 
-  // Construct ISO 8601 string (YYYY-MM-DDTHH:mm:ss)
+  // (YYYY-MM-DDTHH:mm:ss)
   const isoString = `${partValues.year}-${partValues.month}-${partValues.day}T${partValues.hour}:${partValues.minute}:${partValues.second}`;
-  
-  // Convert to Date object while preserving local time
-  const localDate = new Date(isoString + 'Z'); // Treat it as UTC
+  console.log("ISO STRING", isoString);
 
-  return new Date(localDate.getTime()); // Adjust to local time
+  const localDate = new Date(isoString + 'Z'); 
+
+  return new Date(localDate.getTime());
 };
 
 
 export const getLocalTimeHours = (): number => {
-  const now = getLocalTime(); // Get the formatted ISO string from getLocalTime
-  const timeParts = now.toISOString().split('T')[1].split(':'); // Extract time part (HH:mm:ss)
-  const hours = parseInt(timeParts[0], 10); // Get the hours as a number
+  const now = getLocalTime(); 
+  const timeParts = now.toISOString().split('T')[1].split(':'); 
+  const hours = parseInt(timeParts[0], 10); 
   return hours;
 };
 

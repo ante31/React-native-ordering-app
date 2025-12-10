@@ -25,33 +25,25 @@ export const isHoliday = (holidays?: Holidays): 'closed' | 'shortened' | 'normal
 };
 
 
-export const isClosedMessageDisplayed = (workingHours: any, holidays?: Holidays): boolean => {
+export const isClosedMessageDisplayed = (appStatus: any, workingHours: any, holidays?: Holidays): boolean => {
+  if (appStatus.appClosed || appStatus.forceAppOpen) {
+    console.log("appButtonsDisabled", appStatus.appClosed, appStatus.forceAppOpen);
+    return appStatus.appClosed || !appStatus.forceAppOpen;
+  }
   const hours = getLocalTimeHours();
   const minutes = getLocalTimeMinutes();
-
-  console.log("hhours", hours);
-  console.log("mminutes", minutes);
 
   const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.closingTime.split(":").map(Number);
 
-  console.log("openingHours", openingHours);
-  console.log("openingMinutes", openingMinutes);
-  console.log("closingHours", closingHours);
-  console.log("closingMinutes", closingMinutes);
-
-  console.log("holidaysY", 
-    hours > closingHours || 
-    (hours === closingHours && minutes >= closingMinutes) || 
-    hours < openingHours || 
-    (hours === openingHours && minutes < openingMinutes) ||
-    isHoliday(holidays) === "closed");
+  console.log("holidaysY", holidays);
 
   // Show closed message if current time is before opening or after closing
   return closingAfterMidnight(openingHours, closingHours) ?
     (hours > closingHours && hours < openingHours || 
     hours === closingHours && minutes >= closingMinutes ||
-    hours === openingHours && minutes < openingMinutes) :
+    hours === openingHours && minutes < openingMinutes) 
+    :
     hours > closingHours || 
     (hours === closingHours && minutes >= closingMinutes) || 
     hours < openingHours || 
@@ -61,11 +53,14 @@ export const isClosedMessageDisplayed = (workingHours: any, holidays?: Holidays)
 
 
 
-export const appButtonsDisabled = (workingHours: any, holidays?: Holidays): boolean => {
+export const appButtonsDisabled = (appStatus: any, workingHours: any, holidays?: Holidays): boolean => {
+  if (appStatus.appClosed || appStatus.forceAppOpen) {
+    return !(!appStatus.appClosed || appStatus.forceAppOpen);
+  }
+  
   const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.closingTime.split(":").map(Number);
 
-  // return false;
 
   if (closingAfterMidnight(openingHours, closingHours)) // buttons are never disabled if closing hours are 00:00 and after
     return false;
@@ -96,19 +91,18 @@ export const isDeliveryClosed = (workingHours: any): boolean => {
   const [openingHours, openingMinutes] = workingHours.deliveryOpeningTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.deliveryClosingTime.split(":").map(Number);
 
+  console.log("isDeliveryClosed", hours, minutes, openingHours, openingMinutes, closingHours, closingMinutes);
+
   // Show closed message if current time is before opening or after closing
   return closingAfterMidnight(openingHours, closingHours)?
-    hours > closingHours && hours < openingHours || // generalno
-    hours === closingHours && minutes >= closingMinutes ||
-    hours === openingHours && minutes < openingMinutes
+    hours > closingHours || // generalno
+    hours === closingHours && minutes >= closingMinutes 
     :
     hours > closingHours || 
-    (hours === closingHours && minutes >= closingMinutes) || 
-    hours < openingHours || 
-    (hours === openingHours && minutes < openingMinutes);
+    (hours === closingHours && minutes >= closingMinutes) 
   };
 
-const closingAfterMidnight = (openingHours: number, closingHours: number, ) => {
+export const closingAfterMidnight = (openingHours: number, closingHours: number, ) => {
   return closingHours < openingHours;
 }
 

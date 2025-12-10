@@ -88,6 +88,7 @@ const getStyles = (scale: any, errors: any, orderData: any) =>
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 8,
+    backgroundColor: '#fffbff'
 
   },
   icon: {

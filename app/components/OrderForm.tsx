@@ -62,8 +62,8 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
 
 
   const handleLocationPress = async (event: any) => {
-    event.stopPropagation(); // Prevents input field from being focused
-    Keyboard.dismiss(); // Manually dismiss the keyboard to prevent unwanted focus
+    event.stopPropagation(); 
+    Keyboard.dismiss();
 
     setLoading(true);
 

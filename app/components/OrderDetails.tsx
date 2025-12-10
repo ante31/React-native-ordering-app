@@ -48,11 +48,11 @@ const getStyles = (scale: any) =>
     marginVertical: 10,
   },
   disabledButton: {
-    backgroundColor: '#B0BEC5', // Disabled background color
-    opacity: 0.6, // Reduce opacity for disabled state
+    backgroundColor: '#B0BEC5', 
+    opacity: 0.6, 
   },
   disabledText: {
-    color: '#fff', // Light grey text when disabled
+    color: '#fff', 
   },
   title: {
     fontFamily: 'Lexend_400Regular',

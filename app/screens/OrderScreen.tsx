@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, use } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { Button, Divider } from 'react-native-paper';
 import { backendUrl } from '../../localhostConf';
@@ -22,12 +22,20 @@ import { useGeneral } from '../generalContext';
 import { checkTimeValidity } from '../services/checkTimeValidity';
 import { checkNotificationPermission } from '../services/checkNotificationsPermission';
 import { safeFetch } from '../services/safeFetch';
+import { isDeliveryClosed } from '../services/isAppClosed';
 
 export default function OrderScreen({ route, navigation, scale }: { route: any, navigation: any, scale: any }) {
   const styles = getStyles(scale);
   const isSubmittingRef = useRef(false);
   const submissionLock = useRef(false);
   const isLocked = useRef(false);
+
+  // useEffect(() => {
+  //   const lockTimeout = setTimeout(() => {
+  //     isLocked.current = false; // Unlock after 5 seconds
+  //   }, 5000);
+  //   return () => clearTimeout(lockTimeout); // Cleanup on unmount
+  // }, [isLocked]);
 
   const { expoPushToken, notification } = usePushNotifications();
   const { dispatch } = useCart();
@@ -82,13 +90,14 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
   const orderZone = storageOrder?.zone || lastOrder?.zone || '';
   const orderNote = storageOrder?.note || '';
 
-  const [isSlidRight, setIsSlidRight] = useState(storageOrder?.isDelivery || false);
+  const [isSlidRight, setIsSlidRight] = useState(false);
   const [boxWidth, setBoxWidth] = useState(0);
   const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<string>('standard');
   const [errors, setErrors] = useState({ name: '', phone: '', address: '', zone: '' });
   const [displayMessage, setDisplayMessage] = useState(false);
   const [displaySecondMessage, setDisplaySecondMessage] = useState(false);
   const [displayWorkTimeMessage, setDisplayWorkTimeMessage] = useState(false);
+  const [displayDeliveryClosedMessage, setDisplayDeliveryClosedMessage] = useState(false);
   const orderPrice = cartState.items.reduce((sum: number, item: any) => sum + item.quantity * item.price, 0);
 
   const [orderData, setOrderData] = useState({
@@ -134,6 +143,11 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
   }, [isSlidRight])
 
   const handleSubmit = async () => {
+    console.log("submit clicked");
+    if (isDeliveryClosed(general?.workTime[dayOfWeek]) && isSlidRight) {
+      setDisplayWorkTimeMessage(true);
+      return;
+    }
     if (isLocked.current) return;
     isLocked.current = true; // Lock instantly
 
@@ -184,9 +198,11 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
             ...orderData,
             token: expoPushToken?.data,
             totalPrice: orderPrice + (isSlidRight ? general?.deliveryPrice : 0),
+            timeOption: selectedDeliveryOption,
             time: currentDate,
             deadline: deadline,
             language: isCroatianLang ? "hr" : "en",
+            zone: orderData.isDelivery ? orderData.zone : '',
           };
 
           const response = await safeFetch(`${backendUrl}/orders`, {
@@ -222,26 +238,30 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
         console.error(err);
       }
     } else {
+      isLocked.current = false;
       console.log("Form validation failed");
     }
     isSubmittingRef.current = false;
     submissionLock.current = false;
     setIsSubmitting(false);
+    isLocked.current = false;
 }
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView >
         <Slider
+          workingHours={general?.workTime[dayOfWeek]}
           isSlidRight={isSlidRight}
           setIsSlidRight={setIsSlidRight}
           boxWidth={boxWidth}
           setBoxWidth={setBoxWidth}
           orderData={orderData}
           setOrderData={setOrderData}
-          initialSide={storageOrder?.isDelivery ? 'right' : 'left'}
+          initialSide={storageOrder?.isDelivery ? (isDeliveryClosed(general?.workTime[dayOfWeek]) ? 'left' : 'right') : 'left'}
           isCroatianLang={isCroatianLang}
           scale={scale}
+          setDisplayDeliveryClosedMessage={setDisplayDeliveryClosedMessage}
         />
 
 
@@ -253,6 +273,8 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
           setDisplayMessage={setDisplayMessage}
           displayWorkTimeMessage={displayWorkTimeMessage}
           setDisplayWorkTimeMessage={setDisplayWorkTimeMessage}
+          displayDeliveryClosedMessage={displayDeliveryClosedMessage}
+          setDisplayDeliveryClosedMessage={setDisplayDeliveryClosedMessage}
           displaySecondMessage={displaySecondMessage}
           setDisplaySecondMessage={setDisplaySecondMessage}
           timeString={timeString}
@@ -301,17 +323,17 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
         mode="contained"
         style={[
           styles.orderButton,
-          general?.workTime && appButtonsDisabled(general.workTime[dayOfWeek], general.holidays) && styles.disabledButton
+          general?.workTime && appButtonsDisabled(general?.appStatus, general.workTime[dayOfWeek], general.holidays) && styles.disabledButton
         ]}
         onPress={() => {   if (!isLocked.current) handleSubmit(); }}
-        disabled={!general?.workTime || appButtonsDisabled(general.workTime[dayOfWeek], general.holidays)
+        disabled={!general?.workTime || appButtonsDisabled(general?.appStatus, general.workTime[dayOfWeek], general.holidays)
           || (hasNotificationPermission && !expoPushToken) || isSubmitting
         }
       >
-        <Text style={[
+        <Text allowFontScaling={false} style={[
           { fontSize: scale.isTablet() ? 30 : 20, fontFamily: 'Lexend_400Regular' },
           styles.textPosition,
-          general?.workTime && appButtonsDisabled(general.workTime[dayOfWeek], general.holidays) && styles.disabledText // Change text color when disabled
+          general?.workTime && appButtonsDisabled(general?.appStatus, general.workTime[dayOfWeek], general.holidays) && styles.disabledText // Change text color when disabled
         ]}>
           {isCroatianLang ? 'Završi narudžbu' : 'Confirm order'}
         </Text>

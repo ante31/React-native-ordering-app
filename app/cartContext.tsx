@@ -62,7 +62,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
 };
 
-export const CartProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const CartProvider: React.FC<React.PropsWithChildren> = ({ children }: any) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
   const getCartLength = () => state.items.reduce((total, item) => total + item.quantity, 0);
 

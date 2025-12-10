@@ -39,7 +39,6 @@ const validateForm = (orderData: any, isSlidRight: boolean, setErrors: any, minO
 
     setErrors(newErrors);
 
-    console.log("VALIDITYy", valid);
     return valid;
   };
 

@@ -8,41 +8,72 @@ import * as Application from 'expo-application';
 import semver from 'semver';
 import { Platform } from 'react-native';
 import { safeFetch } from './services/safeFetch';
+import { io } from 'socket.io-client';
 
 type GeneralContextType = {
   general: General | null;
   showClosedAppModal: boolean;
   setShowClosedAppModal: (value: boolean) => void;
-  infoAcknowledged: boolean;
-  setInfoAcknowledged: (value: boolean) => void;
+  forceUpdateAcknowledged: boolean;
+  setForceUpdateAcknowledged: (value: boolean) => void;
+  customMessageAcknowledged: boolean;
+  setCustomMessageAcknowledged: (value: boolean) => void;
   showForceUpdate: boolean;
-  setShowForceUpdate: (value: boolean) => void;
+  setShowForceUpdate: (value: boolean) => void;  
+  showCustomMessage: boolean;
+  setShowCustomMessage: (value: boolean) => void;
 };
 
 
+const socket = io(backendUrl, { transports: ['websocket'] });
 
 const GeneralContext = createContext<GeneralContextType | null>(null);
 
 export const GeneralProvider = ({ children }: { children: React.ReactNode }) => {
   const [general, setGeneral] = useState<General | null>(null);
   const [showClosedAppModal, setShowClosedAppModal] = useState(false);
-  const [infoAcknowledged, setInfoAcknowledged] = useState(false);
+  const [forceUpdateAcknowledged, setForceUpdateAcknowledged] = useState(false);
+  const [customMessageAcknowledged, setCustomMessageAcknowledged] = useState(false);
   const [showForceUpdate, setShowForceUpdate] = useState(false);
+  const [showCustomMessage, setShowCustomMessage] = useState(false);
 
-  // Fetch general data
   useEffect(() => {
-    const fetchGeneral = async () => {
-      try {
-        const response = await safeFetch(`${backendUrl}/general`);
-        const data = await response.json();
-        setGeneral(data);
-      } catch (error) {
-        console.error('Error fetching general data:', error);
-      }
-    };
+  const fetchGeneral = async () => {
+    try {
+      const response = await safeFetch(`${backendUrl}/general`);
+      const data = await response.json();
+      console.log('🌐 [Fetch] General data fetched:', data);
+      setGeneral(data);
+    } catch (error) {
+      console.error('❌ [Fetch] Error fetching general data:', error);
+    }
+  };
 
-    fetchGeneral();
-  }, []);
+  // Prvo fetchaj
+  fetchGeneral();
+
+  socket.on('connect', () => {
+    console.log('✅ [Socket] Spojeno s backendom:', socket.id);
+  });
+
+  const handleGeneralUpdate = (newGeneralData: any) => {
+    console.log('📥 [Socket] Primljeni general podaci:', newGeneralData);
+    setGeneral(newGeneralData);
+  };
+
+  socket.on('general-update', handleGeneralUpdate);
+
+  socket.on('connect_error', (err) => {
+    console.log('❌ [Socket] connect error:', err.message);
+  });
+
+  return () => {
+    socket.off('connect');
+    socket.off('general-update', handleGeneralUpdate);
+    socket.off('connect_error');
+  };
+}, []);
+
 
   let dayofWeek: string | null = null;
 
@@ -59,8 +90,11 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     if (!general || !dayofWeek) return;
 
     const checkAppStatus = () => {
-      if (isClosedMessageDisplayed(general.workTime[dayofWeek]) && !infoAcknowledged) {
+      if (isClosedMessageDisplayed(general.appStatus, general.workTime[dayofWeek]) && !forceUpdateAcknowledged) {
         setShowClosedAppModal(true);
+      }
+      if (general.message.active){
+        setShowCustomMessage(true);
       }
     };
 
@@ -68,19 +102,18 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
     const interval = setInterval(checkAppStatus, 60000);
 
     return () => clearInterval(interval);
-  }, [general, dayofWeek, infoAcknowledged]);
+  }, [general, dayofWeek, forceUpdateAcknowledged]);
 
 
 // Check app version
   useEffect(() => {
   async function checkVersion() {
-      // Verzija aplikacije - ako ne koristiš Expo, možeš dohvatiti iz native koda ili package.json
       const currentVersion = Application.nativeApplicationVersion || '1.0.0';
       const minVersionIOS = general?.minVersionIOS || '1.0.0';
       const minVersionAndroid = general?.minVersionAndroid || '1.0.0';
 
       const isIOS = Platform.OS === 'ios';
-      const minVersion = isIOS ? minVersionIOS : minVersionAndroid;
+      const minVersion = isIOS ? minVersionIOS : "minVersionAndroid";
 
       console.log("Verzija", currentVersion);
       console.log("Minimalna verzija", minVersion);
@@ -104,10 +137,14 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
         general,
         showClosedAppModal,
         setShowClosedAppModal,
-        infoAcknowledged,
-        setInfoAcknowledged,
+        forceUpdateAcknowledged,
+        setForceUpdateAcknowledged,
+        customMessageAcknowledged,
+        setCustomMessageAcknowledged,
         showForceUpdate,
         setShowForceUpdate,
+        showCustomMessage,
+        setShowCustomMessage
       }}
     >
       {children}

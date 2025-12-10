@@ -11,6 +11,7 @@ import { backendUrl } from "@/localhostConf";
 import { useGeneral } from "../generalContext";
 import { formatEuropeanDateTime } from '../services/toEuropeanDate';
 import { safeFetch } from "../services/safeFetch";
+import { io } from 'socket.io-client';
 
 export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   const {general} = useGeneral();
@@ -22,28 +23,42 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
 
   if (item.status !== "completed"){
     useEffect(() => {
-      if (item.status !== "completed") {
-        const fetchOrders = async () => {
-          try {
-            const fullDateString = getYearMonthDay(item.time);
-            const [year, month, day] = fullDateString.split("-");
-            const response = await safeFetch(`${backendUrl}/orders/${year}/${month}/${day}/${item.id}`);
-    
-            if (!response.ok) throw new Error(`Error fetching orders: ${response.statusText}`);
-    
-            const data = await response.json();
-            setOrder(data);
-          } catch (err) {
-            console.error(err);
-          }
-        };
-    
-        fetchOrders(); // Initial fetch
-        const interval = setInterval(fetchOrders, 30000); // Fetch every 60s
-    
-        return () => clearInterval(interval);
+  if (item.status !== 'completed') {
+    const socket = io(backendUrl, {
+      transports: ['websocket'],
+    });
+
+    const fetchOrder = async () => {
+      try {
+        const fullDateString = getYearMonthDay(item.time);
+        const [year, month, day] = fullDateString.split('-');
+        const response = await safeFetch(`${backendUrl}/orders/${year}/${month}/${day}/${item.id}`);
+
+        if (!response.ok) throw new Error(`Error fetching order: ${response.statusText}`);
+
+        const data = await response.json();
+        setOrder(data);
+      } catch (err) {
+        console.error(err);
       }
-    }, [item]);
+    };
+
+    // Inicijalni fetch
+    fetchOrder();
+
+    // Slušanje samo ove narudžbe
+    const eventName = `order-updated-${item.id}`;
+    socket.on(eventName, (updatedOrder: any) => {
+      console.log('📥 [Socket] Ažurirana narudžba:', updatedOrder);
+      setOrder(updatedOrder);
+    });
+
+    return () => {
+      socket.off(eventName);
+      socket.disconnect();
+    };
+  }
+}, [item]);
   
   }
   return (
@@ -51,7 +66,6 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   <View style={styles.content}>
     <Text style={styles.text}>{isCroatianLang ? 'Ime: ': 'Name: '}{item.name}</Text>
     <Text style={styles.text}>{isCroatianLang ? 'Telefon: ': 'Phone: '}{item.phone}</Text>
-    {/* <Text style={styles.text}>{!item.isDelivery ? isCroatianLang ? 'Preuzimanje': 'Pickup' : isCroatianLang ? 'Dostava': 'Delivery'}</Text> */}
     {item.isDelivery && (               
         <Text style={styles.text}>{isCroatianLang ? 'Adresa: ': 'Address:'} {item.address}, {item.zone}</Text>
     )}
@@ -60,6 +74,7 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
       : item.isDelivery ? 'Estimated delivery time: ' : 'Estimated preparation time: '}
       {formatEuropeanDateTime(item.deadline).split(" ")[1]}
     </Text>
+    <Text style={styles.text}>{isCroatianLang ? 'Cijena: ': 'Price:'} {item.totalPrice}€</Text>
     {item.note.length !== 0 && (<Text style={styles.text}>{isCroatianLang ? 'Napomena: ': 'Note:'} {String(item.note)}</Text>)}
     <Text style={[styles.text, styles.statusText]}>
       Status: {order ? (
@@ -79,8 +94,8 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
         {cartItem.quantity} x {cartItem.name.split("|")[isCroatianLang ? 0 : 1]}
         {cartItem.size !== 'null' && (
         <Text style={styles.sizeText}> ({!isCroatianLang? 
-          cartItem.size === "Mala" ? "Small" :
-          cartItem.size === "Velika" ? "Big" :
+          cartItem.size === "Mala" || cartItem.size === "Mali" ? "Small" :
+          cartItem.size === "Velika" || cartItem.size === "Veliki" ? "Big" :
           cartItem.size === "Jumbo" ? "Jumbo" :
           cartItem.size : cartItem.size })</Text>
         )}
@@ -91,6 +106,16 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
         <Text key={extraIndex} style={{fontFamily: 'Lexend_400Regular'}}>
           {extra.split('|')[isCroatianLang ? 0 : 1]}
           {extraIndex < Object.entries(cartItem.selectedExtras).length - 1 && ', '}
+        </Text>
+        ))}
+      </Text>
+      )}
+      {Object.keys(cartItem.selectedDrinks).length !== 0 && (
+      <Text style={styles.selectedExtrasText}>
+        {Object.entries(cartItem.selectedDrinks).map(([drink, value], drinkIndex) => (
+        <Text key={drinkIndex} style={{fontFamily: 'Lexend_400Regular'}}>
+          {isCroatianLang ? (value as any).ime : (value as any).ime_en}
+          {drinkIndex < Object.entries(cartItem.selectedDrinks).length - 1 && ', '}
         </Text>
         ))}
       </Text>
@@ -106,10 +131,10 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
         </TouchableOpacity> */}
         <TouchableOpacity
             onPress={() => handleRenew(item.id)}
-            style={[styles.rightButton, appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) && styles.disabledButton]}
-            disabled={appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays)} 
+            style={[styles.rightButton, appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays) && styles.disabledButton]}
+            disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays)} 
         >
-            <Text style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayOfWeek], general?.holidays) && styles.disabledText]}>{isCroatianLang ? "Ponovi narudžbu!" : "Renew order!"}</Text>
+            <Text style={[styles.buttonText, appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays) && styles.disabledText]}>{isCroatianLang ? "Ponovi narudžbu!" : "Renew order!"}</Text>
         </TouchableOpacity>
     </View>
   </View>
@@ -131,8 +156,8 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         flex: 1,
         borderRadius: 5,
-        justifyContent: 'center',  // Center text vertically
-        alignItems: 'center',      // Center text horizontally
+        justifyContent: 'center',  
+        alignItems: 'center',      
       },
       rightButton: {
         marginHorizontal: 5,
@@ -140,8 +165,8 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         flex: 5,
         borderRadius: 5,
-        justifyContent: 'center',  // Center text vertically
-        alignItems: 'center',      // Center text horizontally
+        justifyContent: 'center', 
+        alignItems: 'center',  
       },      
       buttonText: {
         color: '#ffd400',

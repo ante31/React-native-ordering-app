@@ -8,17 +8,16 @@ import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 import { Platform } from 'react-native';
 
-const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, scale, submitButtonStatus = "Dodaj", setReloadTrigger=() => {console.log("reloadTrigger")}, onClose }: any) => {
+const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, scale, submitButtonStatus = "Dodaj", setReloadTrigger=() => {console.log("reloadTrigger")}, onClose }: any) => {
   const {general} = useGeneral();
-  const isCroatianLang = isCroatian();
   const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
-  console.log("submitButtonStatus", submitButtonStatus)
+  console.log("submitButtonStatus", submitButtonStatus, isCroatianLang)
 
 
 
   return (
     <View style={{ flexDirection: "row", height: scale.light(60), width: "100%", bottom: 14}}>
-      <View style={[{ marginLeft: 4, flex: 1, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", backgroundColor: '#fff', borderColor: '#ffd400', borderWidth: 2, margin: scale.isTablet() && scale.light(4), borderRadius: 5}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterButton]}>
+      <View style={[{ marginLeft: 4, flex: 1, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", backgroundColor: '#fff', borderColor: '#ffd400', borderWidth: 2, margin: scale.isTablet() && scale.light(4), borderRadius: 5}, appButtonsDisabled(general?.appStatus ,general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterButton]}>
         <TouchableOpacity 
           onPress={() => {
             onDecrease(); 
@@ -31,9 +30,9 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
           hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           style={[{ opacity: quantity <= 1 ? 0.5 : 1}]}
         >
-          <MaterialIcons name="remove" size={scale.light(28)} color="#ffd400" style={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText}/>
+          <MaterialIcons name="remove" size={scale.light(28)} color="#ffd400" style={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText}/>
         </TouchableOpacity>
-        <Text style={[{ fontFamily: "Lexend_700Bold" ,fontSize: scale.light(16), color: "#ffd400" }, , appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText]}>{quantity}</Text>
+        <Text style={[{ fontFamily: "Lexend_700Bold" ,fontSize: scale.light(16), color: "#ffd400" }, , appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText]}>{quantity}</Text>
         <TouchableOpacity 
           onPress={() => { 
             onIncrease(); 
@@ -42,11 +41,11 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }          
           }} 
-          disabled={quantity >= 20 || appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)} 
+          disabled={quantity >= 20 || appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)} 
           hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
           style={[{ opacity: quantity >= 20 ? 0.5 : 1}]}
         >
-          <MaterialIcons name="add" size={scale.light(28)} color="#ffd400" style={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText}/>
+          <MaterialIcons name="add" size={scale.light(28)} color="#ffd400" style={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText}/>
         </TouchableOpacity>
       </View>
       <TouchableOpacity 
@@ -67,7 +66,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
             }
           }
         }} 
-        disabled={isUpdating || appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)} 
+        disabled={isUpdating || appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)} 
         style={[
           {
             marginRight: 4,
@@ -79,7 +78,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
             margin: scale.isTablet() && scale.light(4),
             marginLeft: !scale.isTablet() ? 10 : undefined
           },
-          appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton
+          appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton
         ]}
       >
         <Text
@@ -88,10 +87,11 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
             {
               fontSize: scale.light(14),
               marginBottom: scale.light(2),
+              marginTop: scale.light(2),
               fontFamily: "Lexend_700Bold",
               color: '#fff'
             },
-            appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText
+            appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText
           ]}
         >
         {submitButtonStatus === "Dodaj" &&
@@ -113,7 +113,7 @@ const Counter = ({ quantity, onIncrease, onDecrease, handleAddToCart, handleRemo
                 fontFamily: "Lexend_700Bold",
                 color: '#fff'
               },
-              appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText
+              appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText
             ]}
           >
             {(cartPrice * quantity).toFixed(2)} €

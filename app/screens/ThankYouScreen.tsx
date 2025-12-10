@@ -39,7 +39,7 @@ export default function ThankYouScreen({ route, navigation }: any) {
             {notificationResult? 
               <Text style={styles.boldText}>{isCroatianLang ? "Uskoro ćete primiti potvrdu." : "You will receive a confirmation message shortly."}</Text>
               :
-              <Text style={styles.lightText}>{isCroatianLang ? "Status narudžbe možete vidjeti u posljednjim narudžabama. Ako želite primiti obavijesti o statusu narudžbe, molimo vas da omogučite obavijesti." : "You can check the status of your order in your recent orders. If you want to receive notification about the status of your order, please enable notifications."}</Text>
+              <Text style={styles.lightText}>{isCroatianLang ? "Uskoro ćete primiti SMS potvrdu." : "You will receive a SMS confirmation shortly."}</Text>
             }
           </View>
           <View style={{position: 'absolute', bottom: 20, width: '100%', alignItems: 'center'}}>
@@ -85,6 +85,7 @@ const getStyles = (scale: any) =>
         fontFamily: "Lexend_700Bold",
         color: "#333",
         marginBottom: 10,
+        textAlign: 'center',
       },
       lightText: {
         textAlign: 'center',

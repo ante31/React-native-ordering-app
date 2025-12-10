@@ -2,7 +2,8 @@ import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './screens/HomeScreen';
 import CategoryPage from './screens/CategoryScreen';
-import { Image, TouchableOpacity, StatusBar, View, Text, StyleSheet, Platform, SafeAreaView } from 'react-native';
+import { Image, TouchableOpacity, StatusBar, View, Text, StyleSheet, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CartScreen from './screens/CartScreen';
 import { CartProvider } from './cartContext';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
@@ -10,28 +11,28 @@ import CartIcon from './components/CartIcon';
 import PreviousOrderIcon from './components/PreviousOrderIcon';
 import OrderScreen from './screens/OrderScreen';
 import { ToastProvider } from "react-native-toast-notifications";
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { PreviousOrdersScreen } from './screens/PreviousOrdersScreen';
 import { isCroatian } from './services/languageChecker';
 import ThankYouScreen from './screens/ThankYouScreen';
-import { Modal, Portal, Provider, Button } from 'react-native-paper';
-import { MD3LightTheme } from 'react-native-paper';
+import CustomMessageModal from './components/CustomMessageModal';
 import { useState, useEffect } from "react";
 import * as Notifications from 'expo-notifications';
 import { GeneralProvider } from './generalContext';
 import ClosedAppModal from './components/closedAppModal';
-import { isTablet } from "./services/isTablet";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { Dimensions } from 'react-native';
-import { usePushNotifications } from './services/usePushNotifications';
 import ForceUpdateModal from './components/ForceUpdateModal';
 import { useFonts, Lexend_400Regular, Lexend_700Bold } from '@expo-google-fonts/lexend';
+import { safeFetch } from './services/safeFetch';
+import { backendUrl } from '../localhostConf';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {  
-  const [showNetworkError, setShowNetworkError] = useState(false);  
+  const [showNetworkError, setShowNetworkError] = useState(false); 
+  const [specials, setSpecials] = useState<any[]>([]);
+  const [drinks, setDrinks] = useState<any[]>([]);
   const [fontsLoaded] = useFonts({
     Lexend_400Regular,
     Lexend_700Bold,
@@ -49,12 +50,12 @@ export default function App() {
     light: (size: number) => Math.round((size * SCREEN_HEIGHT) / BASE_HEIGHT),
     medium: (size: number) => {
       const ratio = SCREEN_HEIGHT / BASE_HEIGHT;
-      const exaggeratedRatio = 1 + (ratio - 1) * 2; // duplo veća razlika
+      const exaggeratedRatio = 1 + (ratio - 1) * 2;
       return Math.round(size * exaggeratedRatio);
     },
     heavy: (size: number) => {
       const ratio = SCREEN_HEIGHT / BASE_HEIGHT;
-      const heavyRatio = ratio > 1 ? ratio * 1.5 : ratio; // Heavier scaling on larger screens
+      const heavyRatio = ratio > 1 ? ratio * 1.5 : ratio;
       return Math.round(size * heavyRatio);
     },
     isTablet() {
@@ -77,6 +78,22 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    safeFetch(`${backendUrl}/cjenik/Posebno`)
+      .then((response) => response.json())
+      .then((data) => {
+        setSpecials(Object.entries(data).map(([key, meal]) => ({ id: key, ...(typeof meal === 'object' ? meal : {}) })));
+      })
+      .catch((error) => console.error('Error fetching meals:', error))
+
+    safeFetch(`${backendUrl}/cjenik/Piće`)
+      .then((response) => response.json())
+      .then((data) => {
+        setDrinks(data); 
+      })
+      .catch((error) => console.error('Error fetching meals:', error));
+  }, []);
+
   const isAndroid = Platform.OS === 'android';
 
   const theme = {
@@ -97,352 +114,367 @@ export default function App() {
               <PaperProvider theme={theme}>
                 <StatusBar
                   backgroundColor="#ffd400"
-                  barStyle="dark-content"   // text/icons color: 'light-content' or 'dark-content'
+                  barStyle="dark-content" 
                 />
+                <CustomMessageModal isCroatianLanguage={isCroatianLanguage} scale={scale}/>
                 <ClosedAppModal isCroatianLanguage={isCroatianLanguage} scale={scale}/>
                 <ForceUpdateModal isCroatianLanguage={isCroatianLanguage} scale={scale}/>
-                <Stack.Navigator initialRouteName="Home"   screenOptions={{
-                  navigationBarColor: '#ffd400', 
-                }}>
-                  {/* Home Screen */}
+                
+
+                <Stack.Navigator initialRouteName="Home" >
                   <Stack.Screen
                     name="Home"
                     options={({ navigation }) => ({
                       headerTitleAlign: 'center',
                       headerBackTitleVisible: false,
-                      headerRightContainerStyle: {
-                        paddingRight: 10, // Proper way to control position
+                      headerStyle: {
+                        backgroundColor: '#ffd400',
+                        height: Platform.OS === 'android' ? 80 : 70, 
+                        elevation: 0, 
+                        shadowOpacity: 0, 
                       },
-                      header: () => (
-                        <SafeAreaView style={{ backgroundColor: '#ffd400' }}>
-                          <View
-                            style={{
-                              height: scale.light(50), // Will scale proportionally
-                              paddingHorizontal: 16,
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              borderBottomColor: '#eee',
-                            }}
-                          >
-                            {/* Title - centered with absolute positioning */}
-                            <View>
-                              <Image
-                                source={require('../assets/images/nav-logo.png')}
-                                style={{
-                                  top: 2,
-                                  width: isTablet() ? 150 : 120,
-                                  height: isTablet() ? 150 : 100,
-                                  resizeMode: 'contain',
-                                }}
-                              />
-                            </View>
-                      
-                            {/* Right Icons - pushed to the right */}
-                            <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
-                              <TouchableOpacity
-                                disabled={showNetworkError}
-                                onPressOut={() => navigation.navigate('PreviousOrdersScreen')}
-                                style={{ marginHorizontal: 2, marginTop: 4 }}
-                              >
-                                <PreviousOrderIcon navigation={navigation} scale={scale}/>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                disabled={showNetworkError}
-                                onPressOut={() => navigation.navigate('CartScreen')}
-                                style={{ marginHorizontal: 2, marginTop: 4 }}
-                              >
-                                <CartIcon navigation={navigation} scale={scale} />
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-                        </SafeAreaView>
-                      ),
-                    })}
+                      header: () => {
+                    const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
 
+                    return (
+                      <View style={{
+                        backgroundColor: '#ffd400',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingHorizontal: 16,
+                        height: 60,
+                        paddingTop: Platform.OS === 'android' ? statusBarHeight / 2 : 0,
+                      }}>
+                        <Image
+                          source={require('../assets/images/nav-logo.png')}
+                          style={{
+                            width: 120,
+                            height: 40,
+                            resizeMode: 'contain',
+                          }}
+                        />
+
+                        <View style={{ flexDirection: 'row' }}>
+                          <TouchableOpacity
+                            disabled={showNetworkError}
+                            onPressOut={() => navigation.navigate('PreviousOrdersScreen')}
+                          >
+                            <PreviousOrderIcon navigation={navigation} scale={scale}/>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            disabled={showNetworkError}
+                            onPressOut={() => navigation.navigate('CartScreen')}
+                            style={{ marginHorizontal: 4 }}
+                          >
+                            <CartIcon navigation={navigation} scale={scale} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    );
+                  }
+                    })}
                   >
-                      {(props) => <HomePage {...props} scale={scale} showNetworkError={showNetworkError} setShowNetworkError={setShowNetworkError} />}
+                    {(props) => <HomePage {...props} scale={scale} drinks={drinks} specials={specials} showNetworkError={showNetworkError} setShowNetworkError={setShowNetworkError} />}
                   </Stack.Screen>
-                  <Stack.Screen
-                    name="CategoryPage"
-                    options={({ navigation }) => ({
+
+                <Stack.Screen
+                  name="CategoryPage"
+                  options={({ navigation }) => ({
                     title: '',
-                    headerTitleAlign: 'left', // Align the title to the left
                     headerBackTitleVisible: false,
-                    headerRightContainerStyle: {
-                      paddingRight: 10, // Proper way to control position
-                    },
-                    header: () => (
-                      <SafeAreaView style={{ backgroundColor: '#ffd400' }}>
+                    header: () => {
+                      const statusBarHeight = Platform.OS === 'android'
+                        ? StatusBar.currentHeight || 24
+                        : 0;
+
+                      return (
                         <View
                           style={{
-                            height: scale.light(50),
-                            paddingHorizontal: 16,
+                            backgroundColor: '#ffd400',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            paddingRight: 16,
+                            height: 60,
+                            paddingTop: Platform.OS === 'android' ? statusBarHeight / 2 : 0,
                             borderBottomWidth: 1,
                             borderBottomColor: '#eee',
                           }}
                         >
-                          {/* Back Button */}
-                          <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <HeaderBackButton onPress={() => navigation.goBack()} />
+
                             <TouchableOpacity
                               onPress={() => navigation.goBack()}
                               activeOpacity={0.7}
-                              style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
+                              style={{ marginLeft: -6, paddingVertical: 10, paddingRight: 8 }}
                             >
-                              {!isAndroid ? <Text style={{ fontSize: scale.light(16), color: '#007AFF'}}>Gricko</Text>
-                              : <Text style={{ fontSize: 18, color: 'black'}}></Text> }
+                              {!isAndroid ? (
+                                <Text style={{ fontSize: 18, color: '#007AFF' }}>
+                                  Gricko
+                                </Text>
+                              ) : null}
                             </TouchableOpacity>
                           </View>
-                
-                          {/* Title */}
-                          <View>
-                            <Text></Text>
-                          </View>
-                
-                          {/* Right Icons */}
+
+                          <View />
+
+                          {/* RIGHT: Icons */}
                           <View style={{ flexDirection: 'row' }}>
-                            <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
-                              <TouchableOpacity
-                                onPressOut={() => navigation.navigate('PreviousOrdersScreen')}
-                                style={{ marginHorizontal: 2, marginTop: 4 }}
-                              >
-                                <PreviousOrderIcon navigation={navigation} scale={scale}/>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                onPressOut={() => navigation.navigate('CartScreen')}
-                                style={{ marginHorizontal: 2, marginTop: 4 }}
-                              >
-                                <CartIcon navigation={navigation} scale={scale} />
-                              </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity
+                              onPressOut={() => navigation.navigate('PreviousOrdersScreen')}
+                            >
+                              <PreviousOrderIcon navigation={navigation} scale={scale} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              onPressOut={() => navigation.navigate('CartScreen')}
+                              style={{ marginHorizontal: 4 }}
+                            >
+                              <CartIcon navigation={navigation} scale={scale} />
+                            </TouchableOpacity>
                           </View>
                         </View>
-                      </SafeAreaView>
-                    ),
+                      );
+                    },
                   })}
                 >
-                {(props) => <CategoryPage {...props} scale={scale} />}
+                  {(props) => <CategoryPage {...props} scale={scale} />}
                 </Stack.Screen>
+
                 <Stack.Screen
                   name="CartScreen"
-                  component={(props: any) => <CartScreen {...props} scale={scale} meals={[]} />}
+                  component={(props: any) => (
+                    <CartScreen {...props} scale={scale} drinks={drinks} />
+                  )}
                   options={({ navigation }) => ({
-                    title: isCroatianLanguage ? "Košarica" : "CartScreen",
-                    headerTitleAlign: 'center',
+                    title: isCroatianLanguage ? "Košarica" : "Cart",
                     headerBackTitleVisible: false,
-                    header: () => (
-                      <SafeAreaView style={{ backgroundColor: '#ffd400' }}>
+                    header: () => {
+                      const statusBarHeight =
+                        Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+
+                      return (
                         <View
                           style={{
-                            height: scale.light(50),
-                            paddingHorizontal: 16,
+                            backgroundColor: '#ffd400',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            height: 56,
+                            paddingTop: Platform.OS === 'android' ? statusBarHeight / 2 : 0,
                             borderBottomWidth: 1,
                             borderBottomColor: '#eee',
                           }}
                         >
-                          {/* Back Button */}
-                          <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
-                            <HeaderBackButton onPress={() => navigation.reset({
-                              index: 0,
-                              routes: [{ name: 'Home' }],
-                            })} />
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <HeaderBackButton
+                              onPress={() =>
+                                navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })
+                              }
+                            />
+
                             <TouchableOpacity
                               activeOpacity={0.7}
-                              onPress={() => navigation.reset({
-                                index: 0,
-                                routes: [{ name: 'Home' }],
-                              })}
-                              style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
-                            >
-                              {!isAndroid 
-                                ? <Text style={{ fontSize: scale.light(16), color: '#007AFF'}}>Gricko</Text>
-                                : <Text style={{ fontSize: 18, color: 'black'}}></Text>
+                              onPress={() =>
+                                navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })
                               }
-                        </TouchableOpacity>
+                              style={{ marginLeft: -6, paddingVertical: 10, paddingRight: 8 }}
+                            >
+                              {!isAndroid ? (
+                                <Text style={{ fontSize: 18, color: '#007AFF' }}>Gricko</Text>
+                              ) : null}
+                            </TouchableOpacity>
                           </View>
-                
-                          {/* Title */}
-                          <View>
-                          </View>
-                
-                          {/* Right Icons */}
-                          <View style={{ flexDirection: 'row' }}>
-                            
-                          </View>
+
+                          <View style={{ width: 40 }} />
                         </View>
-                      </SafeAreaView>
-                    ),
+                      );
+                    },
                   })}
                 />
+
                 <Stack.Screen
                   name="PreviousOrdersScreen"
                   component={({ navigation }: any) => (
-                      <PreviousOrdersScreen navigation={navigation} isCroatianLang={isCroatianLanguage} scale={scale} />
-                    )}     
-                    options={({ navigation }) => ({
-                    title: isCroatianLanguage ? "Prethodne narudžbe" : "PreviousOrdersScreen",
-                    headerTitleAlign: 'center',
+                    <PreviousOrdersScreen
+                      navigation={navigation}
+                      isCroatianLang={isCroatianLanguage}
+                      scale={scale}
+                    />
+                  )}
+                  options={({ navigation }) => ({
+                    title: '',
                     headerBackTitleVisible: false,
-                    header: () => (
-                      <SafeAreaView style={{ backgroundColor: '#ffd400' }}>
+                    header: () => {
+                      const statusBarHeight =
+                        Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+
+                      return (
                         <View
                           style={{
-                            height: scale.light(50),
-                            paddingHorizontal: 16,
+                            backgroundColor: '#ffd400',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            paddingRight: 16,
+                            height: 60,
+                            paddingTop: Platform.OS === 'android' ? statusBarHeight / 2 : 0,
                             borderBottomWidth: 1,
                             borderBottomColor: '#eee',
                           }}
                         >
-                          {/* Back Button */}
-                          <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
-                            <HeaderBackButton onPress={() => navigation.reset({
-                              index: 0,
-                              routes: [{ name: 'Home' }],
-                            })} />
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <HeaderBackButton
+                              onPress={() =>
+                                navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })
+                              }
+                            />
+
                             <TouchableOpacity
                               activeOpacity={0.7}
-                              onPress={() => navigation.reset({
-                                index: 0,
-                                routes: [{ name: 'Home' }],
-                              })}
-                              style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
-                            >
-                              {!isAndroid 
-                                ? <Text style={{ fontSize: scale.light(16), color: '#007AFF'}}>Gricko</Text>
-                                : <Text style={{ fontSize: 18, color: 'black'}}></Text>
+                              onPress={() =>
+                                navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })
                               }
-                        </TouchableOpacity>
+                              style={{ marginLeft: -6, paddingVertical: 10, paddingRight: 8 }}
+                            >
+                              {!isAndroid ? (
+                                <Text style={{ fontSize: 18, color: '#007AFF' }}>Gricko</Text>
+                              ) : null}
+                            </TouchableOpacity>
                           </View>
-                
-                          {/* Title */}
-                          <View>
-                            <Text></Text>
-                          </View>
-                
-                          {/* Right Icons */}
-                          <View style={{ flexDirection: 'row' }}>
-                            
-                          </View>
+
+                          <View />
+
+                          <View style={{ flexDirection: 'row' }}></View>
                         </View>
-                      </SafeAreaView>
-                    ),
+                      );
+                    },
                   })}
                 />
+
                 <Stack.Screen
                   name="OrderScreen"
                   options={({ navigation }) => ({
                     title: '',
-                    headerTitleAlign: 'left',
                     headerBackTitleVisible: false,
-                    header: () => (
-                      <SafeAreaView style={{ backgroundColor: '#ffd400' }}>
+                    header: () => {
+                      const statusBarHeight =
+                        Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+
+                      return (
                         <View
                           style={{
-                            height: scale.light(50),
-                            paddingHorizontal: 16,
+                            backgroundColor: '#ffd400',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            paddingRight: 16,
+                            height: 60, 
+                            paddingTop: Platform.OS === 'android' ? statusBarHeight / 2 : 0,
                             borderBottomWidth: 1,
                             borderBottomColor: '#eee',
                           }}
                         >
-                          {/* Back Button */}
-                          <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
-                            <HeaderBackButton onPress={() => navigation.goBack()}/>
+                          {/* LEFT: Back */}
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <HeaderBackButton onPress={() => navigation.goBack()} />
+
                             <TouchableOpacity
                               activeOpacity={0.7}
                               onPress={() => navigation.goBack()}
-
-                              style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
+                              style={{ marginLeft: -6, paddingVertical: 10, paddingRight: 8 }}
                             >
-                              {!isAndroid 
-                                ? <Text style={{ fontSize: scale.light(16), color: '#007AFF'}}>Gricko</Text>
-                                : <Text style={{ fontSize: 18, color: 'black'}}></Text>
-                              }
-                        </TouchableOpacity>
+                              {!isAndroid ? (
+                                <Text style={{ fontSize: 18, color: '#007AFF' }}>Gricko</Text>
+                              ) : null}
+                            </TouchableOpacity>
                           </View>
-                
-                          {/* Title */}
-                          <View>
-                          </View>
-                
-                          {/* Right Icons */}
-                          <View style={{ flexDirection: 'row' }}>
-                            
-                          </View>
+
+                          <View />
+
+                          <View style={{ flexDirection: 'row' }}></View>
                         </View>
-                      </SafeAreaView>
-                    ),
+                      );
+                    },
                   })}
                 >
                   {(props: any) => <OrderScreen {...props} scale={scale} />}
                 </Stack.Screen>
+
                 <Stack.Screen
-                name="ThankYouScreen"
-                component={ThankYouScreen}
-                initialParams={{ isCroatianLang: isCroatianLanguage, scale }}
-                options={({ navigation }) => ({
+                  name="ThankYouScreen"
+                  component={ThankYouScreen}
+                  initialParams={{ isCroatianLang: isCroatianLanguage, scale }}
+                  options={({ navigation }) => ({
                     title: '',
-                    headerTitleAlign: 'left',
                     headerBackTitleVisible: false,
-                    header: () => (
-                      <SafeAreaView style={{ backgroundColor: '#ffd400' }}>
+                    header: () => {
+                      const statusBarHeight =
+                        Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 0;
+
+                      return (
                         <View
                           style={{
-                            height: 50,
-                            paddingHorizontal: 16,
+                            backgroundColor: '#ffd400',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
+                            paddingRight: 16,
+                            height: 60, 
+                            paddingTop: Platform.OS === 'android' ? statusBarHeight / 2 : 0,
                             borderBottomWidth: 1,
                             borderBottomColor: '#eee',
                           }}
                         >
-                          {/* Back Button */}
-                          <View style={{ flexDirection: 'row', alignItems: 'center', position: 'absolute' }}>
-                            <HeaderBackButton onPress={() => navigation.reset({
-                              index: 0,
-                              routes: [{ name: 'Home' }],
-                            })} />
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <HeaderBackButton
+                              onPress={() =>
+                                navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })
+                              }
+                            />
+
                             <TouchableOpacity
                               activeOpacity={0.7}
-                              onPress={() => navigation.reset({
-                                index: 0,
-                                routes: [{ name: 'Home' }],
-                              })}
-                              style={{ marginLeft: -6, paddingVertical: 20, paddingRight: 8 }}
-                            >
-                              {!isAndroid 
-                                ? <Text style={{ fontSize: scale.light(16), color: '#007AFF'}}>Gricko</Text>
-                                : <Text style={{ fontSize: 18, color: 'black'}}></Text>
+                              onPress={() =>
+                                navigation.reset({
+                                  index: 0,
+                                  routes: [{ name: 'Home' }],
+                                })
                               }
-                        </TouchableOpacity>
+                              style={{ marginLeft: -6, paddingVertical: 10, paddingRight: 8 }}
+                            >
+                              {!isAndroid ? (
+                                <Text style={{ fontSize: 18, color: '#007AFF' }}>Gricko</Text>
+                              ) : null}
+                            </TouchableOpacity>
                           </View>
-                
-                          {/* Title */}
-                          <View>
-                          </View>
-                
-                          {/* Right Icons */}
-                          <View style={{ flexDirection: 'row' }}>
-                            
-                          </View>
+
+                          <View />
+
+                          <View style={{ flexDirection: 'row' }} />
                         </View>
-                      </SafeAreaView>
-                    ),
+                      );
+                    },
                   })}
                 />
+
               </Stack.Navigator>
               </PaperProvider>
             </SafeAreaView>

@@ -9,6 +9,7 @@ import {
   Animated,
   Dimensions,
   Platform,
+  PixelRatio,
 } from "react-native";
 import { useCart } from "../cartContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -23,15 +24,37 @@ import { Meal } from "../models/mealModel";
 import CartMealDetails from "../components/CartMealDetails";
 import { HeaderBackButton } from '@react-navigation/elements';
 
-  const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+const fontScale = PixelRatio.getFontScale();
+const isLargeFont = fontScale > 1.8;
+const isMediumLargeFont = fontScale > 1.6;
+const isMediumFont = fontScale > 1.4;
+const isSmallFont = fontScale > 1.2;
 
-const getModalHeight = (meal: any | null) => {
-  if (!meal) return SCREEN_HEIGHT * 0.7;
-  return meal.portionsOptions[0].extras === "null" ? "20%" : "80%";
+const isAndroid = Platform.OS === 'android';
+
+
+const CartScreen = ({ navigation, route, drinks={}, scale  }: { navigation: any, route: any, drinks: any, scale: any }) => {
+  const getModalHeight = (meal: any) => {
+    console.log("meal in cart", meal);
+  const isLargeFont = fontScale > 1.8;
+  const isMediumLargeFont = fontScale > 1.6;
+  const isMediumFont = fontScale > 1.4;
+  const isSmallFont = fontScale > 1.2;
+  if (!meal) return SCREEN_HEIGHT * 0.7;//samo egde case koji se nece dogodit
+  
+  return meal.extras === "null" // prilozi i sokovi (nemaju dodadnih priloga pa ce im modal height bit mal)
+    ? (
+        isLargeFont ? (isAndroid ? "31%" : 300) :
+        isMediumLargeFont ? (isAndroid ? "28%" : 280) :
+        isMediumFont ? (isAndroid ? "26%" : 250) :
+        isSmallFont ? (isAndroid ? "24%" : 230) :
+        (isAndroid ? "20%" : 200)
+      )
+    : meal.extras === "listaPomfrit"
+    ? "45%" // pomfrit ima malu listu priloga
+    : "80%"; // najcesci case
 };
-
-
-const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, route: any, meals: Meal[], scale: any }) => {
   const styles = getStyles(scale);
   useLayoutEffect(() => {
   
@@ -39,10 +62,11 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
   const isCroatianLanguage = isCroatian();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState("");
-  const { storageOrder } = route.params || {}; // Default empty object if params are not available
+  const { storageOrder } = route.params || {};
   const {general} = useGeneral();
   const [showMealDetailsModal, setShowMealDetailsModal] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<any | null>(null);
+  console.log("Selected meal in CartScreen:", selectedMeal);
   const [reloadTrigger, setReloadTrigger] = useState(0);
 
   useEffect(() => {
@@ -79,8 +103,6 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
       }
     });
   }, [cartState.items]);
-
-  console.log("Cart items in CartScreen:", cartState.items);
   
 
   const handlePress = () => {
@@ -98,10 +120,8 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    // Find the item in the cart
     const item = cartState.items.find((item: any) => item.id === id);
     if (item) {
-      // Dispatch the action to increment the quantity
       dispatch({
         type: "UPDATE_ITEM_QUANTITY",
         payload: { id, quantity: item.quantity + 1 },
@@ -115,7 +135,6 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
     }
     const item = cartState.items.find((item: any) => item.id === id);
     if (item && item.quantity > 1) {
-      // Dispatch the action to decrement the quantity
       dispatch({
         type: "UPDATE_ITEM_QUANTITY",
         payload: { id, quantity: item.quantity - 1 },
@@ -128,7 +147,7 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
     const isSameItem = selectedItem === id;
     setSelectedItem(isSameItem ? null : id);
   
-    // Close previously selected item
+    // Zatvarnje svih ostalih stavki
     cartState.items.forEach((item: any) => {
       const animatedWidth = animatedWidths.get(item.id);
       if (animatedWidth && item.id !== id) {
@@ -140,7 +159,7 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
       }
     });
   
-    // Open the selected item
+    // Otvaranje ili zatvaranje odabrane stavke
     const animatedWidth = animatedWidths.get(id);
     if (animatedWidth) {
       Animated.timing(animatedWidth, {
@@ -183,21 +202,21 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
           }}
           style={styles.image}
         />
-        <Text style={[styles.boldText, { fontSize: scale.light(22)}]}>{isCroatianLanguage? "Vaša narudžba je prazna": "Your cart is empty"}</Text>
+        <Text style={[styles.boldText, { fontSize: scale.light(22), alignItems: 'center'}]}>{isCroatianLanguage? "Vaša narudžba je prazna": "Your cart is empty"}</Text>
         <Text style={[styles.lightText, { fontSize: scale.light(18)}]}>{isCroatianLanguage? "Dodajte nešto po želji!": "Add something you like!"}</Text>
         <View style={{position: 'absolute', bottom: 20, width: '100%', alignItems: 'center'}}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={[styles.button]}
           >
-            <Text allowFontScaling={false} style={[styles.buttonText, { fontSize: scale.light(18), height: 26}]}>{isCroatianLanguage? "Natrag": "Back"}</Text>
+            <Text allowFontScaling={false} style={[styles.buttonText, { fontSize: scale.light(18), height: 'auto', }]}>{isCroatianLanguage? "Natrag": "Back"}</Text>
           </TouchableOpacity>
         </View>
       </View>
     );
   }
 
-  console.log("Cart items:", cartState.items);
+  console.log("Drinks in cart items:", cartState.items.map((item: any) => item.selectedDrinks).flat());
 
   return (
     <View style={styles.container}>
@@ -205,10 +224,6 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
         style={{ width: "100%" }}
         contentContainerStyle={styles.scrollViewContent}
       >
-        {/* <View style={styles.addMoreView}>
-        <MaterialIcons name="add" size={26} color="black" /> 
-        <Text style={styles.addMoreText}>{isCroatianLanguage? "Dodajte još artikala": "+ Add more items"}</Text>
-        </View> */}
         {cartState.items.map((item: any, index: number) => (
           <View key={index} style={{ width: '100%' }}>
             <TouchableOpacity onPress={() => handleMealClick(item)} style={styles.itemWrapper}>
@@ -270,7 +285,7 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
                 }}
                 style={{ marginRight: scale.isTablet() ? 20 : 0 }}
               >
-                <MaterialIcons name="delete" size={scale.light(28)} color="red" />
+                <MaterialIcons name="delete" size={scale.light(28)} color="#DA291C" />
               </TouchableOpacity>
             </TouchableOpacity>
             <View style={styles.dividerWrapper}>
@@ -282,18 +297,18 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
       </ScrollView>
       <TouchableOpacity
         onPress={handlePress}
-        disabled={appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays)}
-        style={[styles.button, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
+        disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
+        style={[styles.button, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
       >
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{ marginLeft: scale.isTablet()? 10 : 0, marginRight: scale.isTablet()? 20 : 15, width: scale.light(30), height: scale.light(30), borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
-            <Text allowFontScaling={false} style={[{color: '#ffd400', fontFamily: "Lexend_400Regular", fontSize: scale.light(16)}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
+            <Text allowFontScaling={false} style={[{color: '#ffd400', fontFamily: "Lexend_400Regular", fontSize: scale.light(16)}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
-          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>
+          <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>
             {isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}
           </Text>
         </View>
-        <Text style={[{fontFamily: "Lexend_400Regular", color: '#fff', fontSize: scale.light(18), marginRight: scale.isTablet()? 10 : 0}, appButtonsDisabled(general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>
+        <Text style={[{fontFamily: "Lexend_400Regular", color: '#fff', fontSize: scale.light(18), marginRight: scale.isTablet()? 10 : 0}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>
           {totalPrice.toFixed(2)} €
         </Text>
 
@@ -312,7 +327,7 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
                   handleDelete(itemToDelete)
                   setShowDeleteModal(false)
                 }}
-                style={{ borderRadius: 5, backgroundColor: 'red', height: 60, justifyContent: 'center' }}
+                style={{ borderRadius: 5, backgroundColor: '#DA291C', height: 60, justifyContent: 'center' }}
               >
                 <Text style={{ color: 'white', fontSize: 17 }}>{isCroatianLanguage? "Obriši": "Delete"}</Text>
               </Button>
@@ -339,6 +354,7 @@ const CartScreen = ({ navigation, route, meals, scale  }: { navigation: any, rou
             <CartMealDetails
               visible={showMealDetailsModal}
               meal={selectedMeal}
+              drinks={drinks}
               scale={scale}
               onClose={() => setShowMealDetailsModal(false)}
               handleRemoveFromCart={handleDelete}
@@ -384,7 +400,6 @@ const getStyles = (scale: any) =>
     color: "#666",
   },
 button: {
-  // height: scale.light(50),  // makni ovo
   paddingVertical: 15,
   paddingHorizontal: 20,
   marginBottom: 20,
@@ -454,7 +469,7 @@ button: {
     fontFamily: "Lexend_400Regular",
     position: 'absolute',
     right: scale.isTablet() ? 30 : 10, 
-    top: scale.isTablet() ? -22 : -15, 
+    top: scale.isTablet() ? -22 : isLargeFont ? -24 : isMediumLargeFont ? -20 : isMediumFont ? -20 : isSmallFont ? -18 : -16, 
     fontSize: scale.isTablet() ? 28 : 16,
     color: 'red', 
     backgroundColor: 'white',
@@ -465,11 +480,11 @@ button: {
     borderColor: 'gray', 
   },
   disabledButton: {
-    backgroundColor: '#B0BEC5', // Disabled background color
-    opacity: 0.6, // Reduce opacity for disabled state
+    backgroundColor: '#B0BEC5', 
+    opacity: 0.6, 
   },
   disabledText: {
-    color: '#fff', // Light grey text when disabled
+    color: '#fff', 
   },
   loaderContainer: {
     flex: 1,

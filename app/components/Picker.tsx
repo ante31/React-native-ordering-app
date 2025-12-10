@@ -48,8 +48,9 @@ const Picker = ({ showPicker, setShowPicker, timeString, setTimeString, isSlidRi
             }
 
             // Ensure max time is 23:00
-            if (pickedHours > 23 || (pickedHours === 23 && pickedMinutes >= 0)) {
-                setTimeString("23:00");
+            console.log("closingHour", closingHour, "closingMinutes", closingMinutes, pickedHours, pickedMinutes);
+            if (pickedHours > closingHour || (pickedHours === closingHour && pickedMinutes >= closingMinutes)) {
+                setTimeString(formatTime({ hours: closingHour, minutes: closingMinutes }));
             }
     }
 
