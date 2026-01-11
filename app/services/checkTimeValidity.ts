@@ -13,11 +13,14 @@ export const checkTimeValidity = (
 ) =>{
   const dayOfWeek = getDayOfTheWeek(getLocalTime(), general.holidays);
   
-  const offset = general? isSlidRight ? general.deliveryTime : general.pickUpTime: 45;
+  const offset = general? !isSlidRight ? general.deliveryTime : general.pickUpTime: 45;
+  console.log("offset in checkTimeValidity", offset);
   const { hours, minutes } = getUpdatedTime(offset);
+  console.log("current time in checkTimeValidity", hours, minutes, offset);
+  
 
-  const closingTime = isSlidRight ? general?.workTime[dayOfWeek].deliveryClosingTime : general?.workTime[dayOfWeek].closingTime;
-  const openingTime = isSlidRight ? general?.workTime[dayOfWeek].deliveryOpeningTime : general?.workTime[dayOfWeek].openingTime;
+  const closingTime = !isSlidRight ? general?.workTime[dayOfWeek].deliveryClosingTime : general?.workTime[dayOfWeek].closingTime;
+  const openingTime = !isSlidRight ? general?.workTime[dayOfWeek].deliveryOpeningTime : general?.workTime[dayOfWeek].openingTime;
 
   const [closingHour, closingMinutes] = (closingTime || "23:00").split(":").map(Number);
   const [openingHour, openingMinutes] = (openingTime || "09:00").split(":").map(Number);

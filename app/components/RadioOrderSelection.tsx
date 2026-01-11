@@ -52,10 +52,10 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
     }, [displaySecondMessage, setDisplaySecondMessage]);
     
 console.log("nirnngotinh6im4poim", isCroatianLang ?  
-                isSlidRight 
+                !isSlidRight 
                 ? `Minimalno vrijeme za dostavu je ${general?.deliveryTime} min`
                 : `Minimalno vrijeme za preuzimanje je ${general?.pickUpTime} min`  
-            : isSlidRight 
+            : !isSlidRight 
                 ? `Minimum delivery time is ${general?.deliveryTime} min`
                 : `Minimum pickup time is ${general?.pickUpTime} min`
         )
@@ -65,10 +65,10 @@ console.log("nirnngotinh6im4poim", isCroatianLang ?
             <HelperText type="error" visible={!!displayWorkTimeMessage}>
             {
             isCroatianLang 
-            ?  isSlidRight 
+            ?  !isSlidRight 
             ? `Radno vrijeme dostave je od ${general?.workTime[dayofWeek].deliveryOpeningTime} do ${general?.workTime[dayofWeek].deliveryClosingTime}`
             : `Radno vrijeme fast fooda je od ${general?.workTime[dayofWeek].openingTime} do ${general?.workTime[dayofWeek].closingTime}`  
-            : isSlidRight 
+            : !isSlidRight 
             ? `The delivery working hours are from ${general?.workTime[dayofWeek].deliveryOpeningTime} to ${general?.workTime[dayofWeek].deliveryClosingTime}` 
             : `The pickup working hours are from ${general?.workTime[dayofWeek].openingTime} to ${general?.workTime[dayofWeek].closingTime}`        
             }
@@ -120,7 +120,7 @@ console.log("nirnngotinh6im4poim", isCroatianLang ?
             {selectedDeliveryOption==='standard' && !appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && <View >
                 <View style={styles.box}>
                     <MaterialIcons name="access-time" size={20} color="#DA291C" />
-                    <Text style={styles.radioButtonText}> {isSlidRight? general?.deliveryTime: general?.pickUpTime} min</Text>
+                    <Text style={styles.radioButtonText}> {!isSlidRight? general?.deliveryTime: general?.pickUpTime} min</Text>
                 </View>
             </View>}
         </TouchableOpacity>
@@ -128,10 +128,10 @@ console.log("nirnngotinh6im4poim", isCroatianLang ?
             <HelperText type="error" visible={!!displayMessage}>
             {
             isCroatianLang ?  
-                isSlidRight 
+                !isSlidRight 
                 ? `Minimalno vrijeme za dostavu je ${general?.deliveryTime} min`
                 : `Minimalno vrijeme za preuzimanje je ${general?.pickUpTime} min`  
-            : isSlidRight 
+            : !isSlidRight 
                 ? `Minimum delivery time is ${general?.deliveryTime} min`
                 : `Minimum pickup time is ${general?.pickUpTime} min`
             }
@@ -141,8 +141,8 @@ console.log("nirnngotinh6im4poim", isCroatianLang ?
             <HelperText type="error" visible={!!displaySecondMessage}>
             {
             isCroatianLang ?  
-            isSlidRight? "Odaberite vrijeme dostave ispod": "Odaberite vrijeme preuzimanja ispod"
-            : isSlidRight? "Select delivery time below": "Select pickup time below"
+            !isSlidRight? "Odaberite vrijeme dostave ispod": "Odaberite vrijeme preuzimanja ispod"
+            : !isSlidRight? "Select delivery time below": "Select pickup time below"
             }
             </HelperText>  
         )}
@@ -182,8 +182,8 @@ console.log("nirnngotinh6im4poim", isCroatianLang ?
     ellipsizeMode="tail"
   >
     {isCroatianLang
-      ? `Odaberi vrijeme ${isSlidRight ? 'dostave' : 'preuzimanja'}`
-      : `Select ${isSlidRight ? 'delivery' : 'pickup'} time`}
+      ? `Odaberi vrijeme ${!isSlidRight ? 'dostave' : 'preuzimanja'}`
+      : `Select ${!isSlidRight ? 'delivery' : 'pickup'} time`}
   </Text>
 
   {timeString != "null" && selectedDeliveryOption === 'custom' && (

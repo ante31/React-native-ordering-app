@@ -20,17 +20,17 @@ const validateForm = (orderData: any, isSlidRight: boolean, setErrors: any, minO
       valid = false;
     }
 
-    if (isSlidRight && (!orderData.address || orderData.address.length < 5 || orderData.address.length > 100)) {
+    if (!isSlidRight && (!orderData.address || orderData.address.length < 5 || orderData.address.length > 100)) {
       newErrors.address = iscroatianLang ? "Adresa mora imati 5-100 znakova" : "Address must be 5-100 characters long";
       valid = false;
     }
 
-    if (isSlidRight && !orderData.zone) {
+    if (!isSlidRight && !orderData.zone) {
       newErrors.zone = iscroatianLang ? "Odaberite zonu dostave" : "Choose delivery zone";
       valid = false;
     }
 
-    if (isSlidRight && orderData.totalPrice < minOrder[orderData.zone]) {
+    if (!isSlidRight && orderData.totalPrice < minOrder[orderData.zone]) {
       newErrors.zone = iscroatianLang ?
       "Minimalna cijena za " + (orderData.zone === "Kaštel Gomilica"? "Kaštel Gomilicu" : orderData.zone) + " je " + minOrder[orderData.zone].toFixed(2) + " €"
       : "Minimal order for " + orderData.zone + " is " + minOrder[orderData.zone].toFixed(2) + " €";

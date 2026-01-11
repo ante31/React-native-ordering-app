@@ -1,6 +1,7 @@
 import { getLocalTime, getLocalTimeHours, getLocalTimeMinutes } from "./getLocalTime";
 
   export const getUpdatedTime = (offset: number) => {
+    console.log("Offset in getUpdatedTime", offset);
       const now = getLocalTime();
       const totalMinutes = getLocalTimeMinutes() + offset;
       const adjustedHours = getLocalTimeHours() + Math.floor(totalMinutes / 60); // Add extra hour if minutes surpass 60

@@ -1,43 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { backendUrl } from "../../localhostConf";
-import { ScrollView, View, Text, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
-import { Card, Portal, Modal } from 'react-native-paper';
+import { useState, useRef,  } from "react";
+import { ScrollView, View, StyleSheet } from "react-native";
 import { Category } from "../models/categoryModel";
 import { isCroatian } from "../services/languageChecker";
 import { CenteredLoading } from "../components/CenteredLoading";
 import { useGeneral } from "../generalContext";
-import { Image, Platform } from 'react-native';
 import Footer from "../components/Footer";
 import { Meal } from "../models/mealModel";
-import MealDetails from '../components/MealDetails';
-import { isTablet } from "../services/isTablet";
 import NetworkError from "../components/NetworkError";
-import { safeFetch } from "../services/safeFetch";
-import { io } from 'socket.io-client';
+import RewardBar from "../components/RewardBar";
+import { ConfettiManager } from "../components/Confetti"; 
+import RewardModal from "../components/RewardModal";
+import { useCategories } from "../../hooks/useCategories";
+import { useLoyalty } from "@/hooks/useLoyalty";
+import { useExtras } from "@/hooks/useExtras";
+import CategoryCard from "../components/CategoryCard";
+import { MealModal } from "../components/MealModal";
 
-const { width, height } = Dimensions.get('screen');
-const socket = io(backendUrl, { transports: ['websocket'] });
-
-export default function HomePage({ navigation, scale, drinks={}, specials, showNetworkError, setShowNetworkError }: { navigation: any, scale: any, drinks: any, specials: any, showNetworkError: boolean, setShowNetworkError: any }) {
-  const [data, setData] = useState<any>(null);
-  
+export default function HomePage({ navigation, scale, drinks={}, specials, showNetworkError, setShowNetworkError }: { navigation: any, scale: any, drinks: any, specials: any, showNetworkError: boolean, setShowNetworkError: any }) {  
   
   const CARD_MARGIN = 16;
-  const SPECIAL_OFFER_POSITION = -5;
-  const SPECIAL_OFFER_TABLET_POSITION = -8;
-  const SPECIAL_OFFER_TABLET_SIZE = 170;
-  const SPECIAL_OFFER_SIZE = 110;
   const { general } = useGeneral();
   const isCroatianLanguage = isCroatian();
-  const [extras, setExtras] = useState<any>({});
+  const extras = useExtras(setShowNetworkError);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories = useCategories(setShowNetworkError);
   const [showMealModal, setShowMealModal] = useState(false);
+  const [showRewardModal, setShowRewardModal] = useState(false);
 
-  const getModalHeight = (meal: Meal | null) => {
-    if (!meal) return height * 0.7;
-    return meal.portions[0].extras === "null" ? "20%" : "80%";
+const confettiRef = useRef<any>(null);
+
+const triggerConfetti = () => {
+  setShowRewardModal(true);
+  const startValovi = () => {
+    confettiRef.current?.start();
   };
+  startValovi();
+};
+
+  const { currentPoints, setCurrentPoints, loyaltyBarPhone } = useLoyalty(general);
 
   const handleMealClick = (meal: Meal) => {
     setSelectedMeal(meal);
@@ -61,52 +61,6 @@ export default function HomePage({ navigation, scale, drinks={}, specials, showN
   }
   };
 
-  useEffect(() => {
-    safeFetch(`${backendUrl}/kategorije`)
-      .then(response => response.json())
-      .then(data => {
-        const categoryList = Object.keys(data).map(key => {
-          const fullTitle = key.split('|');
-          return {
-            title: fullTitle[0],       
-            titleEn: fullTitle[1],     
-            image: data[key].image,    
-            index: data[key].index,
-            category: data[key].category  ,
-            id: data[key].id,
-            specialOffer: data[key].specialOffer
-          };
-        });
-
-        setCategories(categoryList);
-      })
-      .catch(error => {
-        console.error('Error fetching categories:', error);
-      });
-  }, []);
-
-  useEffect(() => {
-  safeFetch(`${backendUrl}/extras`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      setExtras(data);
-    })
-    .catch(error => {
-      setShowNetworkError(true);
-      console.log('Greška pri dohvaćanju priloga:', error);
-    });
-}, []);
-
-
-  console.log("Zašto ", isTablet())
-
-
-
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       {categories.length === 0 || showNetworkError ? (
@@ -116,10 +70,8 @@ export default function HomePage({ navigation, scale, drinks={}, specials, showN
         <CenteredLoading />
       ) : (
         <ScrollView
-          contentContainerStyle={{
-
-          }}
         >
+          <RewardBar currentPoints={currentPoints} threshold={general?.awardThreshold || 500} onRewardPress={triggerConfetti} />
           <View
             style={{
               paddingLeft: CARD_MARGIN,
@@ -131,154 +83,41 @@ export default function HomePage({ navigation, scale, drinks={}, specials, showN
             }}
           >
             {categories
-              .filter(item => item.title !== 'Info')
-              .sort((a, b) => a.index - b.index)
-              .map((item, index) => (
-                <View
+              .filter((item: Category) => item.title !== 'Info')
+              .sort((a: Category, b: Category) => a.index - b.index)
+              .map((item: Category, index: number) => (
+                <CategoryCard 
                   key={index}
-                  style={{
-                    width: item.title === 'Pizza' || item.title === 'Meso' ? '100%' : '50%',
-                    paddingRight: CARD_MARGIN,
-                    paddingTop: CARD_MARGIN,
-                  }}
-                >
-                  <View style={{ flex: 1, minHeight: 200 }}>
-                    {item.specialOffer && (
-                      <TouchableOpacity
-                        activeOpacity={1}
-                        onPress={() =>
-                          handlePress(
-                            item.title,
-                            item.titleEn,
-                            item.image,
-                            item.category,
-                            item.id
-                          )
-                        }
-                        style={{
-                          opacity: 1,
-                          position: 'absolute',
-                          top: isTablet()
-                            ? SPECIAL_OFFER_TABLET_POSITION
-                            : SPECIAL_OFFER_POSITION,
-                          right: isTablet()
-                            ? SPECIAL_OFFER_TABLET_POSITION
-                            : SPECIAL_OFFER_POSITION,
-                          zIndex: 1,
-                        }}
-                      >
-                        <Image
-                          source={isCroatianLanguage ? require('../../assets/images/posebna ponuda-cro.png') : require('../../assets/images/posebna ponuda-eng.png')}
-                          style={{
-                            width: isTablet()
-                              ? SPECIAL_OFFER_TABLET_SIZE
-                              : SPECIAL_OFFER_SIZE,
-                            height: isTablet()
-                              ? SPECIAL_OFFER_TABLET_SIZE
-                              : SPECIAL_OFFER_SIZE,
-                            resizeMode: 'cover',
-                            borderRadius: 10,
-                          }}
-                        />
-                      </TouchableOpacity>
-                    )}
-
-                    <Card
-                      onPress={() =>
-                        handlePress(
-                          item.title,
-                          item.titleEn,
-                          item.image,
-                          item.category,
-                          item.id
-                        )
-                      }
-                      style={{
-                        flex: 1, 
-                        ...(Platform.OS === 'ios' && {
-                          overflow: 'hidden',
-                        }),
-                      }}
-                    >
-                      <Card.Cover
-                        source={{ uri: item.image }}
-                        style={{
-                          backgroundColor: 'white',
-                          width: '100%',
-                          // Postavite visinu koju ste imali u iOS kodu
-                          height: scale.isTablet() ? 400 : 200, 
-                          borderRadius: 10,
-                        }}
-                        // Card.Cover automatski koristi resizeMode: 'cover', ali možemo ga eksplicitno definirati
-                      />
-
-                      <Card.Content
-                        style={{
-                          flexGrow: 1,
-                          justifyContent: 'flex-end', // Naslov ide dolje
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: 'black',
-                            fontSize: scale.light(19),
-                            paddingTop: 16,
-                            fontFamily: 'Lexend_700Bold',
-                          }}
-                        >
-                          {isCroatianLanguage ? item.title : item.titleEn}
-                        </Text>
-                      </Card.Content>
-                    </Card>
-                  </View>
-                </View>
+                  item={item}
+                  isCroatianLanguage={isCroatianLanguage}
+                  scale={scale}
+                  handlePress={handlePress}
+                />
               ))}
           </View>
-
           <Footer scale={scale} general={general} isCroatianLanguage={isCroatianLanguage}/>
-
         </ScrollView>
         
       )}
-      <Portal>
-        <Modal
-          visible={showMealModal}
-          onDismiss={() => setShowMealModal(false)}
-          contentContainerStyle={[styles.modalContainer, { height: getModalHeight(selectedMeal), margin: scale.heavy(16) }]}
-        >
-          {selectedMeal ? (
-            <MealDetails
-              visible={showMealModal}
-              globalMeal={selectedMeal}
-              drinks={drinks}
-              scale={scale}
-              onClose={() => setShowMealModal(false)}
-              navigation={navigation}
-            />
-          ) : (
-            <View style={styles.loaderContainer}>
-              <CenteredLoading />
-            </View>
-          )}
-        </Modal>
-      </Portal>
+      <MealModal 
+        visible={showMealModal} 
+        meal={selectedMeal} 
+        drinks={drinks} 
+        scale={scale} 
+        navigation={navigation}
+        onClose={() => { setShowMealModal(false); setCurrentPoints(0); }} 
+      />
+      <RewardModal scale={scale} setCurrentPoints={setCurrentPoints} isCroatianLanguage={isCroatianLanguage} general={general} confettiRef={confettiRef} showRewardModal={showRewardModal} setShowRewardModal={setShowRewardModal} />
+      <View 
+        style={[
+          StyleSheet.absoluteFill, 
+          { zIndex: 999, overflow: 'hidden' }
+        ]} 
+        pointerEvents="none"
+      >
+        <ConfettiManager ref={confettiRef} />
+      </View>
     </View>
   );
 
 }
-
-
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    height: height * 0.7,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-});

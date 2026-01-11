@@ -82,15 +82,18 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
   }
 
   // if (general)
-  //   console.log("owfefd", isClosedMessageDisplayed(general.workTime[dayofWeek]))
 
 
   // Check app status and show modal if needed
   useEffect(() => {
     if (!general || !dayofWeek) return;
 
+      console.log("owfefd", isClosedMessageDisplayed(general.appStatus, general.workTime[dayofWeek]) && !forceUpdateAcknowledged)
+
+
     const checkAppStatus = () => {
-      if (isClosedMessageDisplayed(general.appStatus, general.workTime[dayofWeek]) && !forceUpdateAcknowledged) {
+      console.log("Checking app status:", general.appStatus, general.workTime[dayofWeek]);
+      if (isClosedMessageDisplayed(general.appStatus, general.workTime[dayofWeek], general.holidays) && !forceUpdateAcknowledged) {
         setShowClosedAppModal(true);
       }
       if (general.message.active){

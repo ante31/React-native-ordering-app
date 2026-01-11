@@ -4,7 +4,6 @@ import Counter from './Counter';
 import ExtrasList from './ExtrasList'; // Import the new component
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useCart } from "../cartContext";
-// import { useClickOutside } from "react-native-click-outside";
 import SizesList from "./SizesList";
 import { backendUrl } from "../../localhostConf";
 import { useToast } from "react-native-toast-notifications";
@@ -15,7 +14,7 @@ import DrinksList from "./DrinksList";
 import SaucesList from "./SaucesList";
 import { useGeneral } from "../generalContext"; 
 
-const CartMealDetails = ({ visible, meal, drinks = {}, scale, onClose, handleRemoveFromCart, setReloadTrigger, navigation }: any) => {
+const CartMealDetails = ({ visible, meal, drinks = {}, scale, onClose, handleRemoveFromCart, navigation }: any) => {
   console.log("CartMealDetailsmeal", meal);
     const {general} = useGeneral();
   
@@ -302,7 +301,6 @@ console.log("Selected extras in CartMealDetails:", selectedExtras);
             isUpdating={isUpdating}
             navigation={navigation}
             submitButtonStatus={submitButtonStatus}
-            setReloadTrigger={setReloadTrigger}
             scale={scale}
             onClose={onClose}
           />

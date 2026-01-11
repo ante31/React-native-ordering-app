@@ -8,7 +8,7 @@ import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 import { Platform } from 'react-native';
 
-const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, scale, submitButtonStatus = "Dodaj", setReloadTrigger=() => {console.log("reloadTrigger")}, onClose }: any) => {
+const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, scale, submitButtonStatus = "Dodaj", onClose }: any) => {
   const {general} = useGeneral();
   const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   console.log("submitButtonStatus", submitButtonStatus, isCroatianLang)
@@ -61,7 +61,6 @@ const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddTo
             if (submitButtonStatus === "Ažuriraj") {
               handleRemoveFromCart(mealId);
               handleAddToCart();
-              setReloadTrigger((prev: number) => prev + 1);
               onClose();
             }
           }

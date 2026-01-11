@@ -40,6 +40,8 @@ const ExtrasList = ({ isCroatianLang, meal, extras, selectedExtras, setSelectedE
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
+    console.log("extras", extras, "with value:", value);
+
     const fullExtraKey = Object.entries(extras).find(([key]) => key.includes(extra))?.[0] || extra;
 
     setSelectedExtras((prevSelected: { [key: string]: number }) => {

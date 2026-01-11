@@ -1,10 +1,10 @@
 import { Text, View, BackHandler, StyleSheet, Image, TouchableOpacity, Platform } from "react-native";
 import { useEffect, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { HeaderBackButton } from '@react-navigation/elements';
-
+import { scale } from "../services/scale";
 export default function ThankYouScreen({ route, navigation }: any) {
-  const { isCroatianLang, notificationResult, scale } = route.params;
+  const { isCroatianLang, notificationResult } = route.params;
+
   const styles = getStyles(scale);
   const nav = useNavigation();
   console.log("NR", notificationResult)

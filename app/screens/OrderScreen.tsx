@@ -23,6 +23,7 @@ import { checkTimeValidity } from '../services/checkTimeValidity';
 import { checkNotificationPermission } from '../services/checkNotificationsPermission';
 import { safeFetch } from '../services/safeFetch';
 import { isDeliveryClosed } from '../services/isAppClosed';
+import { checkPrimaryPhone } from '../services/checkPrimaryPhone';
 
 export default function OrderScreen({ route, navigation, scale }: { route: any, navigation: any, scale: any }) {
   const styles = getStyles(scale);
@@ -37,6 +38,7 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
   //   return () => clearTimeout(lockTimeout); // Cleanup on unmount
   // }, [isLocked]);
 
+  const [customMessageModalVisible, setCustomMessageModalVisible] = useState(false);
   const { expoPushToken, notification } = usePushNotifications();
   const { dispatch } = useCart();
   const { cartState, storageOrder } = route.params;
@@ -106,7 +108,7 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
     address: orderAddress,
     zone: orderZone,
     note: orderNote,
-    isDelivery: isSlidRight,
+    isDelivery: storageOrder?.isDelivery ?? true,
     timeOption: selectedDeliveryOption,
     cartItems: cartState.items,
     time: '',
@@ -114,7 +116,7 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
     token: '',
     status: "pending",
     language: isCroatianLang ? "hr" : "en",
-    totalPrice: orderPrice + (isSlidRight ? general?.deliveryPrice : 0)
+    totalPrice: orderPrice + (!isSlidRight ? general?.deliveryPrice : 0)
   });
 
 
@@ -143,8 +145,18 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
   }, [isSlidRight])
 
   const handleSubmit = async () => {
+    //checkPrimaryPhone(orderData.phone);
+    //const shouldSubmitImmediately = await LoyaltyCheck();
+
+    //if (shouldSubmitImmediately ) {
+      await submitOrder();
+    //}
+  }
+
+
+  const submitOrder = async () => {
     console.log("submit clicked");
-    if (isDeliveryClosed(general?.workTime[dayOfWeek]) && isSlidRight) {
+    if (isDeliveryClosed(general?.workTime[dayOfWeek]) && !isSlidRight) {
       setDisplayWorkTimeMessage(true);
       return;
     }
@@ -154,13 +166,9 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
 
     // Calculate current time
     const currentDate = getLocalTime();
-    console.log("loggg", currentDate);
     const manipulativeCurrentDate = getLocalTime();
-    console.log("shrek1", manipulativeCurrentDate);
 
     let deadline = "";
-
-    // Fake currentDate to be 23:00 in Europe/Zagreb time
 
     if (selectedDeliveryOption === "standard") {
       console.log("Standard:");
@@ -197,7 +205,7 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
           const orderDataWithToken = {
             ...orderData,
             token: expoPushToken?.data,
-            totalPrice: orderPrice + (isSlidRight ? general?.deliveryPrice : 0),
+            totalPrice: orderPrice + (!isSlidRight ? general?.deliveryPrice : 0),
             timeOption: selectedDeliveryOption,
             time: currentDate,
             deadline: deadline,
@@ -247,6 +255,8 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
     isLocked.current = false;
 }
 
+console.log("orderData render ", storageOrder);
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
       <ScrollView >
@@ -258,7 +268,8 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
           setBoxWidth={setBoxWidth}
           orderData={orderData}
           setOrderData={setOrderData}
-          initialSide={storageOrder?.isDelivery ? (isDeliveryClosed(general?.workTime[dayOfWeek]) ? 'left' : 'right') : 'left'}
+          // initialSide={storageOrder?.isDelivery ? (!isDeliveryClosed(general?.workTime[dayOfWeek]) ? 'left' : 'right') : 'left'}
+          initialSide={storageOrder ? (storageOrder.isDelivery ? 'left' : 'right') : 'left'}
           isCroatianLang={isCroatianLang}
           scale={scale}
           setDisplayDeliveryClosedMessage={setDisplayDeliveryClosedMessage}
@@ -331,11 +342,11 @@ export default function OrderScreen({ route, navigation, scale }: { route: any, 
         }
       >
         <Text allowFontScaling={false} style={[
-          { fontSize: scale.isTablet() ? 30 : 20, fontFamily: 'Lexend_400Regular' },
+          { fontSize: scale.isTablet() ? 30 : 18, fontFamily: 'Lexend_400Regular' },
           styles.textPosition,
           general?.workTime && appButtonsDisabled(general?.appStatus, general.workTime[dayOfWeek], general.holidays) && styles.disabledText // Change text color when disabled
         ]}>
-          {isCroatianLang ? 'Završi narudžbu' : 'Confirm order'}
+          {isCroatianLang ? `Završi narudžbu - ${isSlidRight? "Preuzimanje": "Dostava"}` : `Confirm order - ${isSlidRight? "Pickup": "Delivery"}`}
         </Text>
       </Button>
 
@@ -370,17 +381,7 @@ const getStyles = (scale: any) =>
       paddingVertical: 5,
 
     },
-    button: {
-      // height: scale.light(50),  // makni ovo
-      paddingVertical: 15,
-      paddingHorizontal: 20,
-      marginBottom: 20,
-      backgroundColor: "#ffd400",
-      borderRadius: 5,
-      width: "90%",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+
     textPosition: {
       color: '#fff',
       lineHeight: scale.isTablet() ? 50 : 30, // Adjust this to control vertical alignment and prevent cropping

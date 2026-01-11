@@ -18,8 +18,6 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   const isCroatianLang = isCroatian();
   const [order, setOrder] = useState<any>(null);
   const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
-  
-  console.log("fetched ",order);
 
   if (item.status !== "completed"){
     useEffect(() => {
@@ -64,13 +62,14 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   return (
 
   <View style={styles.content}>
-    <Text style={styles.text}>{isCroatianLang ? 'Ime: ': 'Name: '}{item.name}</Text>
+    <Text style={styles.text}>{isCroatianLang ? item.isDelivery ? 'DOSTAVA NA ADRESU' : 'PREUZIMANJE U OBJEKTU' : item.isDelivery ? 'HOME DELIVERY' : 'IN-STORE PICKUP'}</Text>
+    <Text style={styles.text}>{isCroatianLang ? 'Ime: ' : 'Name: '} {item.name}</Text>
     <Text style={styles.text}>{isCroatianLang ? 'Telefon: ': 'Phone: '}{item.phone}</Text>
     {item.isDelivery && (               
         <Text style={styles.text}>{isCroatianLang ? 'Adresa: ': 'Address:'} {item.address}, {item.zone}</Text>
     )}
     <Text style={styles.text}>{isCroatianLang
-      ? item.isDelivery ? 'Okvrino vrijeme dostave: ' : 'Okvirno vrijeme pripreme: '
+      ? item.isDelivery ? 'Okvirno vrijeme dostave: ' : 'Okvirno vrijeme pripreme: '
       : item.isDelivery ? 'Estimated delivery time: ' : 'Estimated preparation time: '}
       {formatEuropeanDateTime(item.deadline).split(" ")[1]}
     </Text>

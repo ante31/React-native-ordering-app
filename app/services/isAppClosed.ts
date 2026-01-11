@@ -2,6 +2,24 @@ import { useGeneral } from "../generalContext";
 import { Holidays } from "../models/generalModel";
 import { getLocalTime, getLocalTimeHours, getLocalTimeMinutes } from "./getLocalTime";
 
+export const getHolidayGreeting = (isCroatian: boolean) => {
+  const date = getLocalTime().toISOString().split('T')[0]; // YYYY-MM-DD
+  const [year, month, day] = date.split('-');
+  const mmdd = `${month}-${day}`; // MM-DD
+  
+  const greetings: { [key: string]: { hr: string; en: string } } = {
+    '12-25': { hr: "Sretan Božić!", en: "Merry Christmas!" },
+    '12-26': { hr: "Sretan Sv. Stjepan!", en: "Happy St. Stephen's Day!" },
+    '12-31': { hr: "Sretna Stara godina!", en: "Happy New Year's Eve!" },
+    '01-01': { hr: "Sretna Nova godina!", en: "Happy New Year!" },
+  };
+
+  const wish = greetings[mmdd];
+  // Generička poruka, tipa badnjak 24.12.
+  if (wish) return isCroatian ? wish.hr : wish.en;
+  return isCroatian ? "Danas ne radimo." : "Closed today.";
+};
+
 export const isHoliday = (holidays?: Holidays): 'closed' | 'shortened' | 'normal' => {
   const date = getLocalTime().toISOString().split('T')[0]; // YYYY-MM-DD
   const [yearStr, month, day] = date.split('-');
@@ -26,9 +44,10 @@ export const isHoliday = (holidays?: Holidays): 'closed' | 'shortened' | 'normal
 
 
 export const isClosedMessageDisplayed = (appStatus: any, workingHours: any, holidays?: Holidays): boolean => {
-  if (appStatus.appClosed || appStatus.forceAppOpen) {
-    console.log("appButtonsDisabled", appStatus.appClosed, appStatus.forceAppOpen);
-    return appStatus.appClosed || !appStatus.forceAppOpen;
+  console.log("isClosedMessageDisplayed", appStatus, workingHours, isHoliday(holidays) === "closed", holidays);
+  if (appStatus.appClosed || appStatus.forceAppOpen || isHoliday(holidays) === "closed") {
+    console.log("appButtonsDisabled", appStatus.appClosed, appStatus.forceAppOpen, isHoliday(holidays) === "closed");
+    return appStatus.appClosed || !appStatus.forceAppOpen || isHoliday(holidays) === "closed";
   }
   const hours = getLocalTimeHours();
   const minutes = getLocalTimeMinutes();
@@ -47,8 +66,7 @@ export const isClosedMessageDisplayed = (appStatus: any, workingHours: any, holi
     hours > closingHours || 
     (hours === closingHours && minutes >= closingMinutes) || 
     hours < openingHours || 
-    (hours === openingHours && minutes < openingMinutes) ||
-    isHoliday(holidays) === "closed";
+    (hours === openingHours && minutes < openingMinutes)
 };
 
 

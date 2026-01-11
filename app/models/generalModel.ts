@@ -17,6 +17,7 @@ export type Extras = {
 }
 
 export type General = {
+  awardThreshold: number;
   deliveryPrice: number;
   deliveryTime: number;
   displayCurrency: string;

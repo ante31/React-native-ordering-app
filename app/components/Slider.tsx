@@ -26,7 +26,7 @@ const Slider = ({ workingHours, isSlidRight, setIsSlidRight, boxWidth, setBoxWid
         useNativeDriver: false,
       }).start();
       setIsSlidRight(!isSlidRight);
-      setOrderData({ ...orderData, isDelivery: !isSlidRight });
+      setOrderData({ ...orderData, isDelivery: isSlidRight });
       console.log('Sliding to the ' + side + ' side');
     }
   };
@@ -35,16 +35,16 @@ const Slider = ({ workingHours, isSlidRight, setIsSlidRight, boxWidth, setBoxWid
     <View style={styles.sliderContainer}>
       <View style={[styles.grayBox]} onLayout={(event) => setBoxWidth(event.nativeEvent.layout.width * 0.5)}>
         <Animated.View style={[styles.whiteBox, { transform: [{ translateX: slideAnim }] }]} />
-        <TouchableOpacity style={[styles.touchableLeft, isSlidRight && { opacity: 0.4 }]} onPress={() => toggleSlide('left')} activeOpacity={1}>
+        <TouchableOpacity style={[styles.touchableLeft, isSlidRight && { opacity: 0.4 }]} onPress={() => isDeliveryClosed(workingHours)? setDisplayDeliveryClosedMessage(true) : toggleSlide('left')} activeOpacity={1}>
           <Text 
             allowFontScaling={false}
-            style={styles.centerText}>{isCroatianLang ? 'Preuzimanje' : 'Pickup'}
+            style={styles.centerText}>{isCroatianLang ? 'Dostava na adresu' : 'Home delivery'}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.touchableRight, !isSlidRight && { opacity: 0.4 }]} onPress={() => isDeliveryClosed(workingHours)? setDisplayDeliveryClosedMessage(true) : toggleSlide('right')} activeOpacity={1}>
+        <TouchableOpacity style={[styles.touchableRight, !isSlidRight && { opacity: 0.4 }]} onPress={() =>  toggleSlide('right')} activeOpacity={1}>
           <Text 
             allowFontScaling={false}
-            style={styles.centerText}>{isCroatianLang ? 'Dostava' : 'Delivery'}
+            style={styles.centerText}>{isCroatianLang ? 'Preuzimanje u objektu' : 'In-store pickup'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -60,13 +60,14 @@ const getStyles = (scale: any) =>
   },
   centerText: {
     color: '#DA291C',
-    fontSize: scale.isTablet() ? 30 : 17,
+    textAlign: 'center',
+    fontSize: scale.isTablet() ? 30 : 18,
     fontFamily: "Lexend_700Bold"  }
   ,
   grayBox: {
     flexDirection: 'row',
     width: '90%',
-    height: scale.isTablet() ? 80 : 46,
+    height: scale.isTablet() ? 80 : 56,
     backgroundColor: '#d4d4d4',
     borderRadius: scale.isTablet() ? 50 : 30,
     position: 'relative',
@@ -74,7 +75,7 @@ const getStyles = (scale: any) =>
   },
   whiteBox: {
     width: '50%',
-    height: scale.isTablet() ? 76 : 42,
+    height: scale.isTablet() ? 76 : 52,
     backgroundColor: 'white',
     borderRadius: scale.isTablet() ? 50 : 28,
     position: 'absolute',

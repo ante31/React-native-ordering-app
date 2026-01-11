@@ -4,6 +4,7 @@ import { useGeneral } from '../generalContext'; // Import the context hook
 import { StyleSheet, Text, View } from 'react-native';
 import { appButtonsDisabled } from '../services/isAppClosed';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
+import { isHoliday, getHolidayGreeting } from '../services/isAppClosed';
 
 const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
   const {
@@ -17,6 +18,7 @@ const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
   const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
   console.log("Time details log", getLocalTime(), dayOfWeek);
+  console.log("ClosedAppModal render", showClosedAppModal, general?.appStatus, forceUpdateAcknowledged);
 
   return (
     <Portal>
@@ -25,46 +27,42 @@ const ClosedAppModal = ({ isCroatianLanguage, scale }: any) => {
         visible={showClosedAppModal} 
         onDismiss={() => { setForceUpdateAcknowledged(true); setShowClosedAppModal(false); }}
       >
-        {general && <View style={styles.modalContent}>
-          <Text style={[styles.modalText, { fontSize: scale.light(16) }]}>
-            {general.appStatus.appClosed && !general.appStatus.forceAppOpen ?
-              isCroatianLanguage
-              ? `Aplikacija je zatvorena.`
-              : `Application is closed.`
-              :
-            appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays) ?
-              isCroatianLanguage
-              ? `Aplikacija je zatvorena. Radno vrijme je od ${general?.workTime[dayOfWeek].openingTime} do ${general?.workTime[dayOfWeek].closingTime}.`
-              : `Application is closed. Working hours are from ${general?.workTime[dayOfWeek].openingTime} to ${general?.workTime[dayOfWeek].closingTime}.`
-              :
-              isCroatianLanguage
-              ? `Gricko se otvara u ${general?.workTime[dayOfWeek].openingTime}. Možete naručiti za kasnije.`
-              : `Gricko opens at ${general?.workTime[dayOfWeek].openingTime}. You can place an order for later.`
-            }
-          </Text>
-          <Button 
-            mode="contained" 
-            style={[
-              styles.orderButton, 
-              { 
-                paddingVertical: scale.light(8),
-                minHeight: scale.light(40)
-              }
-            ]}
-                      onPress={() => { setForceUpdateAcknowledged(true); setShowClosedAppModal(false); }}
-          >
-            <Text style={[
-              styles.textPosition, 
-              { 
-                fontFamily: 'Lexend_700Bold',
-                fontSize: scale.light(16),
-                lineHeight: scale.light(16)
-              }
-            ]}>
-              {isCroatianLanguage ? 'U redu' : 'OK'}
+        {general && (
+          <View style={styles.modalContent}>
+            <Text style={[styles.modalText, { fontSize: scale.light(16) }]}>
+              {(() => {
+                // 1. Ručno zatvaranje aplikacije (najveći prioritet)
+                if (general.appStatus.appClosed && !general.appStatus.forceAppOpen) {
+                  return isCroatianLanguage ? "Aplikacija je zatvorena." : "Application is closed.";
+                }
+                // 2. Provjera blagdana
+                if (isHoliday(general.holidays) === "closed") {
+                  return "Danas ne radimo. " + getHolidayGreeting(isCroatianLanguage);
+                }
+                // 3. Provjera regularnog radnog vremena
+                if (appButtonsDisabled(general?.appStatus, general?.workTime[dayOfWeek], general?.holidays)) {
+                  return isCroatianLanguage
+                    ? `Aplikacija je zatvorena. Radno vrijeme je od ${general?.workTime[dayOfWeek].openingTime} do ${general?.workTime[dayOfWeek].closingTime}.`
+                    : `Application is closed. Working hours are from ${general?.workTime[dayOfWeek].openingTime} to ${general?.workTime[dayOfWeek].closingTime}.`;
+                }
+                // 4. Preorder poruka
+                return isCroatianLanguage
+                  ? `Gricko se otvara u ${general?.workTime[dayOfWeek].openingTime}. Možete naručiti za kasnije.`
+                  : `Gricko opens at ${general?.workTime[dayOfWeek].openingTime}. You can place an order for later.`;
+              })()}
             </Text>
-          </Button>
-        </View>}
+            
+            <Button 
+              mode="contained" 
+              style={[styles.orderButton, { paddingVertical: scale.light(8), minHeight: scale.light(40) }]}
+              onPress={() => { setForceUpdateAcknowledged(true); setShowClosedAppModal(false); }}
+            >
+              <Text style={[styles.textPosition, { fontFamily: 'Lexend_700Bold', fontSize: scale.light(16), lineHeight: scale.light(16) }]}>
+                {isCroatianLanguage ? 'U redu' : 'OK'}
+              </Text>
+            </Button>
+          </View>
+        )}
       </Modal>
     </Portal>
   );

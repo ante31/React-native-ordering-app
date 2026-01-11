@@ -1,4 +1,3 @@
-import { StorageModel } from '../models/storageModel';
 import * as SecureStore from 'expo-secure-store';
 
 
@@ -7,7 +6,6 @@ const storeData = async (key: string, value: any) => {
     // Store the value securely
     await SecureStore.setItemAsync(key, JSON.stringify(value));
     console.log("Data saved successfully!");
-    console.log("234",value);
 
     // Get the current list of order keys from SecureStore
     const storedKeys = await SecureStore.getItemAsync('order_keys');

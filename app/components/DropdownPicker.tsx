@@ -41,7 +41,6 @@ const DropdownComponent = ({ errors, orderData, setOrderData, isCroatianLang, sc
 
   return (
     <View style={styles.container}>
-      {/* {renderLabel()} */}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: 'black', borderWidth: 2  }]}
         placeholderStyle={styles.placeholderStyle}
@@ -64,8 +63,8 @@ const DropdownComponent = ({ errors, orderData, setOrderData, isCroatianLang, sc
           <AntDesign
             style={styles.icon}
             color={isFocus ? '#ffcc00' : '#ffcc00'}
-            name="Safety"
-            size={24}
+            name={"safety" as any} 
+            size={20}
           />
         )}
       />

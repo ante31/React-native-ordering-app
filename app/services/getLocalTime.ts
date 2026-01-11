@@ -85,7 +85,7 @@ export const getYearMonthDay = (input: Date) => {
 
 export const getDayOfTheWeek = (input: Date, holidays?: Holidays): string => {
   const daysOfWeek = getDaysOfTheWeek();
-  const dayIndex = input.getDay(); // getDay() returns a number (0-6) where 0 is Sunday
+  const dayIndex = input.getDay(); // number (0-6) where 0 is Sunday
 
   const holiday = isHoliday(holidays);
   console.log("isholiday", isHoliday(holidays));

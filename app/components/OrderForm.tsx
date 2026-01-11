@@ -118,6 +118,10 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
     setLoading(false);
   };
 
+    useEffect(() => {
+    console.log("isDelivery changed", orderData.isDelivery);
+  }, [orderData.isDelivery]);
+
   return (
     <View>
       <TextInput 

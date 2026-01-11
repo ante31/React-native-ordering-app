@@ -163,7 +163,7 @@
 
   <div id="q2_razlog_ne" class="hidden">
     <label class="block mb-2" id="p2_q2">2. Ako ne, zašto ne koristite sportsku udlagu?</label>
-    <div class="grid grid-cols-1 gap-2">
+    <div class="grid grid-cols-1 gap-2" data-min-required-group="RazlogNekoristenja">
       <label><input type="checkbox" name="RazlogNekoristenja" value="Nije potrebna" /> <span data-id="p2_q2_opt1">Nije mi potrebna</span></label>
       <label><input type="checkbox" name="RazlogNekoristenja" value="Nije udobna" /> <span data-id="p2_q2_opt2">Nije udobna</span></label>
       <label><input type="checkbox" name="RazlogNekoristenja" value="Preskupa" /> <span data-id="p2_q2_opt3">Preskupa je</span></label>
@@ -186,9 +186,9 @@
       <label class="block mb-2" id="p2_q4">4. Koliko često koristite sportsku udlagu tijekom treninga?</label>
       <select name="KorištenjeTrening" class="w-full p-3 rounded-xl bg-white/10 border border-white/20" id="p2_q4_select">
         <option value="" disabled selected id="p2_q4_opt0">Odaberite...</option>
-        <option id="p2_q4_opt1">Uvijek</option>
-        <option id="p2_q4_opt2">Ponekad</option>
-        <option id="p2_q4_opt3">Nikad</option>
+        <option value="Uvijek" id="p2_q4_opt1">Uvijek</option>
+        <option value="Ponekad" id="p2_q4_opt2">Ponekad</option>
+        <option value="Nikad" id="p2_q4_opt3">Nikad</option>
       </select>
     </div>
   
@@ -196,9 +196,9 @@
       <label class="block mb-2" id="p2_q5">5. Koliko često koristite sportsku udlagu tijekom natjecanja?</label>
       <select name="KorištenjeNatjecanje" class="w-full p-3 rounded-xl bg-white/10 border border-white/20" id="p2_q5_select">
         <option value="" disabled selected id="p2_q5_opt0">Odaberite...</option>
-        <option id="p2_q5_opt1">Uvijek</option>
-        <option id="p2_q5_opt2">Ponekad</option>
-        <option id="p2_q5_opt3">Nikad</option>
+        <option value="Uvijek" id="p2_q5_opt1">Uvijek</option>
+        <option value="Ponekad" id="p2_q5_opt2">Ponekad</option>
+        <option value="Nikad" id="p2_q5_opt3">Nikad</option>
       </select>
     </div>
 
@@ -282,7 +282,7 @@
 
       <div id="q4_vrsta_ozljede" class="hidden">
         <label class="block mb-2" id="p4_q3">3. Ako da, koja vrsta ozljede?</label>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-2" data-min-required-group="VrstaOzljede">
           <label><input type="checkbox" name="VrstaOzljede" value="Puknuće zuba" /> <span data-id="p4_q3_opt1">Puknuće zuba</span></label>
           <label><input type="checkbox" name="VrstaOzljede" value="Avulzija" /> <span data-id="p4_q3_opt2">Avulzija (zub je ispao, izgubili ste zub)</span></label>
           <label><input type="checkbox" name="VrstaOzljede" value="Ugriz jezika/obraza" /> <span data-id="p4_q3_opt3">Ugriz jezika i obraza</span></label>
@@ -365,7 +365,7 @@
       
       <div>
         <label class="block mb-2" id="p5_q6">6. Što je utjecalo na odabir vrste udlage?</label>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-2" data-min-required-group="UtjecajOdabirUdlage">
           <label><input type="checkbox" name="UtjecajOdabirUdlage" value="Cijena" /> <span data-id="p5_q6_opt1">Cijena</span></label>
           <label><input type="checkbox" name="UtjecajOdabirUdlage" value="Pristupačnost" /> <span data-id="p5_q6_opt2">Pristupačnost</span></label>
           <label><input type="checkbox" name="UtjecajOdabirUdlage" value="Preporuka suigrača" /> <span data-id="p5_q6_opt3">Preporuka suigrača</span></label>
@@ -557,25 +557,26 @@
 
       <h2 class="text-xl font-semibold mb-4 text-center" id="p9_title">IX. INFORMIRANOST I EDUKACIJA</h2>
 
-      <div id="q9_preporuka">
+      <div>
         <label class="block mb-2" id="p9_q1">1. Od koga ste dobili preporuku za nošenje sportske udlage?</label>
-        <div class="grid grid-cols-2 gap-2">
-          <label><input type="checkbox" name="Preporuka" value="Trenera" /> <span data-id="p9_q1_opt1">Trenera</span></label>
-          <label><input type="checkbox" name="Preporuka" value="Doktora dentalne medicine" /> <span data-id="p9_q1_opt2">Doktora dentalne medicine</span></label>
-          <label><input type="checkbox" name="Preporuka" value="Suigrača" /> <span data-id="p9_q1_opt3">Suigrača</span></label>
-        </div>
+        <select name="PreporukaUdlage" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20" id="p9_q1_select">
+          <option value="" disabled selected id="p9_q1_opt0">Odaberite...</option>
+          <option id="p9_q1_opt1">Trenera</option>
+          <option id="p9_q1_opt2">Doktora dentalne medicine</option>
+          <option id="p9_q1_opt3">Suigrača</option>
+        </select>
       </div>
 
       <div>
         <label class="block mb-2" id="p9_q2">2. Smatrate li da ste dovoljno informirani o važnosti sportskih udlaga?</label>
         <div class="flex gap-4">
-          <label><input type="radio" name="Informiranost" value="Da" required /> <span data-id="opt_da">Da</span></label>
-          <label><input type="radio" name="Informiranost" value="Ne" required /> <span data-id="opt_ne">Ne</span></label>
+          <label><input type="radio" name="DovoljnoInformiran" value="Da" required /> <span data-id="opt_da">Da</span></label>
+          <label><input type="radio" name="DovoljnoInformiran" value="Ne" required /> <span data-id="opt_ne">Ne</span></label>
         </div>
       </div>
 
       <div>
-        <label class="block mb-2" id="p9_q3">3. Smatrate li da bi se sportaši trebali educirati o zaštiti zuba i čeljusti?</label>
+        <label class="block mb-2" id="p9_q3">3. Smatrate li da bi sportaše trebalo educirati o zaštiti zubi i čeljusti?</label>
         <div class="flex gap-4">
           <label><input type="radio" name="EdukacijaSportaša" value="Da" required /> <span data-id="opt_da">Da</span></label>
           <label><input type="radio" name="EdukacijaSportaša" value="Ne" required /> <span data-id="opt_ne">Ne</span></label>
@@ -585,13 +586,13 @@
       <div>
         <label class="block mb-2" id="p9_q4">4. Smatrate li da bi doktori dentalne medicine trebali aktivnije promovirati korištenje sportskih udlaga?</label>
         <div class="flex gap-4">
-          <label><input type="radio" name="PromocijaDoktora" value="Da" required /> <span data-id="opt_da">Da</span></label>
-          <label><input type="radio" name="PromocijaDoktora" value="Ne" required /> <span data-id="opt_ne">Ne</span></label>
+          <label><input type="radio" name="PromocijaDDM" value="Da" required /> <span data-id="opt_da">Da</span></label>
+          <label><input type="radio" name="PromocijaDDM" value="Ne" required /> <span data-id="opt_ne">Ne</span></label>
         </div>
       </div>
-
+      
       <div>
-        <label class="block mb-2" id="p9_q5">5. Mislite li da bi sportske udlage trebale biti obavezne u svim kontaktnim sportovima?</label>
+        <label class="block mb-2" id="p9_q5">5. Smatrate li da bi sportske udlage trebale biti obavezne u svim kontaktnim sportovima?</label>
         <div class="flex gap-4">
           <label><input type="radio" name="ObavezneUdlage" value="Da" required /> <span data-id="opt_da">Da</span></label>
           <label><input type="radio" name="ObavezneUdlage" value="Ne" required /> <span data-id="opt_ne">Ne</span></label>
@@ -614,9 +615,9 @@
   </div>
 
   <script>
-// Objekt s prijevodima
-const translations = {
-    'hr': {
+    // Objekt s prijevodima
+    const translations = {
+      'hr': {
         // Općenito/gumbi
         'title': 'Profesionalna Anketa',
         'btn_next': 'Dalje →',
@@ -633,11 +634,11 @@ const translations = {
         'opt_konfekcijsku': 'Konfekcijsku',
         'placeholder_drugo': 'Drugo...',
         'placeholder_upisite': 'Upišite ovdje...',
-        'alert_success': 'Email uspješno poslan! Hvala Vam na sudjelovanju.',
-        'err_server_base': 'Greška: Nepoznata greška na serveru.',
-        'err_server_connect': 'Greška spajanja: Server se ne može dohvatiti. Provjerite vezu ili pokušajte ponovo.',
-        'btn_sending': 'Šaljem...',
-        'p3_q1_value_text': 'Vrijednost: 50/100', // Puni tekst se mijenja s vrijednošću
+        'alert_success': 'Email uspješno poslan! Hvala Vam na sudjelovanju!',
+        'p3_q1_value_text': 'Vrijednost',
+        'err_server_base': 'Došlo je do greške prilikom slanja.',
+        'err_server_connect': 'Greška u komunikaciji sa serverom.',
+        'btn_sending': 'Slanje...',
 
         // Stranica 1
         'p1_title': 'I. OPĆE INFORMACIJE',
@@ -682,7 +683,13 @@ const translations = {
         'p2_q3_opt2': 'Poluprilagodljivi dentalni štitnik (boil and bite)',
         'p2_q3_opt3': 'Individualnu',
         'p2_q4': '4. Koliko često koristite sportsku udlagu tijekom treninga?',
+        'p2_q4_opt1': 'Uvijek',
+        'p2_q4_opt2': 'Ponekad',
+        'p2_q4_opt3': 'Nikad',
         'p2_q5': '5. Koliko često koristite sportsku udlagu tijekom natjecanja?',
+        'p2_q5_opt1': 'Uvijek',
+        'p2_q5_opt2': 'Ponekad',
+        'p2_q5_opt3': 'Nikad',
         'p2_q6': '6. Gdje ste nabavili svoju udlagu?',
         'p2_q6_opt1': 'Sportska trgovina',
         'p2_q6_opt2': 'Online kupnja',
@@ -709,7 +716,7 @@ const translations = {
         'p4_q3_placeholder': 'Drugo...',
         'p4_q4': '4. Jeste li ikada pretrpjeli ozljedu dok ste nosili sportsku udlagu?',
         'p4_q5': '5. Osjećate li se sigurnije kada nosite sportsku udlagu?',
-        
+
         // Stranica 5
         'p5_title': 'V. USPOREDBA KONFEKCIJSKIH I INDIVIDUALNIH UDLAGA',
         'p5_q1': '1. Ako ste koristili obje vrste, koja vam je udobnija?',
@@ -725,7 +732,7 @@ const translations = {
         'p5_q7': '7. Koristite li neku dodatnu zaštitnu opremu za zube ili čeljust?',
         'p5_q7_opt2': 'Štitnik za bradu',
         'p5_q7_opt3': 'Kacigu za zaštitu za čeljust',
-        
+
         // Stranica 6
         'p6_title': 'VI. ODRŽAVANJE I HIGIJENA',
         'p6_q1': '1. Koliko često čistite svoju sportsku udlagu?',
@@ -745,7 +752,7 @@ const translations = {
         'p6_q5_opt2': '3-6 mjeseci',
         'p6_q5_opt3': '6-12 mjeseci',
         'p6_q5_opt4': 'Više od godinu dana',
-        
+
         // Stranica 7
         'p7_title': 'VII. UTJECAJ NA SPORTSKU IZVEDBU',
         'p7_q1': '1. Smatrate li da vam udlaga smanjuje sportsku izvedbu?',
@@ -775,14 +782,14 @@ const translations = {
         'p9_q1_opt2': 'Doktora dentalne medicine',
         'p9_q1_opt3': 'Suigrača',
         'p9_q2': '2. Smatrate li da ste dovoljno informirani o važnosti sportskih udlaga?',
-        'p9_q3': '3. Smatrate li da bi se sportaši trebali educirati o zaštiti zuba i čeljusti?',
+        'p9_q3': '3. Smatrate li da bi sportaše trebalo educirati o zaštiti zubi i čeljusti?',
         'p9_q4': '4. Smatrate li da bi doktori dentalne medicine trebali aktivnije promovirati korištenje sportskih udlaga?',
-        'p9_q5': '5. Mislite li da bi sportske udlage trebale biti obavezne u svim kontaktnim sportovima?',
+        'p9_q5': '5. Smatrate li da bi sportske udlage trebale biti obavezne u svim kontaktnim sportovima?',
         'p9_q6': '6. Imate li neki dodatni komentar ili prijedlog vezan uz sportske udlage?',
         'p9_q6_placeholder': 'Upišite ovdje...'
-    },
-    'en': {
-        // General/buttons
+      },
+      'en': {
+        // General
         'title': 'Professional Survey',
         'btn_next': 'Next →',
         'btn_finish': 'Submit',
@@ -798,11 +805,11 @@ const translations = {
         'opt_konfekcijsku': 'Stock',
         'placeholder_drugo': 'Other...',
         'placeholder_upisite': 'Type here...',
-        'alert_success': 'Email successfully sent! Thank you for participating.',
-        'err_server_base': 'Error: Unknown server error.',
-        'err_server_connect': 'Connection error: Cannot reach server. Check connection or try again.',
+        'alert_success': 'Email successfully sent! Thank you for participating!',
+        'p3_q1_value_text': 'Value',
+        'err_server_base': 'An error occurred during submission.',
+        'err_server_connect': 'Error communicating with the server.',
         'btn_sending': 'Sending...',
-        'p3_q1_value_text': 'Value: 50/100', // The full text changes with value
 
         // Page 1
         'p1_title': 'I. GENERAL INFORMATION',
@@ -833,7 +840,7 @@ const translations = {
         'p1_q7_opt2': '2-4 times a week',
         'p1_q7_opt3': '5 or more times a week',
 
-        // Page 2
+        // Stranica 2
         'p2_title': 'II. EXPERIENCE WITH SPORTS MOUTHGUARDS',
         'p2_q1': '1. Do you use a sports mouthguard?',
         'p2_q2': '2. If no, why do you not use a sports mouthguard?',
@@ -847,35 +854,41 @@ const translations = {
         'p2_q3_opt2': 'Semi-custom dental guard (boil and bite)',
         'p2_q3_opt3': 'Custom-made',
         'p2_q4': '4. How often do you use a sports mouthguard during training?',
+        'p2_q4_opt1': 'Always',
+        'p2_q4_opt2': 'Sometimes',
+        'p2_q4_opt3': 'Never',
         'p2_q5': '5. How often do you use a sports mouthguard during competition?',
-        'p2_q6': '6. Where did you obtain your mouthguard?',
+        'p2_q5_opt1': 'Always',
+        'p2_q5_opt2': 'Sometimes',
+        'p2_q5_opt3': 'Never',
+        'p2_q6': '6. Where did you acquire your mouthguard?',
         'p2_q6_opt1': 'Sports store',
         'p2_q6_opt2': 'Online purchase',
-        'p2_q6_opt3': 'At a dental medicine doctor',
-        'p2_q6_opt4': 'Received from the club / coach',
-        
-        // Page 3
-        'p3_title': 'III. COMFORT AND FIT',
+        'p2_q6_opt3': 'From a dental medicine doctor',
+        'p2_q6_opt4': 'Received from club / coach',
+
+        // Stranica 3
+        'p3_title': 'III. COMFORT AND ADJUSTMENT',
         'p3_q1': '1. How would you rate the comfort of your mouthguard (VAS scale)?',
         'p3_q2': '2. Do you feel discomfort or pressure in your mouth while wearing the mouthguard?',
         'p3_q3': '3. Can you breathe normally while wearing the mouthguard?',
         'p3_q4': '4. Can you speak normally while wearing the mouthguard?',
 
-        // Page 4
+        // Stranica 4
         'p4_title': 'IV. PROTECTION AND FUNCTIONALITY',
-        'p4_q1': '1. Do you believe your mouthguard provides sufficient protection from injuries?',
+        'p4_q1': '1. Do you believe the mouthguard provides sufficient protection from injury?',
         'p4_q2': '2. Have you ever suffered an injury to your teeth, lips, or jaw during sports?',
         'p4_q3': '3. If yes, what type of injury?',
         'p4_q3_opt1': 'Tooth fracture',
         'p4_q3_opt2': 'Avulsion (tooth fell out, you lost a tooth)',
         'p4_q3_opt3': 'Biting the tongue/cheek',
         'p4_q3_opt4': 'Jaw injury',
-        'p4_q3_opt5': 'Temporomandibular joint injuries',
+        'p4_q3_opt5': 'Temporomandibular joint (TMJ) injuries',
         'p4_q3_placeholder': 'Other...',
         'p4_q4': '4. Have you ever suffered an injury while wearing a sports mouthguard?',
         'p4_q5': '5. Do you feel safer when wearing a sports mouthguard?',
-        
-        // Page 5
+
+        // Stranica 5
         'p5_title': 'V. COMPARISON OF STOCK AND CUSTOM-MADE MOUTHGUARDS',
         'p5_q1': '1. If you have used both types, which one is more comfortable for you?',
         'p5_q2': '2. Which one allows you to breathe more easily?',
@@ -890,8 +903,8 @@ const translations = {
         'p5_q7': '7. Do you use any additional protective gear for your teeth or jaw?',
         'p5_q7_opt2': 'Chin guard',
         'p5_q7_opt3': 'Helmet with jaw protection',
-        
-        // Page 6
+
+        // Stranica 6
         'p6_title': 'VI. MAINTENANCE AND HYGIENE',
         'p6_q1': '1. How often do you clean your sports mouthguard?',
         'p6_q1_opt1': 'After every use',
@@ -909,9 +922,9 @@ const translations = {
         'p6_q5_opt1': 'Less than 3 months',
         'p6_q5_opt2': '3-6 months',
         'p6_q5_opt3': '6-12 months',
-        'p6_q5_opt4': 'More than a year',
-        
-        // Page 7
+        'p6_q5_opt4': 'More than one year',
+
+        // Stranica 7
         'p7_title': 'VII. IMPACT ON SPORTS PERFORMANCE',
         'p7_q1': '1. Do you believe the mouthguard reduces your sports performance?',
         'p7_q2': '2. Does the mouthguard cause you a gag reflex?',
@@ -922,18 +935,18 @@ const translations = {
         'p7_q7': '7. Can you briefly describe the irritation?',
         'p7_q7_placeholder': 'Type here...',
 
-        // Page 8
+        // Stranica 8
         'p8_title': 'VIII. PRICE AND AVAILABILITY',
         'p8_q1': '1. How much did you pay for your sports mouthguard?',
         'p8_q1_opt1': 'Less than 10 €',
         'p8_q1_opt2': '10-50 €',
         'p8_q1_opt3': '50-100 €',
         'p8_q1_opt4': 'More than 100 €',
-        'p8_q2': '2. Do you believe the price of the mouthguard is justified relative to its quality?',
+        'p8_q2': '2. Do you believe the price of the mouthguard is justified in relation to its quality?',
         'p8_q3': '3. Would you be willing to invest in a higher quality mouthguard?',
         'p8_q4': '4. Are you satisfied with the availability of sports mouthguards on the market?',
 
-        // Page 9
+        // Stranica 9
         'p9_title': 'IX. AWARENESS AND EDUCATION',
         'p9_q1': '1. From whom did you receive a recommendation to wear a sports mouthguard?',
         'p9_q1_opt1': 'Coach',
@@ -945,469 +958,445 @@ const translations = {
         'p9_q5': '5. Do you think sports mouthguards should be mandatory in all contact sports?',
         'p9_q6': '6. Do you have any additional comments or suggestions related to sports mouthguards?',
         'p9_q6_placeholder': 'Type here...'
-    }
-};
+      }
+    };
 
-let currentLang = 'hr'; // Zadani jezik
+    let currentLang = 'hr'; // Zadani jezik
+    let koristenjeUdlageAnswer = ''; // Globalna varijabla za spremanje odgovora P2Q1 (Dodano)
 
-// Funkcija za prevođenje cijele stranice
-function setLanguage(lang) {
-    currentLang = lang;
-    document.documentElement.lang = lang; // Postavi HTML lang atribut
+    // Funkcija za prevođenje cijele stranice
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang; // Postavi HTML lang atribut
 
-    // Ažuriraj naslov stranice
-    document.getElementById('title').textContent = translations[lang]['title'];
+      // Ažuriraj naslov stranice
+      document.getElementById('title').textContent = translations[lang]['title'];
 
-    // Ažuriraj sve elemente s 'id' atributom
-    for (const id in translations[lang]) {
+      // Ažuriraj sve elemente s 'id' atributom
+      for (const id in translations[lang]) {
         const element = document.getElementById(id);
         if (element && id !== 'p3_q1_value_text' && id !== 'alert_success' && id !== 'err_server_base' && id !== 'err_server_connect' && id !== 'btn_sending') {
             element.textContent = translations[lang][id];
         }
-    }
-    
-    // Posebno rukovanje gumbom "Dalje"
-    document.querySelectorAll('.next-btn').forEach(btn => {
+      }
+
+      // Posebno rukovanje gumbom "Dalje"
+      document.querySelectorAll('.next-btn').forEach(btn => {
         btn.textContent = translations[lang]['btn_next'];
-    });
+      });
 
-    // Posebno rukovanje gumbom "Pošalji"
-    const finishBtn = document.getElementById('finishBtn');
-    if (finishBtn) finishBtn.textContent = translations[lang]['btn_finish'];
+      // Posebno rukovanje gumbom "Pošalji"
+      const finishBtn = document.getElementById('finishBtn');
+      if (finishBtn) finishBtn.textContent = translations[lang]['btn_finish'];
 
-    // Posebno rukovanje Select elementima (opcije)
-    const selectOptions = {
+      // Posebno rukovanje Select elementima (opcije)
+      const selectOptions = {
         'p1_q6_select': ['p1_q6_opt0', 'p1_q6_opt1', 'p1_q6_opt2', 'p1_q6_opt3', 'p1_q6_opt4'],
         'p1_q7_select': ['p1_q7_opt0', 'p1_q7_opt1', 'p1_q7_opt2', 'p1_q7_opt3'],
         'p2_q4_select': ['p2_q4_opt0', 'p2_q4_opt1', 'p2_q4_opt2', 'p2_q4_opt3'],
         'p2_q5_select': ['p2_q5_opt0', 'p2_q5_opt1', 'p2_q5_opt2', 'p2_q5_opt3'],
         'p6_q5_select': ['p6_q5_opt0', 'p6_q5_opt1', 'p6_q5_opt2', 'p6_q5_opt3', 'p6_q5_opt4'],
-        'p8_q1_select': ['p8_q1_opt0', 'p8_q1_opt1', 'p8_q1_opt2', 'p8_q1_opt3', 'p8_q1_opt4']
-    };
+        'p8_q1_select': ['p8_q1_opt0', 'p8_q1_opt1', 'p8_q1_opt2', 'p8_q1_opt3', 'p8_q1_opt4'],
+        'p9_q1_select': ['p9_q1_opt0', 'p9_q1_opt1', 'p9_q1_opt2', 'p9_q1_opt3']
+      };
 
-    for (const selectId in selectOptions) {
-        selectOptions[selectId].forEach(optionId => {
+      for (const selectId in selectOptions) {
+        const selectElement = document.getElementById(selectId);
+        if (selectElement) {
+          selectOptions[selectId].forEach(optionId => {
             const optionElement = document.getElementById(optionId);
             if (optionElement) {
-                // Za opciju "Odaberite..." koristimo 'opt_odaberite'
+                // Logika za opciju 0 koja ima poseban tekst u translations
                 if (optionId.endsWith('_opt0')) {
                     optionElement.textContent = translations[lang]['opt_odaberite'];
                 } else {
-                    // Za ostale opcije, ID je isti kao ključ u prijevodu
-                    optionElement.textContent = translations[lang][optionId];
+                    // Postavlja prevedeni tekst
+                    optionElement.textContent = translations[lang][optionId]; 
                 }
             }
-        });
-    }
-
-    // Ažuriraj tekstove radio/checkbox gumba koji koriste 'data-id'
-    document.querySelectorAll('[data-id]').forEach(el => {
-        const key = el.getAttribute('data-id');
-        if (translations[lang][key]) {
-            el.textContent = translations[lang][key];
-        } else if (key === 'opt_da') {
-            el.textContent = translations[lang]['opt_da'];
-        } else if (key === 'opt_ne') {
-            el.textContent = translations[lang]['opt_ne'];
+          });
         }
-    });
+      }
 
-    // Ažuriraj placeholdere
-    document.getElementById('p1_q5_placeholder').placeholder = translations[lang]['placeholder_drugo'];
-    document.getElementById('p4_q3_placeholder').placeholder = translations[lang]['placeholder_drugo'];
-    document.getElementById('p7_q7_placeholder').placeholder = translations[lang]['placeholder_upisite'];
-    document.getElementById('p9_q6_placeholder').placeholder = translations[lang]['placeholder_upisite'];
-    
-    // Ažuriraj aktivne zastave
-    document.querySelectorAll('.flag-icon').forEach(flag => {
+      // Ažuriraj tekstove radio/checkbox grupa (koriste data-id)
+      document.querySelectorAll('span[data-id]').forEach(span => {
+          const dataId = span.getAttribute('data-id');
+          // Koristi 'opt_' prefiks za općenite odgovore (Da/Ne)
+          if (dataId.startsWith('opt_')) {
+              span.textContent = translations[lang][dataId];
+          // Koristi specifične ID-jeve za opcije koje su definirane u translation bloku
+          } else {
+              if (translations[lang][dataId]) {
+                  span.textContent = translations[lang][dataId];
+              }
+          }
+      });
+
+      // Ažuriraj placeholdere
+      document.getElementById('p1_q5_placeholder').placeholder = translations[lang]['placeholder_drugo'];
+      document.getElementById('p4_q3_placeholder').placeholder = translations[lang]['placeholder_drugo'];
+      document.getElementById('p7_q7_placeholder').placeholder = translations[lang]['placeholder_upisite'];
+      document.getElementById('p9_q6_placeholder').placeholder = translations[lang]['placeholder_upisite'];
+
+      // Ažuriraj aktivne zastave
+      document.querySelectorAll('.flag-icon').forEach(flag => {
         flag.classList.remove('active');
-    });
-    document.getElementById(`${lang}Flag`).classList.add('active');
+      });
+      document.getElementById(`${lang}Flag`).classList.add('active');
 
-    // Ažuriraj tekst za VAS slider (p3_q1_value_text)
-    const comfortValueElement = document.getElementById('comfortValue');
-    if (comfortValueElement) {
+      // Ažuriraj tekst za VAS slider (p3_q1_value_text)
+      const comfortValueElement = document.getElementById('comfortValue');
+      if (comfortValueElement) {
         document.getElementById('p3_q1_value_text').innerHTML = `${translations[lang]['p3_q1_value_text'].split(':')[0]}: <span id="comfortValue" class="font-semibold">${comfortValueElement.textContent}</span>/100`;
+        // ISPRAVAK: Re-fetch globalne varijable jer je innerHTML zamijenio element
+        comfortValue = document.getElementById("comfortValue");
+      }
     }
-}
 
+    let answers = {};
+    const totalSteps = 9;
 
-// Ostatak JS logike ostaje, uz dodatak listenera za zastave i prilagodbe u Submit dijelu.
+    // Selektori
+    const nextBtns = document.querySelectorAll('.next-btn');
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const comfortSlider = document.getElementById("comfortSlider");
+    let comfortValue = document.getElementById("comfortValue"); // <--- AŽURIRANO: Promijenjeno u let kako bi se moglo re-fetchati
 
-let answers = {};
-const totalSteps = 9;
+    function updateProgress(currentStep) {
+      const percentage = Math.round((currentStep / totalSteps) * 100);
+      progressBar.style.width = `${percentage}%`;
+      progressText.textContent = `${currentStep} / ${totalSteps}`;
+    }
 
-// Selektori
-const nextBtns = document.querySelectorAll('.next-btn');
-const progressBar = document.getElementById("progressBar");
-const progressText = document.getElementById("progressText");
-const comfortSlider = document.getElementById("comfortSlider");
-const comfortValue = document.getElementById("comfortValue");
+    function goToStep(currentStep, nextStep) {
+      const currentPage = document.getElementById(`page${currentStep}`);
+      if (currentPage) {
+        currentPage.classList.add("hidden");
+        currentPage.classList.remove("fade");
+      }
 
+      const nextPage = document.getElementById(`page${nextStep}`);
+      if (nextPage) {
+        nextPage.classList.remove("hidden");
+        nextPage.classList.add("fade");
 
-function updateProgress(currentStep) {
-  const percentage = Math.round((currentStep / totalSteps) * 100);
-  
-  progressBar.style.width = `${percentage}%`;
-  progressText.textContent = `${currentStep} / ${totalSteps}`;
-}
+        // Ovdje pokrećemo uvjetnu logiku za tu stranicu
+        if (nextStep === 2) handleConditionalPage2();
+        if (nextStep === 4) handleConditionalPage4();
+        // DODANO: Uvjetna vidljivost na stranici 8
+        if (nextStep === 8) handleConditionalPage8();
+      }
 
-function goToStep(currentStep, nextStep) {
-  const currentPage = document.getElementById(`page${currentStep}`);
-  if (currentPage) {
-    currentPage.classList.add("hidden");
-    currentPage.classList.remove("fade");
-  }
+      updateProgress(nextStep);
+      document.body.scrollTo(0, 0);
+    }
 
-  const nextPage = document.getElementById(`page${nextStep}`);
-  if (nextPage) {
-    nextPage.classList.remove("hidden");
-    nextPage.classList.add("fade"); 
-    
-    // Ovdje pokrećemo uvjetnu logiku za tu stranicu
-    if (nextStep === 2) handleConditionalPage2();
-    if (nextStep === 4) handleConditionalPage4();
-    if (nextStep === 5) handleConditionalPage5(); 
-    if (nextStep === 7) handleConditionalPage7();
-    if (nextStep === 8) handleConditionalPage8();
-    if (nextStep === 9) handleConditionalPage9();
-  }
-
-  updateProgress(nextStep);
-  document.body.scrollTo(0, 0); 
-}
-
-// Funkcija za postavljanje/uklanjanje 'required' atributa za cijeli kontejner
-function toggleRequired(container, isRequired) {
-    container.querySelectorAll('input, select, textarea').forEach(element => {
+    // Funkcija za postavljanje/uklanjanje 'required' atributa za cijeli kontejner
+    function toggleRequired(container, isRequired) {
+      container.querySelectorAll('input, select, textarea').forEach(element => {
         // Preskače elemente koji su isključeni (disabled)
         if (element.hasAttribute('disabled')) return;
         
-        // Postavi obaveznost
-        element.required = isRequired;
+        // Posebno rukovanje za checkbox/radio grupe koje imaju custom validaciju
+        if (element.type === 'checkbox' || element.type === 'radio') {
+            // Ako element pripada grupi za min-required, ne postavljamo 'required' atribut na sam element
+            if (element.closest('[data-min-required-group]')) {
+                // Ali moramo osigurati da se ne brišu values ako je isRequired = false, jer to radi brisanje u answers
+                // Umjesto toga, fokusirat ćemo se samo na brisanje vrijednosti kod ne-obaveznosti
+            } else {
+                element.required = isRequired;
+            }
+        } else {
+             // Postavi obaveznost za ostale elemente (select, text, number)
+            element.required = isRequired;
+        }
+
 
         // Ako nije obavezno, resetiraj vrijednost i očisti odgovore
         if (!isRequired) {
-            if (element.type === 'radio' || element.type === 'checkbox') {
-                element.checked = false;
-            } else if (element.tagName === 'SELECT') {
-                // Vrati na prvu opciju (koja bi trebala biti disabled selected)
-                if (element.options.length > 0) element.value = element.options[0].value;
-            } else if (element.tagName === 'TEXTAREA' || element.type === 'text' || element.type === 'number') {
-                element.value = '';
-            }
-            // Ukloni polje iz 'answers' objekta - VAŽNO!
+          if (element.type === 'radio' || element.type === 'checkbox') {
+            element.checked = false;
+          } else {
+            element.value = '';
+          }
+          // I obriši odgovor iz globalnog 'answers' objekta
+          if (element.name && answers[element.name]) {
             delete answers[element.name];
+          }
         }
-    });
-}
+      });
+    }
 
-// ----------------------------------------------------------------------
-// UVJETNA LOGIKA ZA STRANICU 2 (KORIŠTENJE UDLAGE I OBRNUTA LOGIKA)
-// ----------------------------------------------------------------------
-function handleConditionalPage2() {
-    const q1Radio = document.querySelectorAll('input[name="KoristenjeUdlage"]');
-    const q2RazlogNe = document.getElementById('q2_razlog_ne');
-    const q3q6Da = document.getElementById('q2_da_group'); 
-    const nextButton = document.getElementById('page2_next_btn');
+    // ----------------------------------------------------------------------
+    // CUSTOM VALIDACIJA ZA MINIMALNO JEDAN CHECKBOX
+    // ----------------------------------------------------------------------
+    function validateMinCheckboxes(form) {
+        let isValid = true;
+        // Pronađi sve grupe koje zahtijevaju minimalno 1 odabir
+        const requiredGroups = form.querySelectorAll('[data-min-required-group]');
+        
+        requiredGroups.forEach(group => {
+            const groupName = group.getAttribute('data-min-required-group');
+            const checkboxes = group.querySelectorAll(`input[type="checkbox"][name="${groupName}"]`);
+            
+            // Provjeri samo ako je grupa vidljiva (nije skrivena roditeljskim elementom)
+            if (!group.closest('.hidden')) {
+                const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                
+                if (checkedCount === 0) {
+                    isValid = false;
+                    // Dodaj privremenu klasu za vizualni feedback (npr. crveni obrub)
+                    group.style.border = '2px solid red';
+                    group.style.padding = '10px';
+                    group.style.borderRadius = '8px';
+                    
+                    // Važno: Ne prekidamo ovdje, želimo označiti sve nevaljane grupe na trenutnoj stranici
+                } else {
+                    // Ukloni vizualni feedback ako je validno
+                    group.style.border = '';
+                    group.style.padding = '';
+                    group.style.borderRadius = '';
+                }
+            }
+        });
+
+        return isValid;
+    }
     
-    const updateVisibility = () => {
+    // Dodatni event listener za uklanjanje crvenog okvira čim se odabere opcija
+    document.querySelectorAll('[data-min-required-group] input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            const group = e.target.closest('[data-min-required-group]');
+            const groupName = group.getAttribute('data-min-required-group');
+            const checkboxes = group.querySelectorAll(`input[type="checkbox"][name="${groupName}"]`);
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            if (checkedCount > 0) {
+                group.style.border = '';
+                group.style.padding = '';
+                group.style.borderRadius = '';
+            }
+        });
+    });
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // UVJETNA LOGIKA ZA STRANICU 2 (KORIŠTENJE UDLAGE)
+    // ----------------------------------------------------------------------
+    function handleConditionalPage2() {
+      const q1Radio = document.querySelectorAll('input[name="KoristenjeUdlage"]');
+      const q2RazlogNe = document.getElementById('q2_razlog_ne');
+      const q3q6Da = document.getElementById('q2_da_group');
+      const nextButton = document.getElementById('page2_next_btn');
+
+      const updateVisibility = () => {
         const selectedValue = document.querySelector('input[name="KoristenjeUdlage"]:checked')?.value;
-        
-        if (selectedValue === 'Da') {
-            // ODGOVOR: Da
-            q3q6Da.classList.remove('hidden');
-            toggleRequired(q3q6Da, true); // Polja postaju obavezna
-            
-            q2RazlogNe.classList.add('hidden');
-            toggleRequired(q2RazlogNe, false);
 
-            nextButton.dataset.nextStep = "3";
-            
+        if (selectedValue === 'Da') {
+          // ODGOVOR: Da
+          q3q6Da.classList.remove('hidden');
+          toggleRequired(q3q6Da, true);
+          q2RazlogNe.classList.add('hidden');
+          toggleRequired(q2RazlogNe, false);
+          nextButton.dataset.nextStep = "3"; // Ide na S3
         } else if (selectedValue === 'Ne') {
-            // ODGOVOR: Ne
-            q3q6Da.classList.add('hidden');
-            toggleRequired(q3q6Da, false);
-
-            q2RazlogNe.classList.remove('hidden');
-            toggleRequired(q2RazlogNe, false); 
-
-            nextButton.dataset.nextStep = "4"; // Ide na S4 (Preskače S3)
-
+          // ODGOVOR: Ne
+          q3q6Da.classList.add('hidden');
+          toggleRequired(q3q6Da, false);
+          q2RazlogNe.classList.remove('hidden');
+          toggleRequired(q2RazlogNe, true);
+          nextButton.dataset.nextStep = "4"; // Ide na S4 (Preskače S3)
         } else {
-            // INICIJALNI ULAZ NA STRANICU (Obrnut prikaz: vidljivo, ali nije obavezno)
-            q3q6Da.classList.remove('hidden');
-            toggleRequired(q3q6Da, false); 
-
-            q2RazlogNe.classList.add('hidden');
-            toggleRequired(q2RazlogNe, false);
-
-            nextButton.dataset.nextStep = "3"; 
+          // INICIJALNI ULAZ NA STRANICU
+          q3q6Da.classList.add('hidden');
+          toggleRequired(q3q6Da, false);
+          q2RazlogNe.classList.add('hidden');
+          toggleRequired(q2RazlogNe, false);
+          nextButton.dataset.nextStep = "3";
         }
-    };
+      };
 
-    q1Radio.forEach(radio => radio.removeEventListener('change', updateVisibility)); 
-    q1Radio.forEach(radio => radio.addEventListener('change', updateVisibility));
-    
-    updateVisibility();
-}
+      q1Radio.forEach(radio => radio.removeEventListener('change', updateVisibility));
+      q1Radio.forEach(radio => radio.addEventListener('change', updateVisibility));
 
-// ----------------------------------------------------------------------
-// UVJETNA LOGIKA ZA STRANICU 4 (OZLJEDA)
-// ----------------------------------------------------------------------
-function handleConditionalPage4() {
-    const q2Radio = document.querySelectorAll('input[name="PretrpioOzljedu"]');
-    const q3VrstaOzljede = document.getElementById('q4_vrsta_ozljede');
-    
-    const updateVisibility = () => {
+      updateVisibility();
+    }
+
+    // ----------------------------------------------------------------------
+    // UVJETNA LOGIKA ZA STRANICU 4 (OZLJEDA)
+    // ----------------------------------------------------------------------
+    function handleConditionalPage4() {
+      const q2Radio = document.querySelectorAll('input[name="PretrpioOzljedu"]');
+      const q3VrstaOzljede = document.getElementById('q4_vrsta_ozljede');
+
+      const updateVisibility = () => {
         const selectedValue = document.querySelector('input[name="PretrpioOzljedu"]:checked')?.value;
-        
+
         if (selectedValue === 'Da') {
-            q3VrstaOzljede.classList.remove('hidden');
+          q3VrstaOzljede.classList.remove('hidden');
+          toggleRequired(q3VrstaOzljede, true);
         } else {
-            q3VrstaOzljede.classList.add('hidden');
-            toggleRequired(q3VrstaOzljede, false);
+          q3VrstaOzljede.classList.add('hidden');
+          toggleRequired(q3VrstaOzljede, false);
         }
-    };
+      };
 
-    q2Radio.forEach(radio => radio.removeEventListener('change', updateVisibility));
-    q2Radio.forEach(radio => radio.addEventListener('change', updateVisibility));
-    
-    updateVisibility();
-}
+      q2Radio.forEach(radio => radio.removeEventListener('change', updateVisibility));
+      q2Radio.forEach(radio => radio.addEventListener('change', updateVisibility));
 
-// ----------------------------------------------------------------------
-// UVJETNA LOGIKA ZA STRANICU 5 (USPOREDBA)
-// ----------------------------------------------------------------------
-function handleConditionalPage5() {
-    const koristiUdlagu = answers['KoristenjeUdlage'] === 'Da';
-    const usporedbaDetalji = document.getElementById('q5_usporedba_detalji');
-    const q5KoristiliObje = document.getElementById('q5_koristili_obje');
-    
-    if (!koristiUdlagu) {
-        // Ova stranica se preskače ako se ne koristi udlaga. Ako se izravno pristupa (greškom) 
-        // ili se logika nije pokrenula, sakriti ćemo je.
-        q5KoristiliObje.classList.add('hidden');
-        toggleRequired(q5KoristiliObje, false);
-        
-        usporedbaDetalji.classList.add('hidden');
-        toggleRequired(usporedbaDetalji, false); 
-        
-    } else {
-        q5KoristiliObje.classList.remove('hidden');
-        toggleRequired(q5KoristiliObje, true);
-        
-        usporedbaDetalji.classList.remove('hidden');
-        toggleRequired(usporedbaDetalji, true);
+      updateVisibility();
     }
-}
-
-// ----------------------------------------------------------------------
-// UVJETNA LOGIKA ZA STRANICU 7 (IRITACIJA)
-// ----------------------------------------------------------------------
-function handleConditionalPage7() {
-    const q6Radio = document.querySelectorAll('input[name="IritacijaRanice"]');
-    const q7Komentar = document.getElementById('q7_komentar_iritacija');
     
-    const updateVisibility = () => {
-        const selectedValue = document.querySelector('input[name="IritacijaRanice"]:checked')?.value;
-        
-        if (selectedValue === 'Da') {
-            q7Komentar.classList.remove('hidden');
-            q7Komentar.querySelector('textarea').required = true;
-            
-        } else {
-            q7Komentar.classList.add('hidden');
-            toggleRequired(q7Komentar, false);
+    // ----------------------------------------------------------------------
+    // UVJETNA LOGIKA ZA STRANICU 8 (CIJENA) - DODANO
+    // ----------------------------------------------------------------------
+    function handleConditionalPage8() {
+      const q8CijenaUdlage = document.getElementById('q8_cijena_udlage');
+      
+      // Provjeri globalnu varijablu
+      if (koristenjeUdlageAnswer === 'Ne') {
+        q8CijenaUdlage.classList.add('hidden');
+        toggleRequired(q8CijenaUdlage, false);
+      } else {
+        q8CijenaUdlage.classList.remove('hidden');
+        toggleRequired(q8CijenaUdlage, true);
+      }
+    }
+
+
+    // ----------------------------------------------------------------------
+    // OBRADA NEXT GUMBA (AŽURIRANO)
+    // ----------------------------------------------------------------------
+    nextBtns.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const currentForm = e.target.closest('form');
+        const currentStep = parseInt(currentForm.dataset.step);
+        let nextStep = parseInt(e.target.dataset.nextStep); 
+
+        // 1. Standardna Validacija forme
+        if (!currentForm.checkValidity()) {
+          currentForm.reportValidity();
+          return;
         }
-    };
 
-    q6Radio.forEach(radio => radio.removeEventListener('change', updateVisibility));
-    q6Radio.forEach(radio => radio.addEventListener('change', updateVisibility));
-    
-    updateVisibility();
-}
-
-// ----------------------------------------------------------------------
-// UVJETNA LOGIKA ZA STRANICU 8 (CIJENA UDLAGE)
-// ----------------------------------------------------------------------
-function handleConditionalPage8() {
-    const koristiUdlagu = answers['KoristenjeUdlage'] === 'Da';
-    const q8Cijena = document.getElementById('q8_cijena_udlage');
-    
-    if (koristiUdlagu) {
-        q8Cijena.classList.remove('hidden');
-        toggleRequired(q8Cijena, true); // Pitanje je obavezno
-    } else {
-        q8Cijena.classList.add('hidden');
-        toggleRequired(q8Cijena, false);
-    }
-}
-
-// ----------------------------------------------------------------------
-// UVJETNA LOGIKA ZA STRANICU 9 (PREPORUKA)
-// ----------------------------------------------------------------------
-function handleConditionalPage9() {
-    const koristiUdlagu = answers['KoristenjeUdlage'] === 'Da';
-    const q9Preporuka = document.getElementById('q9_preporuka');
-    
-    if (koristiUdlagu) {
-        q9Preporuka.classList.remove('hidden');
-        // Checkbox polja nisu obavezna po defaultu
-        toggleRequired(q9Preporuka, false);
-    } else {
-        q9Preporuka.classList.add('hidden');
-        toggleRequired(q9Preporuka, false);
-    }
-}
-
-
-// Globalni slušatelj za sve "Dalje" tipke
-nextBtns.forEach(button => {
-  button.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    const currentForm = e.target.closest('form');
-    const currentStep = parseInt(currentForm.dataset.step);
-    let nextStep = parseInt(e.target.dataset.nextStep); 
-    
-    // 1. Validacija forme 
-    if (!currentForm.checkValidity()) {
-        currentForm.reportValidity();
-        return;
-    }
-
-    // 2. Pohrani podatke trenutne forme (ISPRAVAK: SPREMAMO PRIJE RAČUNANJA SLJEDEĆEG KORAKA)
-    const formData = new FormData(currentForm);
-    
-    // Čistimo checkbox/radio grupe da bismo osigurali da se samo novi podaci spremaju
-    currentForm.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(element => {
-        if (element.type === 'checkbox') {
-             answers[element.name] = answers[element.name] || []; // Inicijaliziraj ako ne postoji
-        } else if (element.type === 'radio') {
-             delete answers[element.name]; // Radio tip je 1-na-1 pa samo brišemo
-        }
-    });
-    
-    // Ponovno prolazimo kroz sve elemente za spremanje, 
-    // pazeći da ignoriramo skrivene elemente za koje se ne zahtijeva odgovor
-    currentForm.querySelectorAll('input, select, textarea').forEach(element => {
-        const name = element.name;
-        
-        // Provjeri je li element unutar skrivenog uvjetnog bloka
-        if (element.closest('.hidden')) {
+        // 1.1 Custom validacija minimalno jednog checkboxa
+        if (!validateMinCheckboxes(currentForm)) {
+            // Skrolaj do prve grupe s greškom ako je potrebno
+            const firstErrorGroup = currentForm.querySelector('[data-min-required-group][style*="border: 2px solid red"]');
+            if (firstErrorGroup) {
+                firstErrorGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
         }
-
-        if (element.type === 'checkbox' && element.checked) {
+        
+        // 2. Pohrani podatke trenutne forme
+        
+        // Praznimo arraye za checkbox/radio grupe koje se sada tretiraju kao radio za single-select
+        // NOTE: Ostavljamo ovaj dio jer je answers globalni objekt, treba očistiti stare unose prije ponovnog spremanja
+        currentForm.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(element => {
+            if (element.name && answers[element.name]) {
+                delete answers[element.name]; 
+            }
+        });
+        
+        // Prolazimo kroz sve elemente za spremanje, ignorirajući skrivene
+        currentForm.querySelectorAll('input, select, textarea').forEach(element => {
+          const name = element.name;
+          
+          // Provjeri je li element unutar skrivenog uvjetnog bloka (iako bi toggleRequired trebao to riješiti)
+          if (element.closest('.hidden')) {
+            return;
+          }
+          
+          if (element.type === 'checkbox' && element.checked) {
             // Ako je checkbox, dodaj u niz
             if (!answers[name]) answers[name] = [];
             answers[name].push(element.value);
-        } else if (element.type === 'radio' && element.checked) {
-             // Ako je radio button, spremi vrijednost
-             answers[name] = element.value;
-        } else if (element.tagName === 'SELECT' || element.type === 'number' || element.type === 'text' || element.tagName === 'TEXTAREA') {
+          } else if (element.type === 'radio' && element.checked) {
+            // Ako je radio button, spremi vrijednost
+            answers[name] = element.value;
+          } else if (element.tagName === 'SELECT' || element.type === 'number' || element.type === 'text' || element.tagName === 'TEXTAREA') {
             // Spremi ostale tipove polja ako imaju vrijednost
             if (element.value) answers[name] = element.value;
-        }
-    });
-    
-    // 3. Prijelaz na sljedeći korak s UVJETNIM PRESKAKANJEM
-    
-    const koristiUdlagu = answers['KoristenjeUdlage'] === 'Da';
+          }
+        });
 
-    if (!koristiUdlagu) {
-        // Logika za NE KORISTI UDLAGU:
+        // 2.1 Ažuriraj globalnu varijablu za P2Q1
         if (currentStep === 2) {
-            // Sa Stranice 2 ide na Stranicu 4 (nextStep je već "4" postavljen u handleConditionalPage2)
-        } else if (currentStep === 4) {
-             // Sa Stranice 4 skačemo na Stranicu 8 (preskače 5, 6, 7)
-             nextStep = 8;
-             handleConditionalPage8(); // Aktiviraj uvjetnu logiku za S8 odmah
-        } else if (currentStep === 8) {
-             // Sa Stranice 8 ide na Stranicu 9
-             handleConditionalPage9(); // Aktiviraj uvjetnu logiku za S9 odmah
+            koristenjeUdlageAnswer = answers['KoristenjeUdlage'];
         }
+
+        // 2.2 IMPLEMENTACIJA PRESKAKANJA P5, P6, P7
+        if (currentStep === 4) {
+            if (koristenjeUdlageAnswer === 'Ne') {
+                nextStep = 8; // Preskoči na S8
+            } else {
+                nextStep = 5; // Standardno na S5
+            }
+        }
+        // Napomena: Preskakanje P3 (S2 -> S4) je već implementirano unutar handleConditionalPage2
+
+        // 3. Prijelaz na sljedeći korak
+        goToStep(currentStep, nextStep);
         
-    } else if (koristiUdlagu && currentStep === 2) {
-         // Logika za DA KORISTI UDLAGU:
-         // Postavlja se na S3 (već postavljen u handleConditionalPage2)
-         nextStep = 3;
+      });
+    });
+
+
+    // Slušatelji za zastave
+    document.getElementById('hrFlag').addEventListener('click', () => setLanguage('hr'));
+    document.getElementById('enFlag').addEventListener('click', () => setLanguage('en'));
+
+    // Slušatelj za klizač udobnosti (stranica 3)
+    if (comfortSlider) {
+      comfortSlider.addEventListener('input', (e) => {
+        comfortValue.textContent = e.target.value;
+      });
     }
-    
-    
-    if (nextStep <= totalSteps) {
-      goToStep(currentStep, nextStep);
-    }
-    
-    console.log(`Odgovori nakon koraka ${currentStep}:`, answers);
-  });
-});
-
-// Slušatelj za klizač (Slider update)
-comfortSlider?.addEventListener("input", () => {
-    // Ažuriraj samo brojčanu vrijednost
-    comfortValue.textContent = comfortSlider.value;
-    // Opcionalno, ažuriraj cijeli tekst ako je potrebno (trenutno se ne traži)
-    // document.getElementById('p3_q1_value_text').textContent = `${translations[currentLang]['p3_q1_value_text'].split(':')[0]}: ${comfortSlider.value}/100`;
-});
 
 
-// Slušatelj za zadnju formu (Pošalji)
+    // Slušatelj za zadnju formu (Pošalji)
 document.getElementById('page9').addEventListener("submit", async (e) => {
     e.preventDefault();
-    
     const currentForm = e.target.closest('form');
     const errorBox = document.getElementById("errorBox");
+    const finishBtn = document.getElementById('finishBtn');
 
-    errorBox.innerHTML = '';
-    
+    errorBox.innerHTML = ''; // Očisti prethodne greške
+
     if (!currentForm.checkValidity()) {
         currentForm.reportValidity();
         return;
     }
 
-    // Pohrani finalne podatke forme 9
-    const formData = new FormData(currentForm);
-    
-    // Očisti checkbox grupe prije spremanja novih podataka (zbog FormData koja ignorira nečekirane)
-    currentForm.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        if (answers[checkbox.name]) {
-             answers[checkbox.name] = [];
-        }
-    });
-
-    // Prikupi sve podatke sa S9 - isti princip kao i za nextBtn
+    // 1. Pohrani finalne podatke forme 9 u objekt 'answers'
     currentForm.querySelectorAll('input, select, textarea').forEach(element => {
         const name = element.name;
-        
-        // Provjeri je li element unutar skrivenog uvjetnog bloka
+        // Preskačemo skrivene (uvjetne) elemente
         if (element.closest('.hidden')) {
             return;
         }
-
         if (element.type === 'checkbox' && element.checked) {
-            // Ako je checkbox, dodaj u niz
             if (!answers[name]) answers[name] = [];
             answers[name].push(element.value);
         } else if (element.type === 'radio' && element.checked) {
-             // Ako je radio button, spremi vrijednost
-             answers[name] = element.value;
-        } else if (element.tagName === 'SELECT' || element.type === 'number' || element.type === 'text' || element.tagName === 'TEXTAREA') {
-            // Spremi ostale tipove polja ako imaju vrijednost
-            if (element.value) answers[name] = element.value;
+            answers[name] = element.value;
+        } else if ((element.tagName === 'SELECT' || element.type === 'number' || element.type === 'text' || element.tagName === 'TEXTAREA') && element.value) {
+            answers[name] = element.value;
         }
     });
+    
+    // Postavljanje gumba na stanje slanja (Slanje...)
+    const originalBtnText = finishBtn.textContent;
+    finishBtn.textContent = translations[currentLang]['btn_sending'] || 'Slanje...';
+    finishBtn.disabled = true;
 
+    console.log("Prikupljeni odgovori za slanje:", answers);
 
-    // Kod za slanje na backend (Koristi http://localhost:3001/send-email)
     try {
-        const payload = answers; 
-        
-        const submitButton = document.getElementById('finishBtn');
-        submitButton.disabled = true;
-        submitButton.textContent = translations[currentLang]['btn_sending'];
-
+        // 2. API POZIV (KORISTIMO answers kao payload)
+        const payload = answers;
         const response = await fetch("https://anketa-server-red.vercel.app/send-email", {
             method: "POST",
             headers: {
@@ -1416,37 +1405,48 @@ document.getElementById('page9').addEventListener("submit", async (e) => {
             body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(translations[currentLang]['alert_success']);
-            currentForm.reset();
-        } else {
-            errorBox.innerHTML = `
-                <div class="bg-red-500/20 border border-red-500 text-red-300 p-3 rounded-xl mt-4">
-                    ${translations[currentLang]['err_server_base'].replace('Nepoznata greška na serveru.', result.message || 'Nepoznata greška na serveru.')}
-                </div>`;
-            submitButton.disabled = false;
-            submitButton.textContent = translations[currentLang]['btn_finish'];
+        // 3. OBRADA ODGOVORA
+        if (!response.ok) {
+            const errorResult = await response.json();
+            throw new Error(`HTTP error! status: ${response.status}. Poruka: ${errorResult.message || 'Nepoznata greška.'}`);
         }
-    } catch (err) {
-        console.error("Greška pri dohvaćanju:", err);
-        errorBox.innerHTML = `
-            <div class="bg-red-500/20 border border-red-500 text-red-300 p-3 rounded-xl mt-4">
-                ${translations[currentLang]['err_server_connect']}
-            </div>`;
-        const submitButton = document.getElementById('finishBtn');
-        submitButton.disabled = false;
-        submitButton.textContent = translations[currentLang]['btn_finish'];
+
+        const result = await response.json();
+        
+        // Uspješno slanje - Prikaz poruke o uspjehu
+        const successMessage = translations[currentLang]['alert_success'] || 'Vaši odgovori su uspješno poslani. Hvala Vam na sudjelovanju!';
+        
+        // Sakrij formu i prikaži samo poruku uspjeha
+        document.querySelector('.w-full.max-w-xl').innerHTML = `<div class="p-8 bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.6)] fade text-white text-center">
+            <h2 class="text-2xl font-semibold mb-4">${translations[currentLang]['title']}</h2>
+            <p class="text-lg">${successMessage}</p>
+        </div>`;
+
+    } catch (error) {
+        // 4. OBRADA GREŠKE
+        console.error("Greška pri slanju ankete:", error);
+
+        let errorMessage;
+        if (error.message.includes('Failed to fetch')) {
+            // Greška povezivanja
+            errorMessage = translations[currentLang]['err_server_connect'] || 'Nije moguće povezati se s poslužiteljem. Provjerite svoju internetsku vezu.';
+        } else {
+            // Opća server greška
+            const statusMatch = error.message.match(/status: (\d+)/);
+            const status = statusMatch ? statusMatch[1] : 'N/A';
+            errorMessage = `${translations[currentLang]['err_server_base'] || 'Došlo je do greške prilikom slanja podataka. Pokušajte ponovno. (Status: '}${status})`;
+        }
+        
+        errorBox.innerHTML = `<div class="p-4 bg-red-500/20 text-red-300 rounded-xl">${errorMessage}</div>`;
+
+        // Vrati gumb u normalno stanje nakon greške
+        finishBtn.textContent = originalBtnText;
+        finishBtn.disabled = false;
     }
 });
 
-// Inicijalizacija
-document.addEventListener('DOMContentLoaded', () => {
-    // Listeneri za zastave
-    document.getElementById('hrFlag').addEventListener('click', () => setLanguage('hr'));
-    document.getElementById('enFlag').addEventListener('click', () => setLanguage('en'));
-    
+
+    // Inicijalizacija
     // Inicijalni jezik
     setLanguage(currentLang); 
 
@@ -1465,25 +1465,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const q4_vrsta_ozljede = document.getElementById('q4_vrsta_ozljede');
     if (q4_vrsta_ozljede) toggleRequired(q4_vrsta_ozljede, false);
     
-    const usporedbaDetalji = document.getElementById('q5_usporedba_detalji');
-    const q5KoristiliObje = document.getElementById('q5_koristili_obje');
-    if (usporedbaDetalji) toggleRequired(usporedbaDetalji, false);
-    if (q5KoristiliObje) toggleRequired(q5KoristiliObje, false);
-    
     const q7_komentar_iritacija = document.getElementById('q7_komentar_iritacija');
     if (q7_komentar_iritacija) toggleRequired(q7_komentar_iritacija, false);
     
     const q8_cijena_udlage = document.getElementById('q8_cijena_udlage');
-    if (q8_cijena_udlage) toggleRequired(q8_cijena_udlage, false); 
+    if (q8_cijena_udlage) toggleRequired(q8_cijena_udlage, false);
     
-    const q9_preporuka = document.getElementById('q9_preporuka');
-    if (q9_preporuka) toggleRequired(q9_preporuka, false);
-    
-    if (!document.getElementById('page2').classList.contains('hidden')) {
-         handleConditionalPage2();
-    }
-});
-</script>
-
+  </script>
 </body>
 </html>

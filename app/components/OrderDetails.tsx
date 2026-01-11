@@ -12,22 +12,21 @@ export const OrderDetails = ({isCroatianLang, orderPrice, isSlidRight, general, 
           <Text style={[styles.info, {color: 'red'}]}>{orderPrice.toFixed(2)} €</Text>
         </View>
         <Divider style={styles.divider} />
-        {isSlidRight && <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {!isSlidRight && <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.info}>{isCroatianLang ? 'Dostava': 'Delivery'}</Text>
           <Text style={[styles.info, {color: 'red'}]}>
             {general ? general.deliveryPrice.toFixed(2) : '0.00'} €
           </Text>    
         </View>}
-        {isSlidRight && <Divider style={styles.divider} />}
-        {!isSlidRight && <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {isSlidRight && <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.info}>{isCroatianLang? 'Preuzimanje': 'Pick up'}</Text>
           <Text style={[styles.info, {color: 'red'}]}>0.00 €</Text>
         </View>}
-        {!isSlidRight && <Divider style={styles.divider} />}
+        <Divider style={styles.divider} />
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.info}>{isCroatianLang? 'Ukupno': 'Total'}</Text>
           <Text style={[styles.info, {color: 'red'}]}>
-            {general ? (orderPrice + (isSlidRight ? general.deliveryPrice : 0)).toFixed(2) : orderPrice} €
+            {general ? (orderPrice + (!isSlidRight ? general.deliveryPrice : 0)).toFixed(2) : orderPrice} €
           </Text>
         </View>
       <Divider style={styles.divider} />

@@ -12,4 +12,5 @@ export type Meal = {
     price: number;
     extras: string | null;
   }[];
+  saucesList?: boolean;
 };
