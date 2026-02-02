@@ -75,6 +75,8 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
     if (location) {
       const geoaddress = await geodecode(location);
       if (geoaddress) {
+              console.log("Location found:", geoaddress);
+
         const [part1, part2, part3] = geoaddress.split(", ");
         console.log("P3", part3)
         if (part3 === "aerodrom"){
@@ -200,7 +202,7 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
           ...theme,
           colors: {
             ...theme.colors,
-            outline: errors.address && orderData.isDelivery ? 'red' : theme.colors.primary, // 👈 conditional outline color
+            outline: errors.address && orderData.isDelivery ? 'red' : theme.colors.primary, 
           },
           fonts: {
             ...theme.fonts,
@@ -213,6 +215,7 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
       />}
 
       {errors.address && orderData.isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.address}>{errors.address}</HelperText>}
+      {/* ZONA */}
       {orderData.isDelivery && (
         <DropdownComponent errors={errors} orderData={orderData} setOrderData={setOrderData} isCroatianLang={isCroatianLang} scale={scale}/>
       )}

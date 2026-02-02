@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, Platform, TouchableOpacity, Image } from 'react-native';
 import { Card } from 'react-native-paper';
 import { isTablet } from '../services/isTablet';

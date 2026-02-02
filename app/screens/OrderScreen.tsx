@@ -23,7 +23,8 @@ import { checkTimeValidity } from '../services/checkTimeValidity';
 import { checkNotificationPermission } from '../services/checkNotificationsPermission';
 import { safeFetch } from '../services/safeFetch';
 import { isDeliveryClosed } from '../services/isAppClosed';
-import { checkPrimaryPhone } from '../services/checkPrimaryPhone';
+import * as Location from 'expo-location';
+import { geodecode } from '../services/locationService';
 
 export default function OrderScreen({ route, navigation, scale }: { route: any, navigation: any, scale: any }) {
   const styles = getStyles(scale);
@@ -337,6 +338,21 @@ console.log("orderData render ", storageOrder);
           general?.workTime && appButtonsDisabled(general?.appStatus, general.workTime[dayOfWeek], general.holidays) && styles.disabledButton
         ]}
         onPress={() => {   if (!isLocked.current) handleSubmit(); }}
+//         onPress={async () => {
+//   // 1. geocodeAsync returns an array of results
+//   const geocodeResults = await Location.geocodeAsync(orderData.address + ", Kaštela" as string);
+  
+//   if (geocodeResults.length > 0) {
+//     const { latitude, longitude } = geocodeResults[0];
+//     console.log("Geocode result:", latitude, longitude);
+
+//     // 2. Pass an object { latitude, longitude }, NOT an array [lat, long]
+//     const geoaddress = await Location.reverseGeocodeAsync({ latitude, longitude });
+//     console.log("Geodecode result:", geoaddress);
+//   } else {
+//     console.log("No coordinates found for this address");
+//   }
+// }}
         disabled={!general?.workTime || appButtonsDisabled(general?.appStatus, general.workTime[dayOfWeek], general.holidays)
           || (hasNotificationPermission && !expoPushToken) || isSubmitting
         }
