@@ -5,6 +5,7 @@ import { HelperText, RadioButton } from "react-native-paper";
 import { appButtonsDisabled, onlyCustomOrders } from "../services/isAppClosed";
 import { getDayOfTheWeek, getLocalTime, getLocalTimeHours, getLocalTimeMinutes } from "../services/getLocalTime";
 import { useGeneral } from "../generalContext";
+import { consoleSandbox } from "@sentry/react-native";
 
 export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDeliveryOption, setShowPicker, displayMessage, setDisplayMessage, displayWorkTimeMessage, setDisplayWorkTimeMessage, displaySecondMessage, setDisplaySecondMessage, displayDeliveryClosedMessage, setDisplayDeliveryClosedMessage, timeString, isSlidRight, isCroatianLang, scale}: any) => {
     const styles = getStyles(scale);
@@ -33,22 +34,37 @@ export const RadioOrderSelection = ({selectedDeliveryOption, setSelectedDelivery
 
     useEffect(() => {
         if (displayWorkTimeMessage) {
+            console.log("displayWorkTimeMessage triggered");
             const timer = setTimeout(() => {
                 setDisplayWorkTimeMessage(false);
             }, 5000);
 
             return () => clearTimeout(timer); 
         }
-    }, [displayWorkTimeMessage, setDisplayWorkTimeMessage]);
+        console.log("displayWorkTimeMessage", displayWorkTimeMessage);
+
+    }, [displayWorkTimeMessage]);
+
+    useEffect(() => {
+        if (displayDeliveryClosedMessage) {
+            const timer = setTimeout(() => {
+                setDisplayDeliveryClosedMessage(false);
+            }, 5000);
+
+            return () => clearTimeout(timer); 
+        }
+    }, [displayDeliveryClosedMessage]);
 
     useEffect(() => {
         if (displaySecondMessage) {
+          console.log("displaySecondMessage triggered");
             const timer = setTimeout(() => {
                 setDisplaySecondMessage(false);
             }, 5000); 
 
             return () => clearTimeout(timer); 
         }
+        console.log("displaySecondMessage", displaySecondMessage);
     }, [displaySecondMessage, setDisplaySecondMessage]);
     
 console.log("nirnngotinh6im4poim", isCroatianLang ?  

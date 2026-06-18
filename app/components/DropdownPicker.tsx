@@ -37,7 +37,7 @@ const DropdownComponent = ({ errors, orderData, setOrderData, isCroatianLang, sc
     return null;
   };
 
-  console.log("Zone", orderData.zone)
+  console.log("Zoney", orderData.zone)
 
   return (
     <View style={styles.container}>

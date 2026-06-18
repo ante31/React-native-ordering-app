@@ -23,12 +23,13 @@ import { getModalHeight } from "../services/getModalHeight";
 import { useCartActions } from "../../hooks/useCartActions";
 import { useCartAnimations } from "../../hooks/useCartAnimations";
 import { CartItem } from "../components/CartItem";
+import { MealModal } from "../components/MealModal";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
 
 
 
-const CartScreen = ({ navigation, route, drinks={}, scale  }: { navigation: any, route: any, drinks: any, scale: any }) => {
+const CartScreen = ({ navigation, route, drinks={}, menu, scale  }: { navigation: any, route: any, drinks: any, menu: any, scale: any }) => {
 
   const styles = getStyles(scale);
 
@@ -39,15 +40,16 @@ const CartScreen = ({ navigation, route, drinks={}, scale  }: { navigation: any,
   const {general} = useGeneral();
   const [showMealDetailsModal, setShowMealDetailsModal] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<any | null>(null);
-  console.log("Selected meal in CartScreen:", selectedMeal);
 
   const { getCartLength, state: cartState, dispatch } = useCart();
   const { totalPrice, handleIncrement, handleDecrement, handleDelete } = useCartActions(cartState, dispatch);
   const { animatedWidths, handleQuantityPress, selectedItem } = useCartAnimations(cartState.items, scale);
   const cartLength = getCartLength();
   const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
+    console.log("Cart items:", cartState.items);
 
-  if (cartLength === 0) {
+
+  if (!storageOrder && cartLength === 0) {
     return (
       <View style={styles.container}>
         <Image
@@ -81,7 +83,7 @@ const CartScreen = ({ navigation, route, drinks={}, scale  }: { navigation: any,
             isCroatianLanguage={isCroatianLanguage}
             animation={{ widths: animatedWidths, selectedId: selectedItem }}
             handlers={{
-              onSelectMeal: (item: any) => { setSelectedMeal(item); setShowMealDetailsModal(true); },
+              onSelectMeal: (item: any) => { setSelectedMeal(item); setShowMealDetailsModal(true); console.log("Selected meal for details:", item); },
               onQuantityPress: handleQuantityPress,
               onDecrement: handleDecrement,
               onIncrement: handleIncrement,
@@ -92,15 +94,15 @@ const CartScreen = ({ navigation, route, drinks={}, scale  }: { navigation: any,
       </ScrollView>
       <TouchableOpacity
         onPress={() => navigation.navigate('OrderScreen', { cartState, storageOrder })}
-        disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)}
+        disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) || cartLength === 0}
         style={[styles.button, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
       >
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <View style={{ marginLeft: scale.isTablet()? 10 : 0, marginRight: scale.isTablet()? 20 : 15, width: scale.light(30), height: scale.light(30), borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{ marginLeft: scale.isTablet()? 10 : 0, marginRight: scale.isTablet()? 10 : 5, width: scale.light(30), height: scale.light(30), borderRadius: 25, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'}}>
             <Text allowFontScaling={false} style={[{color: '#ffd400', fontFamily: "Lexend_400Regular", fontSize: scale.light(16)}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
           <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>
-            {isCroatianLanguage? "Idite na narudžbu!": "Go to checkout!"}
+            {isCroatianLanguage? "Pregledaj narudžbu!": "Go to checkout!"}
           </Text>
         </View>
         <Text style={[{fontFamily: "Lexend_400Regular", color: '#fff', fontSize: scale.light(18), marginRight: scale.isTablet()? 10 : 0}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>
@@ -139,29 +141,16 @@ const CartScreen = ({ navigation, route, drinks={}, scale  }: { navigation: any,
           </View>
         </Modal>
       </Portal>
-      <Portal>
-        <Modal
-          visible={showMealDetailsModal}
-          onDismiss={() => setShowMealDetailsModal(false)}
-          contentContainerStyle={[styles.modalContainer, { height: getModalHeight(selectedMeal), margin: scale.heavy(16) }]}
-        >
-          {selectedMeal ? (
-            <CartMealDetails
-              visible={showMealDetailsModal}
-              meal={selectedMeal}
-              drinks={drinks}
-              scale={scale}
-              onClose={() => setShowMealDetailsModal(false)}
-              handleRemoveFromCart={handleDelete}
-              navigation={navigation}
-            />
-          ) : (
-            <View style={styles.loaderContainer}>
-              <CenteredLoading />
-            </View>
-          )}
-        </Modal>
-      </Portal>
+      <MealModal 
+        visible={showMealDetailsModal} 
+        isCroatianLang={isCroatianLanguage}
+        meal={selectedMeal}
+        menu={menu}
+        scale={scale}
+        onClose={() => setShowMealDetailsModal(false)}
+        handleRemoveFromCart={handleDelete}
+        navigation={navigation} 
+      />
     </View>
   );
 };
@@ -195,7 +184,7 @@ const getStyles = (scale: any) =>
   },
 button: {
   paddingVertical: 15,
-  paddingHorizontal: 20,
+  paddingHorizontal: 10,
   marginBottom: 20,
   backgroundColor: "#ffd400",
   borderRadius: 5,
@@ -234,7 +223,5 @@ button: {
     height: SCREEN_HEIGHT * 0.7,
   },
 });
-
-
 
 export default CartScreen;

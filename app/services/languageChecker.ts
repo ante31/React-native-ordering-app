@@ -7,7 +7,6 @@ export const isCroatian = () => {
     const systemLocales = Localization.getLocales();
     const targetLanguageCodes = ['hr', 'bs', 'sr', 'me'];
 
-    // Ensure that languageCode is not null
     const languageCode = systemLocales[0]?.languageCode;
 
     if (languageCode) {

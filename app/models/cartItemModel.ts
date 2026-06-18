@@ -7,6 +7,7 @@ export type CartItem = {
     quantity: number;
     extras: { [key: string]: number }
     selectedExtras: { [key: string]: number }; 
+    selectedFriesExtras: { [key: string]: number }; 
     selectedDrinks: []; 
     portionsOptions: {
         size: string | null;
@@ -15,4 +16,5 @@ export type CartItem = {
         extras: string | null;
     }[];
     type: string;
+    hasFries: boolean;
   };

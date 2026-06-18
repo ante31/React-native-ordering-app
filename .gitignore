@@ -17,3 +17,5 @@ ios/
 google-services.json
 google-services copy.json
 *.p8
+.env.local
+.env.sentry-build-plugin

@@ -4,11 +4,7 @@ import { safeFetch } from "../app/services/safeFetch";
 import { backendUrl } from "../localhostConf";
 import { Meal } from '../app/models/mealModel';
 
-export const useCategoryMeals = (title: string) => {
-  const [meals, setMeals] = useState<Meal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const selectedMealRef = useRef<Meal | null>(null);
-
+export const useCategoryMeals = (menu: any, title: string) => {
   const mapData = (data: any) => 
     Object.entries(data).map(([key, obj]: [string, any]) => ({
       id: key,
@@ -22,14 +18,15 @@ export const useCategoryMeals = (title: string) => {
       saucesList: obj.saucesList || false,
     }));
 
-  useEffect(() => {
-    // Fetch
-    safeFetch(`${backendUrl}/cjenik/${title}`)
-      .then(res => res.json())
-      .then(data => setMeals(mapData(data)))
-      .finally(() => setIsLoading(false));
+  const [meals, setMeals] = useState<Meal[]>(menu[title] ? mapData(menu[title]) : []);
+  const [isLoading, setIsLoading] = useState(true);
+  const selectedMealRef = useRef<Meal | null>(null);
 
-    // Socket
+  useEffect(() => {
+    console.log("Fetching meals for category:", meals);
+  }, [meals]);
+
+  useEffect(() => {
     const socket = io(backendUrl, { transports: ['websocket'] });
     socket.on(`cjenik-update-${title}`, (data: any) => {
       const updated = mapData(data);

@@ -1,3 +1,4 @@
+import React, { memo, useCallback } from 'react';
 import { View, Text, Platform, TouchableOpacity, Image } from 'react-native';
 import { Card } from 'react-native-paper';
 import { isTablet } from '../services/isTablet';
@@ -16,8 +17,11 @@ interface Props {
   handlePress: (title: string, titleEn: string, image: string, category: boolean, id: string) => void;
 }
 
-const CategoryCard = ({ item, isCroatianLanguage, scale, handlePress }: Props) => {
-  const onPress = () => handlePress(item.title, item.titleEn, item.image, item.category, item.id);
+const CategoryCardComponent = ({ item, isCroatianLanguage, scale, handlePress }: Props) => {
+
+  const onPress = useCallback(() => {
+    handlePress(item.title, item.titleEn, item.image, item.category, item.id);
+  }, [handlePress, item]);
 
   return (
     <View
@@ -33,7 +37,6 @@ const CategoryCard = ({ item, isCroatianLanguage, scale, handlePress }: Props) =
             activeOpacity={1}
             onPress={onPress}
             style={{
-              opacity: 1,
               position: 'absolute',
               top: isTablet() ? SPECIAL_OFFER_TABLET_POSITION : SPECIAL_OFFER_POSITION,
               right: isTablet() ? SPECIAL_OFFER_TABLET_POSITION : SPECIAL_OFFER_POSITION,
@@ -41,7 +44,11 @@ const CategoryCard = ({ item, isCroatianLanguage, scale, handlePress }: Props) =
             }}
           >
             <Image
-              source={isCroatianLanguage ? require('../../assets/images/posebna ponuda-cro.png') : require('../../assets/images/posebna ponuda-eng.png')}
+              source={
+                isCroatianLanguage
+                  ? require('../../assets/images/posebna ponuda-cro.png')
+                  : require('../../assets/images/posebna ponuda-eng.png')
+              }
               style={{
                 width: isTablet() ? SPECIAL_OFFER_TABLET_SIZE : SPECIAL_OFFER_SIZE,
                 height: isTablet() ? SPECIAL_OFFER_TABLET_SIZE : SPECIAL_OFFER_SIZE,
@@ -68,13 +75,16 @@ const CategoryCard = ({ item, isCroatianLanguage, scale, handlePress }: Props) =
               borderRadius: 10,
             }}
           />
+
           <Card.Content style={{ flexGrow: 1, justifyContent: 'flex-end' }}>
-            <Text style={{
-              color: 'black',
-              fontSize: scale.light(19),
-              paddingTop: 16,
-              fontFamily: 'Lexend_700Bold',
-            }}>
+            <Text
+              style={{
+                color: 'black',
+                fontSize: scale.light(19),
+                paddingTop: 16,
+                fontFamily: 'Lexend_700Bold',
+              }}
+            >
               {isCroatianLanguage ? item.title : item.titleEn}
             </Text>
           </Card.Content>
@@ -84,4 +94,6 @@ const CategoryCard = ({ item, isCroatianLanguage, scale, handlePress }: Props) =
   );
 };
 
-export default CategoryCard;
+CategoryCardComponent.displayName = "CategoryCard";
+
+export default memo(CategoryCardComponent);

@@ -21,12 +21,24 @@ import { useFonts, Lexend_400Regular, Lexend_700Bold } from '@expo-google-fonts/
 import { useAppInitialization } from '../hooks/useLayoutInitalization'; 
 import { scale } from './services/scale';
 import CustomHeader from './components/Header';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://67aced7b9db921c21707bfe872092150@o4511349110603776.ingest.de.sentry.io/4511349112701008',
+  sendDefaultPii: true,
+  enableLogs: true,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+});
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {  
+export default Sentry.wrap(function App() {  
   const [showNetworkError, setShowNetworkError] = useState(false); 
-  const { specials, drinks } = useAppInitialization(); // Sva logika je ovdje
+  const { menu, categories } = useAppInitialization(setShowNetworkError); // Sva logika
+  const drinks = (menu as any)["Piće"] || {};
+  const specials = Object.entries((menu as any)["Posebno"] || {}).map(([key, val]) => ({ id: key, ...(val as object) }))
   const [fontsLoaded] = useFonts({ Lexend_400Regular, Lexend_700Bold });
 
   const isCroatianLanguage = isCroatian();
@@ -42,8 +54,7 @@ export default function App() {
 };
 
   return (
-
-    <ToastProvider dangerColor="#ffd400" offsetBottom={40} swipeEnabled={true} textStyle={{ fontFamily: 'Lexend_400Regular' }}>
+    <ToastProvider dangerColor="#ffd400" offsetBottom={50} swipeEnabled={true} textStyle={{ fontFamily: 'Lexend_400Regular' }}>
       <GeneralProvider>
         <CartProvider>
           <SafeAreaProvider>
@@ -58,7 +69,9 @@ export default function App() {
                 <ForceUpdateModal isCroatianLanguage={isCroatianLanguage} scale={scale}/>
                 
 
-                <Stack.Navigator initialRouteName="Home">
+                <Stack.Navigator initialRouteName="Home"   screenOptions={{
+    contentStyle: { backgroundColor: "#fff" },
+  }}>
                   <Stack.Screen
                     name="Home"
                     options={({ navigation }) => ({
@@ -69,10 +82,9 @@ export default function App() {
                       <HomePage 
                         {...props} 
                         scale={scale} 
-                        drinks={drinks} 
-                        specials={specials} 
+                        menu = {menu}
+                        categories={categories}
                         showNetworkError={showNetworkError} 
-                        setShowNetworkError={setShowNetworkError} 
                       />
                     )}
                   </Stack.Screen>
@@ -83,7 +95,7 @@ export default function App() {
                       header: () => <CustomHeader navigation={navigation} />
                     })}
                   >
-                    {(props) => <CategoryPage {...props} scale={scale} />}
+                    {(props) => <CategoryPage {...props} scale={scale} menu={menu} />}
                   </Stack.Screen>
 
                   <Stack.Screen
@@ -92,11 +104,11 @@ export default function App() {
                       header: () => <CustomHeader 
                         navigation={navigation} 
                         showIcons={false} 
-                        onBack={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })} 
+                        onBack={() => navigation.popToTop()} 
                       />
                     })}
                   >
-                    {(props) => <CartScreen {...props} scale={scale} drinks={drinks} />}
+                    {(props) => <CartScreen {...props} scale={scale} drinks={drinks} menu={menu}/>}
                   </Stack.Screen>
 
                   <Stack.Screen
@@ -105,7 +117,7 @@ export default function App() {
                       header: () => <CustomHeader 
                         navigation={navigation} 
                         showIcons={false} 
-                        onBack={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })} 
+                        onBack={() => navigation.popToTop()} 
                       />
                     })}
                   >
@@ -127,7 +139,7 @@ export default function App() {
                       header: () => <CustomHeader 
                         navigation={navigation} 
                         showIcons={false} 
-                        onBack={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })} 
+                        onBack={() => navigation.popToTop()} 
                       />
                     })}
                   >
@@ -142,4 +154,4 @@ export default function App() {
       </GeneralProvider>
     </ToastProvider>
   );
-}
+});

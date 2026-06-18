@@ -2,7 +2,7 @@
   import { Meal } from "../models/mealModel";
   import { PixelRatio, Platform } from "react-native";
   
-  export const getModalHeight = (meal: Meal | null) => {
+  export const getModalHeight = (meal: any | null) => {
     const isAndroid = Platform.OS === 'android';
 
     const fontScale = PixelRatio.getFontScale();
@@ -14,7 +14,7 @@
     const isMediumFont = fontScale > 1.4;
     const isSmallFont = fontScale > 1.2;
 
-    return meal.portions?.[0]?.extras === "null" // prilozi i sokovi (nemaju dodadnih priloga pa ce im modal height bit mal)
+    return meal.portions?.[0]?.extras === "null" || meal.portionsOptions?.[0]?.extras === "null" // prilozi i sokovi (nemaju dodadnih priloga pa ce im modal height bit mal)
       ? (
         isLargeFont ? (isAndroid ? "31%" : 300) :
         isMediumLargeFont ? (isAndroid ? "28%" : 280) :
@@ -22,8 +22,23 @@
         isSmallFont ? (isAndroid ? "24%" : 230) :
         (isAndroid ? "25%" : 200)
       )
-    : meal.portions?.[0]?.extras === "listaPomfrit"
+    : meal.portions?.[0]?.extras === "listaPomfrit" || meal.portionsOptions?.[0]?.extras === "listaPomfrit"
     ? "45%" // pomfrit ima malu listu priloga
     : "80%"; // najcesci case
 
+};
+
+export const getModalHeightInPixels = (meal: any) => {
+  const screenHeight = Dimensions.get("window").height;
+  let modalHeight = getModalHeight(meal);
+  console.log("getModalHeightInPixels called with meal:", getModalHeight(meal));
+
+  if (typeof modalHeight === "string" && modalHeight.endsWith("%")) {
+    const percent = parseFloat(modalHeight.replace("%", ""));
+    console.log("Parsed percent from modalHeight:", percent);
+    console.log("Unexpected modalHeight format:", (percent / 100) * screenHeight);
+    return (percent / 100) * screenHeight;
+  }
+
+  return typeof modalHeight === "number" ? modalHeight : screenHeight * 0.7;
 };

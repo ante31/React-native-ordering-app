@@ -25,7 +25,7 @@ const CustomHeader = ({ navigation, showIcons = true, type = 'back', onBack }: P
       paddingRight: 8,
       paddingLeft: type === 'home' ? 12 : 0,
       height: 60,
-      paddingTop: isAndroid ? statusBarHeight / 2 : 0,
+      // paddingTop: isAndroid ? statusBarHeight / 2 : 0,
       borderBottomWidth: type === 'back' ? 1 : 0,
       borderBottomColor: '#eee',
     }}>

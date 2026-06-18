@@ -5,7 +5,7 @@ import * as Haptics from 'expo-haptics';
 import { geodecode, getLocation } from '../services/locationService';
 import DropdownComponent from './DropdownPicker';
 
-const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSaveData, isCroatianLang, scale }: any) => {
+const Orderform = ({ isDelivery, orderData, setOrderData, errors, setErrors, saveData, setSaveData, isCroatianLang, scale }: any) => {
   const styles = getStyles(scale);
   const [loading, setLoading] = useState(false);
   const theme = {
@@ -42,14 +42,14 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
         }
       }
 
-      if (orderData.isDelivery && orderData.address && orderData.address.length >= 5 && orderData.address.length <= 100) {
+      if (isDelivery && orderData.address && orderData.address.length >= 5 && orderData.address.length <= 100) {
         if (updatedErrors.address) {
           delete updatedErrors.address;
           changed = true;
         }
       }
 
-      if (orderData.isDelivery && orderData.zone) {
+      if (isDelivery && orderData.zone) {
         if (updatedErrors.zone) {
           delete updatedErrors.zone;
           changed = true;
@@ -67,9 +67,9 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
 
     setLoading(true);
 
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }    
+    // if (Platform.OS !== 'web') {
+    //   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // }    
     const location = await getLocation();
     
     if (location) {
@@ -121,8 +121,8 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
   };
 
     useEffect(() => {
-    console.log("isDelivery changed", orderData.isDelivery);
-  }, [orderData.isDelivery]);
+    console.log("isDelivery changed", isDelivery);
+  }, [isDelivery]);
 
   return (
     <View>
@@ -173,7 +173,7 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
         }}
       />
       {errors.phone && <HelperText style={styles.helperText} type="error" visible={!!errors.phone}>{errors.phone}</HelperText>}   
-      {orderData.isDelivery && <TextInput 
+      {isDelivery && <TextInput 
         placeholder={isCroatianLang ? 'Adresa' : 'Address'}
         mode="outlined"
         value={orderData.address}
@@ -202,7 +202,7 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
           ...theme,
           colors: {
             ...theme.colors,
-            outline: errors.address && orderData.isDelivery ? 'red' : theme.colors.primary, 
+            outline: errors.address && isDelivery ? 'red' : theme.colors.primary, 
           },
           fonts: {
             ...theme.fonts,
@@ -214,12 +214,12 @@ const Orderform = ({ orderData, setOrderData, errors, setErrors, saveData, setSa
         }}
       />}
 
-      {errors.address && orderData.isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.address}>{errors.address}</HelperText>}
+      {errors.address && isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.address}>{errors.address}</HelperText>}
       {/* ZONA */}
-      {orderData.isDelivery && (
+      {isDelivery && (
         <DropdownComponent errors={errors} orderData={orderData} setOrderData={setOrderData} isCroatianLang={isCroatianLang} scale={scale}/>
       )}
-      {errors.zone && orderData.isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.zone}>{errors.zone}</HelperText>}
+      {errors.zone && isDelivery && <HelperText style={styles.helperText} type="error" visible={!!errors.zone}>{errors.zone}</HelperText>}
 
       <TextInput
         placeholder={isCroatianLang ? 'Napomena' : 'Note'}

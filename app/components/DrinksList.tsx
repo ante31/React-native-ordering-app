@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { RadioButton, Divider } from 'react-native-paper';
 import * as Haptics from "expo-haptics";
@@ -12,12 +12,10 @@ const DrinksList = ({ drinks, drinksType, drinksMax, selectedDrinks, setSelected
 
   console.log("type", drinksType)
   Object.values(drinks).forEach((drink: any) => {
-    console.log("Drink:", drink.ime);
-    console.log("DrinksList props", drink.tip);
   });
 
 const handleSelectDrink = (drinkId: string) => {
-  Haptics.selectionAsync();
+  // Haptics.selectionAsync();
 
   const drinkToAdd = drinks[drinkId];
   if (!drinkToAdd) return;
@@ -26,21 +24,21 @@ const handleSelectDrink = (drinkId: string) => {
   const totalSelected = selectedDrinks.length;
 
   if (totalSelected < drinksMax) {
-    // Just add new drink (or increment stack)
+    // add new drink
     setSelectedDrinks([...selectedDrinks, { id: drinkId, ...drinkToAdd }]);
   } else {
     if (countOfThisDrink > 0) {
-      // Already selected this drink, want to add one more but at max capacity
-      // Remove oldest *different* drink to make room
+      // Already selected this drink
+      // Remove oldest different drink to make room
       const indexToRemove = selectedDrinks.findIndex((d: any) => d.id !== drinkId);
       if (indexToRemove !== -1) {
         const updated = [...selectedDrinks];
         updated.splice(indexToRemove, 1); // remove oldest different drink
-        updated.push({ id: drinkId, ...drinkToAdd }); // add one more of the selected drink
+        updated.push({ id: drinkId, ...drinkToAdd }); 
         setSelectedDrinks(updated);
       } else {
         // Only one drink type selected maxed out, can't add more
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        // Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
     } else {
       // Different drink selected, max reached - remove oldest drink and add new
@@ -49,17 +47,6 @@ const handleSelectDrink = (drinkId: string) => {
     }
   }
 };
-
-
-
-
-  React.useEffect(() => {
-    // Reset selected drinks when drinks change
-    console.log("Selected drinks changed", selectedDrinks);
-  }, [selectedDrinks]);
-
-  console.log("language", isCroatianLang);
-
 
   return (
     <View style={styles.container}>

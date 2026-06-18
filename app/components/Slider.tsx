@@ -1,13 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Animated, TouchableOpacity, Text } from 'react-native';
 import { isDeliveryClosed } from '../services/isAppClosed';
 
-const Slider = ({ workingHours, isSlidRight, setIsSlidRight, boxWidth, setBoxWidth, orderData, setOrderData, initialSide = 'left', isCroatianLang, scale, setDisplayDeliveryClosedMessage }: { workingHours: any; isSlidRight: boolean; setIsSlidRight: any; boxWidth: number; setBoxWidth: any; orderData: any; setOrderData: any; initialSide?: 'left' | 'right'; isCroatianLang: boolean, scale: number, setDisplayDeliveryClosedMessage: any }) => {
+const Slider = ({ workingHours, isSlidRight, setIsSlidRight, initialSide = 'left', isCroatianLang, scale, setDisplayDeliveryClosedMessage }: { workingHours: any; isSlidRight: boolean; setIsSlidRight: any; initialSide?: 'left' | 'right'; isCroatianLang: boolean, scale: number, setDisplayDeliveryClosedMessage: any }) => {
   const styles = getStyles(scale);
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const [boxWidth, setBoxWidth] = useState(0);
+  
 
   useEffect(() => {
-    if (initialSide === 'right') {
+    if (initialSide === 'right' || isDeliveryClosed(workingHours)) {
       Animated.timing(slideAnim, {
         toValue: boxWidth - 4,
         duration: 300,
@@ -26,7 +28,6 @@ const Slider = ({ workingHours, isSlidRight, setIsSlidRight, boxWidth, setBoxWid
         useNativeDriver: false,
       }).start();
       setIsSlidRight(!isSlidRight);
-      setOrderData({ ...orderData, isDelivery: isSlidRight });
       console.log('Sliding to the ' + side + ' side');
     }
   };
@@ -82,7 +83,7 @@ const getStyles = (scale: any) =>
     left: 2,
     top: 2
   },
-touchableLeft: {
+  touchableLeft: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',

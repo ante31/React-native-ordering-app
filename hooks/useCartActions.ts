@@ -12,20 +12,20 @@ export const useCartActions = (cartState: any, dispatch: any) => {
   };
 
   const handleIncrement = (id: string) => {
-    triggerHaptic();
+    // triggerHaptic();
     const item = cartState.items.find((i: any) => i.id === id);
     if (item) dispatch({ type: "UPDATE_ITEM_QUANTITY", payload: { id, quantity: item.quantity + 1 } });
   };
 
     const handleDelete = (id: string) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
+    // if (Platform.OS !== 'web') {
+    //   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // }
     dispatch({ type: "REMOVE_FROM_CART", payload: id });
   };
 
   const handleDecrement = (id: string) => {
-    triggerHaptic();
+    // triggerHaptic();
     const item = cartState.items.find((i: any) => i.id === id);
     if (item && item.quantity > 1) dispatch({ type: "UPDATE_ITEM_QUANTITY", payload: { id, quantity: item.quantity - 1 } });
   };

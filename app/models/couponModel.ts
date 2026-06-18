@@ -1,6 +1,7 @@
 export type Coupon = {
-  phoneNumber: string;
-  amount: number;         
+  id: string;
+  value: number;         
   isUsed: boolean;
   createdAt: Date;
+  usedAt: Date | null;
 }

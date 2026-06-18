@@ -3,6 +3,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Divider } from "react-native-paper";
 
 export const CartItem = ({ item, scale, isCroatianLanguage, handlers, animation }: any) => {
+  console.log("Rendering CartItem with item:", item);
   const styles = getStyles(scale, {
     isLargeFont: PixelRatio.getFontScale() > 1.8,
     isMediumLargeFont: PixelRatio.getFontScale() > 1.6,
@@ -38,6 +39,32 @@ export const CartItem = ({ item, scale, isCroatianLanguage, handlers, animation 
           {item.size !== "null" ? ` (${item.size})` : ''}
         </Text>
         {/* Render extras i drinks... */}
+          {Object.keys(item.selectedExtras).length > 0 && 
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={styles.lightText}>
+              {Object.keys(item.selectedExtras).map(key => key.split('|')[isCroatianLanguage? 0: 1]).join(', ')}
+            </Text>
+          </View>}
+          {Object.keys(item.selectedFriesExtras).length > 0 && 
+          <View style={{flexDirection: 'row', marginTop: 5, width: '100%'}}>
+            <Text style={styles.lightText}>
+              {isCroatianLanguage ? 'Na pomfrit: ' : 'On the fries: '}{Object.keys(item.selectedFriesExtras).map(key => key.split('|')[isCroatianLanguage? 0: 1]).join(', ')}
+            </Text>
+          </View>}
+          {item.selectedDrinks?.length > 0 && 
+            <View style={{flexDirection: 'row', marginTop: 5}}>
+              <Text style={styles.lightText}>
+                {item.selectedDrinks
+                  .map((drink: any) =>
+                    isCroatianLanguage
+                      ? drink.ime
+                      : drink.ime_en
+                  )
+                  .join(', ')
+                }
+              </Text>
+            </View>
+          }
       </View>
 
       <TouchableOpacity onPress={() => handlers.onDeletePress(item.id)}>

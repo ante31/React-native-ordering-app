@@ -1,4 +1,5 @@
 import { backendUrl } from "@/localhostConf";
+import { getLocalTimeString } from "./getLocalTime";
 
 export async function createCoupon(phoneNumber: string, amount: number = 10) {
   try {
@@ -9,7 +10,7 @@ export async function createCoupon(phoneNumber: string, amount: number = 10) {
         phoneNumber,
         amount,
         isUsed: false,
-        createdAt: new Date().toISOString(),
+        createdAt: getLocalTimeString(),
       }),
     });
 

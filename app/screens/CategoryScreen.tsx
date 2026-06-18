@@ -1,35 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import MealCard from '../components/MealCard';
 import MealDetails from '../components/MealDetails';
 import { isCroatian } from '../services/languageChecker';
 import { Divider, Modal, Portal } from 'react-native-paper';
 import { CenteredLoading } from '../components/CenteredLoading';
-import { getModalHeight } from '../services/getModalHeight';
 import { Meal } from '../models/mealModel';
 import { useCategoryMeals } from '../../hooks/useCategoryMeals';
+import { MealModal } from '../components/MealModal';
 
 
-export default function CategoryPage({ route, navigation, scale }: { route: any; navigation: any; scale: any }) {
+export default function CategoryPage({ route, navigation, scale, menu }: { route: any; navigation: any; scale: any; menu: any }) {
   const { title, titleEn } = route.params;
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [showSecondModal, setShowSecondModal] = useState(false);
   const isCroatianLanguage = isCroatian();
 
-  const { meals, isLoading, selectedMealRef } = useCategoryMeals(title);
+  const { meals, isLoading, selectedMealRef } = useCategoryMeals(menu, title);
 
   const handleMealClick = (meal: Meal) => {
     setSelectedMeal(meal);
     setShowSecondModal(true);
     selectedMealRef.current = meal;
   };
-
+  
   return (
     <View style={[styles.container, { paddingLeft: scale.light(16) }]}>
       <Text style={[styles.title, { fontSize: scale.light(24) }]}>{isCroatianLanguage ? title : titleEn}</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {
-          isLoading ? <CenteredLoading /> :
+          meals.length === 0 ? <CenteredLoading /> :
           meals.length > 0 ? 
           meals
           .sort((a, b) => b.popularity - a.popularity)
@@ -45,42 +45,12 @@ export default function CategoryPage({ route, navigation, scale }: { route: any;
         }
       </ScrollView>
 
-      <Portal>
-        <Modal
-          visible={showSecondModal}
-          onDismiss={() => setShowSecondModal(false)}
-          contentContainerStyle={[
-            styles.modalContainer,
-            {
-              minHeight: getModalHeight(selectedMeal),
-              margin: scale.heavy(16),
-            },
-          ]}
-        >
-          {selectedMeal ? (
-            <MealDetails
-              visible={showSecondModal}
-              globalMeal={selectedMeal}
-              scale={scale}
-              onClose={() => setShowSecondModal(false)}
-              navigation={navigation}
-            />
-          ) : (
-            <View >
-              <CenteredLoading />
-            </View>
-          )}
-        </Modal>
-      </Portal>
+      <MealModal visible={showSecondModal} isCroatianLang={isCroatianLanguage} meal={selectedMeal} menu={menu} scale={scale} onClose={() => setShowSecondModal(false)} navigation={navigation} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

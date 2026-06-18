@@ -1,25 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Image } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Counter from './Counter';
 import ExtrasList from './ExtrasList';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useCart } from "../cartContext";
 import SizesList from "./SizesList";
-import { backendUrl } from "../../localhostConf";
 import { useToast } from "react-native-toast-notifications";
 import { isCroatian } from "../services/languageChecker";
 import { CenteredLoading } from "./CenteredLoading";
-import { useGeneral } from '../generalContext';
-import { safeFetch } from "../services/safeFetch";
 import DrinksList from "./DrinksList";
 import SaucesList from "./SaucesList";
-import ParallaxScroll from '@monterosa/react-native-parallax-scroll';
+import FriesExtrasList from "./FriesExtrasList";
+import { calculateNewPrice } from "../services/calculateNewPrice";
+import { useMealDetails } from "../../hooks/useMealDetails";
 
-const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigation }: any) => {
+const MealDetails = ({ visible, globalMeal, menu, scale, onClose, navigation, isCroatianLang }: any) => {
   const [meal, setLocalData] = useState(globalMeal);
-
+  
   useEffect(() => {
-      console.log('Modal visible:', visible, 'globalMeal:', globalMeal);
 
   // Kad se modal otvori, postavi trenutne podatke u local state modala
   if (visible) {
@@ -28,30 +26,23 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
 }, [visible, globalMeal]);
 
   
-  const isCroatianLang = isCroatian();
 
-
-  const [extras, setExtras] = useState<{ [key: string]: string }>({});
+  const [extras, setExtras] = useState<{ [key: string]: string }>((menu as any)["Prilozi"][meal.portions[0].extras] || {});
+  const [friesExtras, setFriesExtras] = useState<{ [key: string]: string }>((menu as any)["Prilozi"]["listaPomfrit"] || {});
   const [selectedPortionIndex, setSelectedPortionIndex] = useState<number>(0);
   const [selectedSize, setSelectedSize] = useState(meal ? isCroatianLang? meal.portions[0].size: meal.portions[0].size_en : "");
-  const [selectedSauce, setSelectedSauce] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [cartPrice, setPrice] = useState(meal ? meal.portions[0].price : 0); 
   const [selectedExtras, setSelectedExtras] = useState<{ [key: string]: number }>({});
-  const [sauces, setSauces] = useState<{ [key: string]: number }>({});
+  const [selectedFriesExtras, setSelectedFriesExtras] = useState<{ [key: string]: number }>({});
+  const [sauces, setSauces] = useState<{ [key: string]: string }>((menu as any)["Prilozi"]["listaSalateUmaci"] || {});
   const [selectedDrinks, setSelectedDrinks] = useState<any>([]);
   const [cartPriceSum, setPriceSum] = useState(cartPrice);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [extrasLoading, setExtrasLoading] = useState(true);
-  const [saucesLoading, setSaucesLoading] = useState(meal.saucesList === true ? true : false);
-  const { general } = useGeneral();
-
+  const stuff = useMealDetails();
 
   const toast = useToast();
 
-  useEffect(() => {    console.log("isUpdating", isUpdating);
-
-  }, [isUpdating]);
 
   const { state, dispatch } = useCart();
 
@@ -65,31 +56,32 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
 }, [meal, isCroatianLang]);
 
   const handleAddToCart = () => {
+    if (isUpdating) {
+      return;
+    }
     let drinksToAdd = selectedDrinks ?? [];
     const remainingSlots = meal.maxDrinks - drinksToAdd.length;
 
     if (remainingSlots > 0) {
-      const defaultDrink = drinks["ID70"];
+      const defaultDrink = (menu as any)["Piće"]?.["ID70"];
       if (defaultDrink) {
         const drinkWithId = { id: "ID70", ...defaultDrink };
         const defaultDrinksToAdd = Array(remainingSlots).fill(drinkWithId);
         drinksToAdd = [...drinksToAdd, ...defaultDrinksToAdd];
-        setSelectedDrinks(drinksToAdd); // update UI
+        setSelectedDrinks(drinksToAdd);
       }
     }
 
     const uniqueId = `${meal.id}` +
-  `${Object.entries(selectedExtras)
-    .map(([key]) => `_${key.split('|')[0].replace(/\s+/g, '')}`)
-    .sort()
-    .join('')}` +
-  `${drinksToAdd
-    .map((drink: any) => drink.ime.replace(/\s+/g, ''))
-    .sort()
-    .join('')}`;
-
-
-    console.log("unique", uniqueId);
+    `${selectedSize}` +
+    `${Object.entries(selectedExtras)
+      .map(([key]) => `_${key.split('|')[0].replace(/\s+/g, '')}`)
+      .sort()
+      .join('')}` +
+    `${drinksToAdd
+      .map((drink: any) => drink.ime.replace(/\s+/g, ''))
+      .sort()
+      .join('')}`;
 
     dispatch({
       type: 'ADD_TO_CART',
@@ -102,9 +94,11 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
         quantity: quantity,
         extras: meal.portions[selectedPortionIndex].extras,
         selectedExtras: selectedExtras,
+        selectedFriesExtras: selectedFriesExtras,
         selectedDrinks: drinksToAdd,
         portionsOptions: meal.portions,
         type: meal.type,
+        hasFries: meal.hasFries,
       },
     });
 
@@ -119,63 +113,9 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
     }, 400);
   };
 
-  const fetchExtras = async () => {
-    if (meal.portions[selectedPortionIndex]?.extras != "null") {
-      try {
-        console.log("A fetch happened");
-        const response = await safeFetch(`${backendUrl}/cjenik/Prilozi/${meal.portions[selectedPortionIndex]?.extras}`);
-        const data = await response.json();
-
-        let updatedSelectedExtras: { [key: string]: number } = {};
-
-        if (general && general.extras) {
-          updatedSelectedExtras = Object.keys(selectedExtras).reduce((acc: { [key: string]: number }, key) => {
-            if (data.hasOwnProperty(key)) {
-              if (selectedExtras[key] === general.extras.penalty) {
-                acc[key] = general.extras.penalty;
-              } else {
-                acc[key] = data[key];
-              }
-            }
-            return acc;
-          }, {});
-        }
-
-
-        setExtras(data); // update base prices
-        setSelectedExtras(updatedSelectedExtras); // update selected ones with new prices
-        setExtrasLoading(false);
-      } catch (error) {
-        console.error('Error fetching extras:', error);
-        setExtrasLoading(false);
-      }
-    } else {
-      setExtras({});
-      setSelectedExtras({});
-      setExtrasLoading(false);
-    }
-  };
-
-  const fetchSauces = async () => {
-    try {
-      console.log("A fetch happened");
-      const response = await safeFetch(`${backendUrl}/cjenik/Prilozi/listaSalateUmaci`);
-      const data = await response.json();
-
-      setSauces(data); // update base prices
-      setSaucesLoading(false);
-    } catch (error) {
-      console.error('Error fetching extras:', error);
-      setSaucesLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchExtras();
-    if(meal.saucesList === true) {
-      fetchSauces();
-    }
-  }, [ selectedPortionIndex]);
+    calculateNewPrice(selectedExtras, selectedFriesExtras, selectedSize, selectedPortionIndex, meal, quantity, setIsUpdating, setPrice, setPriceSum);
+  }, [selectedExtras, selectedFriesExtras, selectedSize, quantity]);
 
   return (
     <View style={[styles.modalContainer, scale.isTablet() ? { margin: 10 } : {}]}>
@@ -198,7 +138,7 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
             <MaterialIcons name="close" size={scale.medium(32)} color="black" />
           </TouchableOpacity>
         </View>
-        {extrasLoading || saucesLoading ?
+        {false ?
         ( <CenteredLoading /> )
         : (
           <>
@@ -213,8 +153,6 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
                 extras={extras}
                 selectedExtras={selectedExtras}
                 setSelectedExtras={setSelectedExtras}
-                setPrice={setPrice}
-                setPriceSum={setPriceSum}
                 quantity={quantity}
                 setIsUpdating={setIsUpdating}
                 isCroatianLang={isCroatianLang}
@@ -227,8 +165,6 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
                 extras={sauces}
                 selectedExtras={selectedExtras}
                 setSelectedExtras={setSelectedExtras}
-                setPrice={setPrice}
-                setPriceSum={setPriceSum}
                 quantity={quantity}
                 selectedPortionIndex={selectedPortionIndex}
                 isUpdating={isUpdating}
@@ -238,12 +174,21 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
             {meal.portions[0].extras !== "null" && (
               <ExtrasList
                 isCroatianLang={isCroatianLang}
-                meal={meal}
                 extras={extras}
                 selectedExtras={selectedExtras}
                 setSelectedExtras={setSelectedExtras}
-                setPrice={setPrice}
-                setPriceSum={setPriceSum}
+                setIsUpdating={setIsUpdating}
+                isUpdating={isUpdating}
+                scale={scale}
+              />
+            )}
+            {(meal.hasFries) && (
+              <FriesExtrasList
+                isCroatianLang={isCroatianLang}
+                meal={meal}
+                extras={friesExtras}
+                selectedExtras={selectedFriesExtras}
+                setSelectedExtras={setSelectedFriesExtras}
                 quantity={quantity}
                 selectedPortionIndex={selectedPortionIndex}
                 isUpdating={isUpdating}
@@ -252,7 +197,7 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
             )}
             {(meal.type === "sodas" || meal.type === "drinks") && (
               <DrinksList
-                drinks={drinks}
+                drinks={(menu as any)["Piće"] || {}}
                 drinksType={meal.type}
                 drinksMax={meal.maxDrinks}
                 selectedDrinks={selectedDrinks}
@@ -270,8 +215,7 @@ const MealDetails = ({ visible, globalMeal, drinks={}, scale, onClose, navigatio
             onDecrease={() => setQuantity((prev) => Math.max(prev - 1, 1))}
             handleAddToCart={handleAddToCart}
             cartPrice={cartPrice}
-            cartPriceSum={cartPriceSum}
-            setPriceSum={setPriceSum}
+            setIsUpdating={setIsUpdating}
             isUpdating={isUpdating}
             navigation={navigation}
             scale={scale}

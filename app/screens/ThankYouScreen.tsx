@@ -43,17 +43,18 @@ export default function ThankYouScreen({ route, navigation }: any) {
             }
           </View>
           <View style={{position: 'absolute', bottom: 20, width: '100%', alignItems: 'center'}}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log("Navigating to Home");
-                  // Reset the navigation stack and navigate to Home screen
-                  navigation.reset({
-                      index: 0,
-                      routes: [{ name: 'Home' }],
-                  });
-              }}
-              style={styles.button}
-              >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ 
+                  name: 'Home', 
+                  params: { orderCompleted: true, pointsAdded: 20 } 
+                }],
+              });
+            }}
+            style={styles.button}
+          >
               <Text allowFontScaling={false} style={styles.buttonText}>{isCroatianLang? "Natrag": "Back"}</Text>
               </TouchableOpacity>
           </View>

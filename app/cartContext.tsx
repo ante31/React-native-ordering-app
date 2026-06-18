@@ -44,7 +44,6 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'REMOVE_FROM_CART':
       return { ...state, items: state.items.filter((item) => item.id !== action.payload) };
     case 'UPDATE_ITEM_QUANTITY': {
-      // Update the quantity of the specific item by id
       return {
         ...state,
         items: state.items.map((item) =>
@@ -75,6 +74,6 @@ export const CartProvider: React.FC<React.PropsWithChildren> = ({ children }: an
 
 export const useCart = () => useContext(CartContext);
 
-export default CartProvider; // Dodaj default export
+export default CartProvider;
 
 

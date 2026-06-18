@@ -49,7 +49,6 @@ const Picker = ({ showPicker, setShowPicker, timeString, setTimeString, isSlidRi
     };
 
     useEffect(() => {
-        // Pozovi refresh samo kad se promijeni mod (isSlidRight) ili offset
         refreshTime(offset);
 
         const interval = setInterval(() => {
@@ -57,7 +56,7 @@ const Picker = ({ showPicker, setShowPicker, timeString, setTimeString, isSlidRi
         }, 60000);
 
         return () => clearInterval(interval);
-    }, [isSlidRight, offset]); // timeString je namjerno izbačen da se spriječi loop
+    }, [isSlidRight, offset]); 
 
     const onConfirm = (pickedDuration: { hours: number; minutes: number; }) => {
         checkTimeValidity(pickedDuration, setTimeString, setDisplayMessage, setDisplayWorkTimeMessage, setShowPicker, isSlidRight, general);

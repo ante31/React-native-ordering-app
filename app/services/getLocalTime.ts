@@ -26,13 +26,27 @@ export const getLocalTime = (): Date => {
 
   // (YYYY-MM-DDTHH:mm:ss)
   const isoString = `${partValues.year}-${partValues.month}-${partValues.day}T${partValues.hour}:${partValues.minute}:${partValues.second}`;
-  console.log("ISO STRING", isoString);
 
   const localDate = new Date(isoString + 'Z'); 
 
   return new Date(localDate.getTime());
 };
 
+export const getLocalTimeString = (): string => {
+  const date = getLocalTime();
+
+  const pad = (num: number) => num.toString().padStart(2, '0');
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // Mjeseci su 0-11
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  // Vraća format: 2026-03-29T09:28:15
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
 
 export const getLocalTimeHours = (): number => {
   const now = getLocalTime(); 
@@ -74,18 +88,15 @@ export const getLocalTimeMinutes = () => {
   return now.getMinutes();
 };
 
-export const getYearMonthDay = (input: Date) => {
-  const date = new Date(input);
-  const year = date.getFullYear();
-  const month = `0${date.getMonth() + 1}`.slice(-2);
-  const day = `0${date.getDate()}`.slice(-2);
-
-  return `${year}-${month}-${day}`;
-}
+export const getYearMonthDay = (input: string) => {
+  return input.split("T")[0];
+};
 
 export const getDayOfTheWeek = (input: Date, holidays?: Holidays): string => {
   const daysOfWeek = getDaysOfTheWeek();
-  const dayIndex = input.getDay(); // number (0-6) where 0 is Sunday
+  console.log("getDayOfTheWeek2", daysOfWeek);
+  const dayIndex = input.getUTCDay(); // number (0-6) where 0 is Sunday
+  console.log("getDayOfTheWeek3", dayIndex);
 
   const holiday = isHoliday(holidays);
   console.log("isholiday", isHoliday(holidays));

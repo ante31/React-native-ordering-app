@@ -1,6 +1,7 @@
-const validateForm = (orderData: any, isSlidRight: boolean, setErrors: any, minOrder: any, iscroatianLang: boolean) => {
+const validateForm = (orderData: any, isSlidRight: boolean, totalPrice: number, setErrors: any, minOrder: any, iscroatianLang: boolean) => {
     let valid = true;
     let newErrors = { name: '', phone: '', address: '', zone: '' };
+    console.log("Validating form with data:", orderData, "isSlidRight:", isSlidRight, "minOrder:", minOrder, totalPrice);
 
     if (
         !orderData.name ||
@@ -30,7 +31,7 @@ const validateForm = (orderData: any, isSlidRight: boolean, setErrors: any, minO
       valid = false;
     }
 
-    if (!isSlidRight && orderData.totalPrice < minOrder[orderData.zone]) {
+    if (!isSlidRight && totalPrice < minOrder[orderData.zone]) {
       newErrors.zone = iscroatianLang ?
       "Minimalna cijena za " + (orderData.zone === "Kaštel Gomilica"? "Kaštel Gomilicu" : orderData.zone) + " je " + minOrder[orderData.zone].toFixed(2) + " €"
       : "Minimal order for " + orderData.zone + " is " + minOrder[orderData.zone].toFixed(2) + " €";

@@ -1,8 +1,18 @@
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native"
 import { Divider } from "react-native-paper"
 
-export const OrderDetails = ({isCroatianLang, orderPrice, isSlidRight, general, scale}: any) => {
+export const OrderDetails = ({isCroatianLang, orderPrice, isSlidRight, general, selectedCoupon, scale}: any) => {
   const styles = getStyles(scale);
+  const [discount, setDiscount] = useState(0); 
+
+  useEffect(() => {
+    if (selectedCoupon) {
+      setDiscount(selectedCoupon.value); 
+    } else {
+      setDiscount(0); 
+    }
+  }, [selectedCoupon]);
   return (
     <View>
       <Text style={styles.title}>{isCroatianLang ? 'Iznos narudžbe': 'Order amount'}</Text>
@@ -23,10 +33,15 @@ export const OrderDetails = ({isCroatianLang, orderPrice, isSlidRight, general, 
           <Text style={[styles.info, {color: 'red'}]}>0.00 €</Text>
         </View>}
         <Divider style={styles.divider} />
+        {discount > 0 && <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.info}>{isCroatianLang? 'Popust': 'Discount'}</Text>
+          <Text style={[styles.info, {color: 'red'}]}>- {discount.toFixed(2)} €</Text>
+        </View>}
+        <Divider style={styles.divider} />
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.info}>{isCroatianLang? 'Ukupno': 'Total'}</Text>
           <Text style={[styles.info, {color: 'red'}]}>
-            {general ? (orderPrice + (!isSlidRight ? general.deliveryPrice : 0)).toFixed(2) : orderPrice} €
+            {general ? (orderPrice + (!isSlidRight ? general.deliveryPrice : 0) - discount).toFixed(2) : orderPrice} €
           </Text>
         </View>
       <Divider style={styles.divider} />

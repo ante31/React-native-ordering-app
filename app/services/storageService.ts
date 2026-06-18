@@ -3,15 +3,13 @@ import * as SecureStore from 'expo-secure-store';
 
 const storeData = async (key: string, value: any) => {
   try {
-    // Store the value securely
     await SecureStore.setItemAsync(key, JSON.stringify(value));
     console.log("Data saved successfully!");
 
-    // Get the current list of order keys from SecureStore
     const storedKeys = await SecureStore.getItemAsync('order_keys');
     const keys = storedKeys ? JSON.parse(storedKeys) : [];
 
-    // Add the new key to the list
+    // Dodaj novi id
     if (!keys.includes(key)) {
       keys.push(key);
     }

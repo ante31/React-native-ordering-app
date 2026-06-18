@@ -12,12 +12,15 @@ export const getHolidayGreeting = (isCroatian: boolean) => {
     '12-26': { hr: "Sretan Sv. Stjepan!", en: "Happy St. Stephen's Day!" },
     '12-31': { hr: "Sretna Stara godina!", en: "Happy New Year's Eve!" },
     '01-01': { hr: "Sretna Nova godina!", en: "Happy New Year!" },
+
+    [getEasterDate(Number(year))!]: { hr: "Sretan Uskrs!", en: "Happy Easter!" },
+    [getEasterMonday(Number(year))!]: { hr: "Sretan Uskrsni ponedjeljak!", en: "Happy Easter Monday!" },
   };
 
   const wish = greetings[mmdd];
   // Generička poruka, tipa badnjak 24.12.
   if (wish) return isCroatian ? wish.hr : wish.en;
-  return isCroatian ? "Danas ne radimo." : "Closed today.";
+  return "";
 };
 
 export const isHoliday = (holidays?: Holidays): 'closed' | 'shortened' | 'normal' => {
@@ -44,9 +47,7 @@ export const isHoliday = (holidays?: Holidays): 'closed' | 'shortened' | 'normal
 
 
 export const isClosedMessageDisplayed = (appStatus: any, workingHours: any, holidays?: Holidays): boolean => {
-  console.log("isClosedMessageDisplayed", appStatus, workingHours, isHoliday(holidays) === "closed", holidays);
   if (appStatus.appClosed || appStatus.forceAppOpen || isHoliday(holidays) === "closed") {
-    console.log("appButtonsDisabled", appStatus.appClosed, appStatus.forceAppOpen, isHoliday(holidays) === "closed");
     return appStatus.appClosed || !appStatus.forceAppOpen || isHoliday(holidays) === "closed";
   }
   const hours = getLocalTimeHours();
@@ -94,12 +95,20 @@ export const appButtonsDisabled = (appStatus: any, workingHours: any, holidays?:
 
 export const onlyCustomOrders = (workingHours: any): boolean => {
   const hours = getLocalTimeHours();
+  const minutes = getLocalTimeMinutes();
 
-  const [openingHours, openingMinutes] = workingHours.openingTime.split(":").map(Number);
-  const [closingHours, closingMinutes] = workingHours.closingTime.split(":").map(Number);
-  
+  const current = hours * 60 + minutes;
+
+  const [openingHours, openingMinutes] =
+    workingHours.openingTime.split(":").map(Number);
+  const [closingHours, closingMinutes] =
+    workingHours.closingTime.split(":").map(Number);
+
+  const open = openingHours * 60 + openingMinutes;
+  const close = closingHours * 60 + closingMinutes;
+
   // Only allow custom orders before opening
-  return closingAfterMidnight(openingHours, closingHours)? hours >= closingHours && hours < openingHours: hours < openingHours;
+  return current < open;
 };
 
 export const isDeliveryClosed = (workingHours: any): boolean => {
@@ -109,15 +118,20 @@ export const isDeliveryClosed = (workingHours: any): boolean => {
   const [openingHours, openingMinutes] = workingHours.deliveryOpeningTime.split(":").map(Number);
   const [closingHours, closingMinutes] = workingHours.deliveryClosingTime.split(":").map(Number);
 
-  console.log("isDeliveryClosed", hours, minutes, openingHours, openingMinutes, closingHours, closingMinutes);
+  const beforeOpening =
+  hours < openingHours ||
+  (hours === openingHours && minutes < openingMinutes);
+
+const afterClosing =
+  hours > closingHours ||
+  (hours === closingHours && minutes >= closingMinutes);
 
   // Show closed message if current time is before opening or after closing
   return closingAfterMidnight(openingHours, closingHours)?
     hours > closingHours || // generalno
     hours === closingHours && minutes >= closingMinutes 
     :
-    hours > closingHours || 
-    (hours === closingHours && minutes >= closingMinutes) 
+    beforeOpening || afterClosing;
   };
 
 export const closingAfterMidnight = (openingHours: number, closingHours: number, ) => {

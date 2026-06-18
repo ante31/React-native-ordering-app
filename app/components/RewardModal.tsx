@@ -26,8 +26,8 @@ const RewardModal = ({ isCroatianLanguage, general, setCurrentPoints, scale, sho
             <View style={styles.modalContent}>
               <Text style={[styles.modalText, { fontSize: scale.light(16) }]}>
                 {isCroatianLanguage
-                  ? `Čestitamo! Darujemo vam 10€ na vašu sljedeću narudžbu veću od 10€ kao znak zahvalnosti za vašu vjernost!`
-                  : `Congratulations! We're giving you €10 off your next order as a token of our appreciation for your loyalty!`}
+                  ? `Čestitamo! Darujemo vam 10€ na vašu sljedeću narudžbu veću od ${general?.awardMinimalOrder}€ kao znak zahvalnosti za vašu vjernost!`
+                  : `Congratulations! We're giving you 10€ off your next order of at least ${general?.awardMinimalOrder}€ as a token of our appreciation for your loyalty!`}
               </Text>
             </View>
           </LinearGradient>

@@ -19,44 +19,44 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
   const [order, setOrder] = useState<any>(null);
   const dayOfWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
 
-  if (item.status !== "completed"){
+  if (item.status === "pending"){
     useEffect(() => {
-  if (item.status !== 'completed') {
-    const socket = io(backendUrl, {
-      transports: ['websocket'],
-    });
+      if (item.status === 'pending') {
+        const socket = io(backendUrl, {
+          transports: ['websocket'],
+        });
 
-    const fetchOrder = async () => {
-      try {
-        const fullDateString = getYearMonthDay(item.time);
-        const [year, month, day] = fullDateString.split('-');
-        const response = await safeFetch(`${backendUrl}/orders/${year}/${month}/${day}/${item.id}`);
+        const fetchOrder = async () => {
+          try {
+            const fullDateString = getYearMonthDay(item.time);
+            const [year, month, day] = fullDateString.split('-');
+            const response = await safeFetch(`${backendUrl}/orders/${year}/${month}/${day}/${item.id}`);
 
-        if (!response.ok) throw new Error(`Error fetching order: ${response.statusText}`);
+            if (!response.ok) throw new Error(`Error fetching order: ${response.statusText}`);
 
-        const data = await response.json();
-        setOrder(data);
-      } catch (err) {
-        console.error(err);
+            const data = await response.json();
+            setOrder(data);
+          } catch (err) {
+            console.error(err);
+          }
+        };
+
+        // Inicijalni fetch
+        fetchOrder();
+
+        // Slušanje samo ove narudžbe
+        const eventName = `order-updated-${item.id}`;
+        socket.on(eventName, (updatedOrder: any) => {
+          console.log('📥 [Socket] Ažurirana narudžba:', updatedOrder);
+          setOrder(updatedOrder);
+        });
+
+        return () => {
+          socket.off(eventName);
+          socket.disconnect();
+        };
       }
-    };
-
-    // Inicijalni fetch
-    fetchOrder();
-
-    // Slušanje samo ove narudžbe
-    const eventName = `order-updated-${item.id}`;
-    socket.on(eventName, (updatedOrder: any) => {
-      console.log('📥 [Socket] Ažurirana narudžba:', updatedOrder);
-      setOrder(updatedOrder);
-    });
-
-    return () => {
-      socket.off(eventName);
-      socket.disconnect();
-    };
-  }
-}, [item]);
+    }, [item]);
   
   }
   return (
@@ -73,7 +73,21 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
       : item.isDelivery ? 'Estimated delivery time: ' : 'Estimated preparation time: '}
       {formatEuropeanDateTime(item.deadline).split(" ")[1]}
     </Text>
-    <Text style={styles.text}>{isCroatianLang ? 'Cijena: ': 'Price:'} {item.totalPrice}€</Text>
+    <Text style={styles.text}>
+      {isCroatianLang ? 'Cijena: ' : 'Price: '}
+      {item.coupon ? (
+        <>
+          <Text style={[styles.crossedOut, { marginRight: 7 }]}>
+            {item.totalPrice}€
+          </Text>
+          <Text style={styles.text}>
+            {item.totalPrice - item.coupon}€
+          </Text>
+        </>
+      ) : (
+        `${item.totalPrice}€`
+      )}
+    </Text>
     {item.note.length !== 0 && (<Text style={styles.text}>{isCroatianLang ? 'Napomena: ': 'Note:'} {String(item.note)}</Text>)}
     <Text style={[styles.text, styles.statusText]}>
       Status: {order ? (
@@ -81,9 +95,15 @@ export const PreviousOrderCard = ({item, handleRenew, handleDelete}: any) => {
           (order.status === "completed" ? "Dovršeno" : 
           order.status === "accepted" ? "Prihvaćeno" : 
           order.status === "rejected" ? "Odbijeno" : 
+          order.status === "auto-rejected" ? "Odbijeno zbog prevelike gužve" :
           order.status === "pending" ? "Čeka se odgovor" : 
           order.status) 
-          : order.status
+          : (order.status === "completed" ? "Completed" : 
+          order.status === "accepted" ? "Accepted" : 
+          order.status === "rejected" ? "Rejected" : 
+          order.status === "auto-rejected" ? "Rejected due to high demand" :
+          order.status === "pending" ? "Waiting for response" : 
+          order.status)
       ) : ""}
     </Text>
     <Divider style={styles.divider} />
@@ -177,6 +197,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 5,
         fontFamily: 'Lexend_400Regular',
+      },
+      crossedOut: {
+        fontSize: 16,
+        marginBottom: 5,
+        textDecorationLine: 'line-through', // Prekriži tekst
+        color: 'gray', // Obično se stavlja siva boja za "staru" cijenu
       },
       statusText: {
         color: 'gray',

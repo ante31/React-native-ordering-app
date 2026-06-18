@@ -8,7 +8,7 @@ import { useGeneral } from '../generalContext';
 import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 import { Platform } from 'react-native';
 
-const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, cartPriceSum, setPriceSum, isUpdating, navigation, scale, submitButtonStatus = "Dodaj", onClose }: any) => {
+const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddToCart, handleRemoveFromCart, mealId = "", cartPrice, setIsUpdating, isUpdating, scale, submitButtonStatus = "Dodaj", onClose }: any) => {
   const {general} = useGeneral();
   const dayofWeek = getDayOfTheWeek(getLocalTime(), general?.holidays);
   console.log("submitButtonStatus", submitButtonStatus, isCroatianLang)
@@ -20,11 +20,11 @@ const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddTo
       <View style={[{ marginLeft: 4, flex: 1, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", backgroundColor: '#fff', borderColor: '#ffd400', borderWidth: 2, margin: scale.isTablet() && scale.light(4), borderRadius: 5}, appButtonsDisabled(general?.appStatus ,general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterButton]}>
         <TouchableOpacity 
           onPress={() => {
+            setIsUpdating(true);
             onDecrease(); 
-            setPriceSum((prev: number) => prev -= cartPrice);
-            if (Platform.OS !== 'web') {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }
+            // if (Platform.OS !== 'web') {
+            //   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            // }
             }} 
           disabled={quantity <= 1} 
           hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
@@ -35,11 +35,11 @@ const Counter = ({ isCroatianLang, quantity, onIncrease, onDecrease, handleAddTo
         <Text style={[{ fontFamily: "Lexend_700Bold" ,fontSize: scale.light(16), color: "#ffd400" }, , appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledCounterText]}>{quantity}</Text>
         <TouchableOpacity 
           onPress={() => { 
+            setIsUpdating(true);
             onIncrease(); 
-            setPriceSum((prev: number) => prev += cartPrice);
-            if (Platform.OS !== 'web') {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }          
+            // if (Platform.OS !== 'web') {
+            //   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            // }          
           }} 
           disabled={quantity >= 20 || appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays)} 
           hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
