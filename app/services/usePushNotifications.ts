@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 export interface PushNotificationState {
   expoPushToken?: Notifications.ExpoPushToken;
   notification?: Notifications.Notification;
+  notificationsBlocked: boolean;
 }
 
 export const usePushNotifications = (): PushNotificationState => {
@@ -27,6 +28,8 @@ Notifications.setNotificationHandler({
     Notifications.Notification | undefined
   >();
 
+  const [notificationsBlocked, setNotificationsBlocked] = useState(false);
+
   const notificationListener = useRef<Notifications.Subscription | null>(null);
   const responseListener = useRef<Notifications.Subscription | null>(null);
 
@@ -44,6 +47,7 @@ Notifications.setNotificationHandler({
       }
       if (finalStatus !== "granted") {
         console.log("Failed to get push token for push notification");
+        setNotificationsBlocked(true);
         return;
       }
 
@@ -91,5 +95,6 @@ Notifications.setNotificationHandler({
   return {
     expoPushToken,
     notification,
+    notificationsBlocked,
   };
 };

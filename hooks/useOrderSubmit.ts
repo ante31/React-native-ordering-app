@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import * as Sentry from "@sentry/react-native";
 import { getVersion } from "@/app/services/checkVersion";
 import { backendUrl } from "../localhostConf";
-import { isDeliveryClosed } from '../app/services/isAppClosed';
+import { isDeliveryClosed, onlyCustomOrders } from '../app/services/isAppClosed';
 import { safeFetch } from "../app/services/safeFetch";
 import { storeData } from "../app/services/storageService";
 import { updateMealPopularity } from "../app/services/updateMealPopularity";
@@ -42,7 +42,7 @@ export function useOrderSubmit({
       throw new Error("Missing workTime");
     }
 
-    if (isDeliveryClosed(general.workTime[dayOfWeek]) && !isSlidRight) {
+    if (isDeliveryClosed(general.workTime[dayOfWeek]) && !isSlidRight && selectedDeliveryOption !== 'custom') {
       setUiValue("displayWorkTimeMessage", true);
       return;
     }
@@ -135,7 +135,13 @@ export function useOrderSubmit({
 
     dispatch({ type: "CLEAR_CART" });
 
-    navigation.navigate("ThankYouScreen", { isCroatianLang });
+    navigation.navigate("ThankYouScreen", { 
+      isCroatianLang, 
+      orderId: data.id, 
+      orderDate: now.toISOString(),
+      notificationResult: data.notificationResult ?? null,
+      isPreOrder: onlyCustomOrders(general.workTime[dayOfWeek]),
+    });
   };
 
   const executeWithTimeout = () => {

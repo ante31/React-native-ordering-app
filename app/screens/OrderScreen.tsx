@@ -1,56 +1,26 @@
-import { useEffect, useState, useRef, useCallback, use } from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { Button, Divider } from 'react-native-paper';
-import { backendUrl } from '../../localhostConf';
 import Orderform from '../components/OrderForm';
-import validateForm from '../services/validateForm';
-import Slider from '../components/Slider';
-import { StorageModel } from '../models/storageModel';
-import { storeData } from '../services/storageService';
+// import Slider from '../components/Slider';
 import 'react-native-get-random-values';
 import Picker from '../components/Picker';
 import { RadioOrderSelection } from '../components/RadioOrderSelection';
-import { isCroatian } from '../services/languageChecker';
-import { useCart } from '../cartContext';
-import * as SecureStore from 'expo-secure-store';
-import { usePushNotifications } from '../services/usePushNotifications';
-import { updateMealPopularity } from '../services/updateMealPopularity';
 import { appButtonsDisabled } from '../services/isAppClosed';
-import { getDayOfTheWeek, getLocalTime, getLocalTimeString, setTimeInISOString } from '../services/getLocalTime';
+import { getDayOfTheWeek, getLocalTime } from '../services/getLocalTime';
 import { OrderDetails } from '../components/OrderDetails';
 import { useGeneral } from '../generalContext';
-import { checkTimeValidity } from '../services/checkTimeValidity';
-import { safeFetch } from '../services/safeFetch';
 import { isDeliveryClosed } from '../services/isAppClosed';
-import { useLoyaltyBarPhone } from '@/hooks/useLoyaltyBarPhone';
 import CouponList from '../components/CouponList';
-import { Coupon } from '../models/couponModel';
-import * as Sentry from '@sentry/react-native';
 import useOrdersHook from '@/hooks/useOrders';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-export default function OrderScreen({
-  route,
-  navigation,
-  scale,
-}: {
-  route: any;
-  navigation: any;
-  scale: any;
-}) {
+export default function OrderScreen({ route, navigation, scale, }: { route: any; navigation: any; scale: any; }) 
+{
   const styles = getStyles(scale);
-
-  const { cartState, storageOrder } = route.params;
-
-  const { expoPushToken } = usePushNotifications();
-  const { dispatch } = useCart();
+  const { cartState, storageOrder, isDelivery } = route.params;
   const { general } = useGeneral();
 
-  const loyaltyBarPhone = useLoyaltyBarPhone();
-
-  const dayOfWeek = getDayOfTheWeek(
-    getLocalTime(),
-    general?.holidays
-  );
+  const dayOfWeek = getDayOfTheWeek( getLocalTime(), general?.holidays );
 
   const {
   orderData,
@@ -86,10 +56,9 @@ export default function OrderScreen({
 } = useOrdersHook({
   cartState,
   storageOrder,
+  isDelivery,
   navigation,
 });
-
-console.log("dayOfWeek", dayOfWeek);
 
   return (
     <KeyboardAvoidingView
@@ -101,14 +70,12 @@ console.log("dayOfWeek", dayOfWeek);
       style={styles.container}
     >
       <ScrollView>
-        <Slider
+        {/* <Slider
           workingHours={
             general?.workTime[dayOfWeek]
           }
           isSlidRight={isSlidRight}
-          setIsSlidRight={
-            setIsSlidRight
-          }
+          setIsSlidRight={setIsSlidRight}
           initialSide={
             storageOrder
               ? storageOrder.isDelivery
@@ -116,9 +83,7 @@ console.log("dayOfWeek", dayOfWeek);
                 : "right"
               : "left"
           }
-          isCroatianLang={
-            isCroatianLang
-          }
+          isCroatianLang={isCroatianLang}
           scale={scale}
           setDisplayDeliveryClosedMessage={(
             value: boolean
@@ -128,7 +93,20 @@ console.log("dayOfWeek", dayOfWeek);
               value
             )
           }
-        />
+        /> */}
+
+        <View style={styles.deliveryTypeBanner}>
+          <MaterialIcons
+            name={isDelivery ? 'delivery-dining' : 'storefront'}
+            size={28}
+            color="#ffd400"
+          />
+          <Text style={styles.deliveryTypeText}>
+            {isDelivery
+              ? (isCroatianLang ? 'Dostava na adresu' : 'Delivery to address')
+              : (isCroatianLang ? 'Preuzimanje u objektu' : 'Pickup in store')}
+          </Text>
+        </View>
 
         <RadioOrderSelection
           selectedDeliveryOption={
@@ -188,7 +166,7 @@ console.log("dayOfWeek", dayOfWeek);
             )
           }
           timeString={timeString}
-          isSlidRight={isSlidRight}
+          isSlidRight={!isDelivery}
           isCroatianLang={
             isCroatianLang
           }
@@ -210,7 +188,7 @@ console.log("dayOfWeek", dayOfWeek);
           setTimeString={
             setTimeString
           }
-          isSlidRight={isSlidRight}
+          isSlidRight={!isDelivery}
           general={general}
           setDisplayWorkTimeMessage={(
             value: boolean
@@ -244,7 +222,7 @@ console.log("dayOfWeek", dayOfWeek);
           }
         >
           <Orderform
-            isDelivery={!isSlidRight}
+            isDelivery={isDelivery}
             orderData={orderData}
             setOrderData={
               setOrderData
@@ -269,7 +247,7 @@ console.log("dayOfWeek", dayOfWeek);
             isCroatianLang
           }
           orderPrice={orderPrice}
-          isSlidRight={isSlidRight}
+          isSlidRight={!isDelivery}
           general={general}
           selectedCoupon={
             selectedCoupon
@@ -356,14 +334,14 @@ console.log("dayOfWeek", dayOfWeek);
             ? ui.isSubmitting
               ? "Slanje..."
               : `Završi narudžbu - ${
-                  isSlidRight
+                  !isDelivery
                     ? "Preuzimanje"
                     : "Dostava"
                 }`
             : ui.isSubmitting
             ? "Sending..."
             : `Confirm order - ${
-                isSlidRight
+                !isDelivery
                   ? "Pickup"
                   : "Delivery"
               }`}
@@ -378,6 +356,21 @@ const getStyles = (scale: any) =>
     container: {
       flex: 1,
       backgroundColor: '#ffffff',
+    },
+    deliveryTypeBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 14,
+      backgroundColor: '#fffbea',
+      borderBottomWidth: 1,
+      borderBottomColor: '#ffe566',
+      gap: 10,
+    },
+    deliveryTypeText: {
+      fontFamily: 'Lexend_700Bold',
+      fontSize: scale.light(17),
+      color: '#333',
     },
     paddingContainer: {
       paddingHorizontal: 20,

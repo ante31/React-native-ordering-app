@@ -50,10 +50,10 @@ const CustomHeader = ({ navigation, showIcons = true, type = 'back', onBack }: P
       {showIcons && (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPressOut={() => navigation.navigate('PreviousOrdersScreen')}>
-            <PreviousOrderIcon navigation={navigation} scale={scale} />
+            <PreviousOrderIcon />
           </TouchableOpacity>
           <TouchableOpacity onPressOut={() => navigation.navigate('CartScreen')} style={{ marginHorizontal: 4 }}>
-            <CartIcon navigation={navigation} scale={scale} />
+            <CartIcon />
           </TouchableOpacity>
         </View>
       )}

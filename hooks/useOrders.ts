@@ -11,10 +11,12 @@ import { useOrderStorage } from "./useOrderStorage";
 export default function useOrdersHook({
   cartState,
   storageOrder,
+  isDelivery,
   navigation,
 }: {
   cartState: any;
   storageOrder: any;
+  isDelivery: boolean;
   navigation: any;
 }) {
   const { expoPushToken } = usePushNotifications();
@@ -87,11 +89,10 @@ export default function useOrdersHook({
   const [saveData, setSaveData] =
     useState(false);
 
-  // -----------------------------
-  // DELIVERY
-  // -----------------------------
+  // isSlidRight = true znači Preuzimanje, false znači Dostava
+  // isDelivery=true → isSlidRight=false, isDelivery=false → isSlidRight=true
   const [isSlidRight, setIsSlidRight] =
-    useState(false);
+    useState(!isDelivery);
 
   const [
     selectedDeliveryOption,

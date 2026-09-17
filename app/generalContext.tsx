@@ -22,6 +22,8 @@ type GeneralContextType = {
   setShowForceUpdate: (value: boolean) => void;
   showCustomMessage: boolean;
   setShowCustomMessage: (value: boolean) => void;
+  notificationsBlocked: boolean;
+  setNotificationsBlocked: (value: boolean) => void;
 };
 
 
@@ -36,6 +38,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
   const [customMessageAcknowledged, setCustomMessageAcknowledged] = useState(false);
   const [showForceUpdate, setShowForceUpdate] = useState(false);
   const [showCustomMessage, setShowCustomMessage] = useState(false);
+  const [notificationsBlocked, setNotificationsBlocked] = useState(false);
 
   useEffect(() => {
     const fetchGeneral = async () => {
@@ -112,7 +115,9 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
   return (
     <GeneralContext.Provider
       value={{
-        general,
+        general: notificationsBlocked && general
+          ? { ...general, appStatus: { appClosed: true, forceAppOpen: false } }
+          : general,
         showClosedAppModal,
         setShowClosedAppModal,
         forceUpdateAcknowledged,
@@ -122,7 +127,9 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
         showForceUpdate,
         setShowForceUpdate,
         showCustomMessage,
-        setShowCustomMessage
+        setShowCustomMessage,
+        notificationsBlocked,
+        setNotificationsBlocked,
       }}
     >
       {children}

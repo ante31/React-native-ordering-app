@@ -93,7 +93,7 @@ const CartScreen = ({ navigation, route, drinks={}, menu, scale  }: { navigation
         ))}
       </ScrollView>
       <TouchableOpacity
-        onPress={() => navigation.navigate('OrderScreen', { cartState, storageOrder })}
+        onPress={() => navigation.navigate('DeliveryTypeScreen', { cartState, storageOrder })}
         disabled={appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) || cartLength === 0}
         style={[styles.button, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledButton]}
       >
@@ -102,7 +102,7 @@ const CartScreen = ({ navigation, route, drinks={}, menu, scale  }: { navigation
             <Text allowFontScaling={false} style={[{color: '#ffd400', fontFamily: "Lexend_400Regular", fontSize: scale.light(16)}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>{cartState.items.reduce((sum, item) => sum + item.quantity, 0)}</Text>
           </View>
           <Text allowFontScaling={false} style={[styles.buttonText, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText]}>
-            {isCroatianLanguage? "Pregledaj narudžbu!": "Go to checkout!"}
+            {isCroatianLanguage? "Nastavi!": "Continue!"}
           </Text>
         </View>
         <Text style={[{fontFamily: "Lexend_400Regular", color: '#fff', fontSize: scale.light(18), marginRight: scale.isTablet()? 10 : 0}, appButtonsDisabled(general?.appStatus, general?.workTime[dayofWeek], general?.holidays) && styles.disabledText ]}>

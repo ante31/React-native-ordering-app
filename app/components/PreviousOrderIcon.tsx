@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Image } from 'react-native';
 import { isTablet } from '../services/isTablet';
 
-const PreviousOrderIcon = ({ navigation, scale }: { navigation: any, scale: any }) => {
+const PreviousOrderIcon = () => {
 
   return (
       <>

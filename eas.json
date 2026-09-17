@@ -17,7 +17,9 @@
         "gradleCommand": ":app:bundleRelease",
         "buildType": "app-bundle",
         "image": "android-29-ndk26"
-
+      },
+      "env": {
+        "SENTRY_AUTH_TOKEN": "$SENTRY_AUTH_TOKEN"
       }
     }
   },

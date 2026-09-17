@@ -5,7 +5,7 @@ import { useCart } from  '../cartContext';
 import { isTablet } from '../services/isTablet';
 import { Text } from 'react-native-paper';
 
-const CartIcon = ({ navigation, scale }: { navigation: any, scale: any }) => {
+const CartIcon = () => {
   const { getCartLength } = useCart();
   const cartLength = getCartLength();
 
