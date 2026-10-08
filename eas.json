@@ -19,7 +19,8 @@
         "image": "android-29-ndk26"
       },
       "env": {
-        "SENTRY_AUTH_TOKEN": "$SENTRY_AUTH_TOKEN"
+        "SENTRY_AUTH_TOKEN": "$SENTRY_AUTH_TOKEN",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     }
   },
