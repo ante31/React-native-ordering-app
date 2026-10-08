@@ -115,9 +115,7 @@ export const GeneralProvider = ({ children }: { children: React.ReactNode }) => 
   return (
     <GeneralContext.Provider
       value={{
-        general: notificationsBlocked && general
-          ? { ...general, appStatus: { appClosed: true, forceAppOpen: false } }
-          : general,
+        general,
         showClosedAppModal,
         setShowClosedAppModal,
         forceUpdateAcknowledged,
