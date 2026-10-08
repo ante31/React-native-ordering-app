@@ -4,6 +4,7 @@ import { scale } from "../services/scale";
 import { io } from "socket.io-client";
 import { backendUrl } from "@/localhostConf";
 import { safeFetch } from "../services/safeFetch";
+import { usePushNotifications } from "../services/usePushNotifications";
 
 type OrderStatus = 'pending' | 'accepted' | 'rejected' | 'auto-rejected' | 'completed';
 
@@ -17,8 +18,9 @@ function MorphLoader() {
 }
 
 export default function ThankYouScreen({ route, navigation }: any) {
-  const { isCroatianLang, orderId, orderDate, notificationResult, isPreOrder } = route.params;
+  const { isCroatianLang, orderId, orderDate, isPreOrder } = route.params;
   const styles = getStyles(scale);
+  const { notificationsBlocked } = usePushNotifications();
 
   const [status, setStatus] = useState<OrderStatus>('pending');
   // Preorder → odmah prikaži sliku, bez čekanja
@@ -131,7 +133,7 @@ export default function ThankYouScreen({ route, navigation }: any) {
           <Text style={styles.waitingTitle}>
             {isCroatianLang ? 'Čekamo potvrdu...' : 'Waiting for confirmation...'}
           </Text>
-          {!notificationResult && (
+          {notificationsBlocked && (
             <Text style={styles.notificationHint}>
               {isCroatianLang
                 ? 'SMS obavijesti više ne rade. Uključi obavijesti od aplikacije u postavkama kako bi primio/la potvrdu narudžbe.'
