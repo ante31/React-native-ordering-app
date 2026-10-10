@@ -27,7 +27,7 @@ type GeneralContextType = {
 };
 
 
-const socket = io(backendUrl, { transports: ['websocket'] });
+const socket = io(backendUrl, { transports: ['polling', 'websocket'], withCredentials: true });
 
 const GeneralContext = createContext<GeneralContextType | null>(null);
 

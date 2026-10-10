@@ -100,7 +100,7 @@ export function useOrderSubmit({
       deadline,
       status: "pending",
       language: isCroatianLang ? "hr" : "en",
-      zone: !isSlidRight ? orderData.zone : "",
+      zone: orderData.zone || "",
     };
 
     const response = await safeFetch(`${backendUrl}/orders`, {

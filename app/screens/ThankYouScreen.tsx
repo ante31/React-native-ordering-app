@@ -140,6 +140,17 @@ export default function ThankYouScreen({ route, navigation }: any) {
                 : 'SMS notifications are not working. Enable app notifications in settings to receive your order confirmation.'}
             </Text>
           )}
+          <View style={styles.trackingHint}>
+            <Text style={styles.trackingHintText}>
+              {isCroatianLang
+                ? 'Informacije o vašoj narudžbi se nalaze u '
+                : 'Your order information can be found in '}
+            </Text>
+            <Image
+              source={require('../../assets/images/previousOrdersIcon.png')}
+              style={styles.trackingIcon}
+            />
+          </View>
         </Animated.View>
       )}
 
@@ -211,6 +222,22 @@ const getStyles = (scale: any) => StyleSheet.create({
     textAlign: 'center',
     marginHorizontal: 30,
     lineHeight: 18,
+  },
+  trackingHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 30,
+  },
+  trackingHintText: {
+    fontFamily: 'Lexend_400Regular',
+    fontSize: scale.light(12),
+    color: '#aaa',
+  },
+  trackingIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
+    tintColor: '#aaa',
   },
   resultContainer: {
     position: 'absolute',
